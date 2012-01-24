@@ -26,6 +26,12 @@
 <p>First fetching LLVM,</p>
 <pre><code>    $ cd $GHCROOT
     $ git clone http://llvm.org/git/llvm.git
+    $ cd llvm
+</code></pre>
+<p>If you want a C/C++ compiler out of the deal as well, you can clone <code>clang</code> into <code>tools/</code>. Note that <code>clang</code> seems to be even worse than LLVM itself in terms of demand on the system. While my BeagleBoard XM (512MB RAM) made it through most of the build, it ultimately ran out of memory while linking the <code>clang</code> executable. If you need a C compiler, you should consider following the LLVM cross-compiling instructions also posted here unless you have a large amount of memory and lots of time.</p>
+<pre><code>    $ cd tools
+    $ git clone http://llvm.org/git/clang.git
+    $ cd ..
 </code></pre>
 <p>Additionally, GHC requires a patch adding its calling convention to LLVM. The patch will require a bit of minor forward porting,</p>
 <pre><code>    $ wget http://www.gardas.roznovan.cz/llvm/llvm-2011-07-12.patch
@@ -60,6 +66,26 @@
       Unsupported Tests  : 28
       Unexpected Failures: 12
 </code></pre>
+<h3 id="an-aside-libc">An aside: libc++</h3>
+<p>I’ve started using <code>clang</code> as my primary compiler on my ARM box due to its speed and very modest memory requirements while compiling highly templated C++. Unfortunately, it doesn’t seem particularly happy using GCC’s libstdc++. Thankfully, the LLVM project has also produced its own new C++ standard library implementation, <a href="http://libcxx.llvm.org/"><code>libc++</code></a>. Building the library is quite trivial,</p>
+<pre><code>    $ cd $GHCROOT
+    $ git clone http://llvm.org/git/libcxx.git
+    $ cd libcxx/lib
+    $ ./buildit
+</code></pre>
+<p>Installation is quite straightforward,</p>
+<pre><code>    $ sudo ln -sf $GHCROOT/libcxx/lib/libc++.so.1.0 /usr/lib/libc++.so.1.0
+    $ sudo ln -sf libc++.so.1.0 /usr/lib/libc++.so.1
+    $ sudo ln -sf libc++.so.1 /usr/lib/libc++.so
+    $ sudo ln -sf $GHCROOT/libcxx/include /usr/include/c++/v1
+</code></pre>
+<p>Of course, we need to test it before use,</p>
+<pre><code>    $ cd ../test
+    $ ./testit
+</code></pre>
+<p>To use <code>libc++</code> with <code>clang</code>, simply say the magic word,</p>
+<pre><code>    $ clang++ -stdlib=libc++ test.cpp
+</code></pre>
 <h2 id="ghc">GHC</h2>
 <p>First we’ll fetch a few of the <a href="http://hackage.haskell.org/trac/ghc/wiki/Building/Preparation/Linux">prerequisites</a> for building GHC,</p>
 <pre><code>    $ sudo apt-get install happy alex
@@ -77,7 +103,13 @@
 <pre><code>    $ cp mk/build.mk.sample build.mk
     $ edit build.mk
 </code></pre>
-<p>Now edit <code>mk/config.mk</code>, I chose the <code>quick</code> build flavor. We need to adjust the build method to account for the fact that the stage 0 compiler we will be using does not have a native code generator (since none was available in the 6.12 series). In lieu of the native code generator, we will tell GHC to compile the stage 1 compile into C, which will then be compiled to machine code by <code>gcc</code>. To accomplish this, modify the value of <code>GhcStage1HcOpts</code> from <code>-fasm</code> to <code>-fvia-C</code> and remove <code>-fasm</code> from <code>SRC_HC_OPTS</code>. Additionally, if you are planning on hacking on the tree, you may want to follow some of the recommendations at <a href="http://hackage.haskell.org/trac/ghc/wiki/Building/Using"><code class="url">http://hackage.haskell.org/trac/ghc/wiki/Building/Using</code></a> to speed up the build process. The build then proceeds as usual,</p>
+<p>Now edit <code>mk/config.mk</code>, I chose the <code>quick</code> build flavor. We need to adjust the build method to account for the fact that the stage 0 compiler we will be using does not have a native code generator (since none was available in the 6.12 series). In lieu of the native code generator, we will tell GHC to compile the stage 1 compile into C, which will then be compiled to machine code by <code>gcc</code>. To accomplish this, modify the following values,</p>
+<ul>
+<li><code>GhcStage1HcOpts</code> from <code>-fasm</code> to <code>-fvia-C</code></li>
+<li><code>GhcStage2HcOpts</code> from <code>-fasm</code> to <code>-fllvm</code></li>
+<li><code>SRC_HC_OPTS</code> remove <code>-fasm</code> (not quite sure what this should be but this works)</li>
+</ul>
+<p>Additionally, if you are planning on hacking on the tree, you may want to follow some of the recommendations at <a href="http://hackage.haskell.org/trac/ghc/wiki/Building/Using"><code class="url">http://hackage.haskell.org/trac/ghc/wiki/Building/Using</code></a> to speed up the build process. The build then proceeds as usual,</p>
 <pre><code>    $ ./configure --prefix=$GHCROOT/usr
     $ make
     $ sudo make install
