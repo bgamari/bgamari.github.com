@@ -36,7 +36,7 @@
 <p>Additionally, GHC requires a patch adding its calling convention to LLVM. The patch will require a bit of minor forward porting,</p>
 <pre><code>    $ wget http://www.gardas.roznovan.cz/llvm/llvm-2011-07-12.patch
     $ cd llvm
-    $ patch -p1 &lt; ../llvm-2011-07-12.patch
+    $ patch -p1 < ../llvm-2011-07-12.patch
 </code></pre>
 <p>Building is straightforward,</p>
 <pre><code>    $ ./configure --prefix=$GHCROOT/usr
@@ -90,6 +90,9 @@
 <p>First we’ll fetch a few of the <a href="http://hackage.haskell.org/trac/ghc/wiki/Building/Preparation/Linux">prerequisites</a> for building GHC,</p>
 <pre><code>    $ sudo apt-get install happy alex
 </code></pre>
+<p>Of course, we’ll also need our new LLVM build in <code>PATH</code>,</p>
+<pre><code>    $ PATH=$GHCROOT/root/bin:$PATH
+</code></pre>
 <p>Fetching GHC and beginning the bootstrap process,</p>
 <pre><code>    $ cd $GHCROOT
     $ git clone http://darcs.haskell.org/ghc.git
@@ -100,8 +103,8 @@
 <p>Note that due to (bug #5105)[http://hackage.haskell.org/trac/ghc/ticket/5105] we have disabled Data Parallel Haskell.</p>
 <p>Like many compilers, GHC’s build is a multi-stage process. First, a stage 1 compiler will be built using the stage 0 compiler already installed on the system (e.g. the <code>ghc6</code> debian package). After this, a stage 2 compiler will be built using this stage 1 compiler. The stage 2 compiler is the end result of the build.</p>
 <p>The build requires a small bit of configuration,</p>
-<pre><code>    $ cp mk/build.mk.sample build.mk
-    $ edit build.mk
+<pre><code>    $ cp mk/build.mk.sample mk/build.mk
+    $ edit mk/build.mk
 </code></pre>
 <p>Now edit <code>mk/config.mk</code>, I chose the <code>quick</code> build flavor. We need to adjust the build method to account for the fact that the stage 0 compiler we will be using does not have a native code generator (since none was available in the 6.12 series). In lieu of the native code generator, we will tell GHC to compile the stage 1 compile into C, which will then be compiled to machine code by <code>gcc</code>. To accomplish this, modify the following values,</p>
 <ul>
