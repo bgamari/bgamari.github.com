@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
-        <title>writing - adventures_in_devicetree_land</title>
+        <title>writing - Adventures in devicetree land</title>
         <link rel="stylesheet" type="text/css" href="../css/default.css"></link>
     </head>
     <body>
@@ -28,8 +28,7 @@
     echo &quot;Syncing...&quot;
     sync
     echo &quot;Done.&quot;
-    exit 0
-</code></pre>
+    exit 0</code></pre>
 <p>Beagleboard thinks it only has 16M of memory with both v3.0 and v2.6.39 kernels,</p>
 <pre><code>    [    0.000000] Linux version 2.6.39 (ben@ben-laptop) (gcc version 4.5.2 (Ubuntu/Linaro 4.5.2-8ubuntu3) ) #3 SMP Thu Aug 18 11:18:57 EDT 2011
     [    0.000000] CPU: ARMv7 Processor [413fc082] revision 2 (ARMv7), cr=10c53c7f
@@ -50,16 +49,14 @@
     [    0.000000]     modules : 0xbf000000 - 0xc0000000   (  16 MB)
     [    0.000000]       .init : 0xc0008000 - 0xc0053000   ( 300 kB)
     [    0.000000]       .text : 0xc0053000 - 0xc060ad50   (5856 kB)
-    [    0.000000]       .data : 0xc060c000 - 0xc068faa8   ( 527 kB)
-</code></pre>
+    [    0.000000]       .data : 0xc060c000 - 0xc068faa8   ( 527 kB)</code></pre>
 <p>Resulting in OOM pretty early in boot.<br />Yet bootloader realizes correct amount,</p>
 <pre><code>    OMAP3630/3730-GP ES2.0, CPU-OPP2, L3-165MHz, Max CPU Clock 1 Ghz
     OMAP3 Beagle board + LPDDR/NAND
     I2C:   ready
     DRAM:  512 MiB
     NAND:  0 MiB
-    MMC:   OMAP SD/MMC: 0
-</code></pre>
+    MMC:   OMAP SD/MMC: 0</code></pre>
 <p>Passing <code>mem=512M</code> to kernel doesn’t help.</p>
 <p>Perhaps problem is in devicetree. Downloaded <code>dtc</code> from <code>git://git.jdl.com/software/dtc.git</code> since version in kernel tree (scripts/dtc) doesn’t build. Decoded devicetree,</p>
 <pre><code>   [1125 ben@ben-laptop dtc(master)] $ ./dtc -I dtb -O dts /media/boot/board.dtb 
@@ -82,8 +79,7 @@
                     device_type = &quot;memory&quot;;
                     reg = &lt;0x0 0x0&gt;;
             };
-    };
-</code></pre>
+    };</code></pre>
 <p>Hmm, not sure what this means. Where is actual devicetree source for the beagleboard? Googling turns up many recent mentions <a href="https://patchwork.kernel.org/patch/932472/"><code class="url">https://patchwork.kernel.org/patch/932472/</code></a> of arch/arm/boot/dts in kernel tree, but this does not exist in v2.6.39 nor v3.0. It seems like the devicetree branch of a <a href="http://git.secretlab.ca/?p=linux-2.6.git;a=tree;f=arch/arm/boot/dts;h=714ec4bce2c5ff54a0873a67977758c1efd91a97;hb=refs/heads/devicetree/arm">random repository</a> has this directory with an omap3-beagle.dts. It includes <code>skeleton.dtsi</code> which claims that the bootloader will populate the memory node,</p>
 <pre><code>    /*
      * Skeleton device tree; the bare minimum needed to boot; just include and
@@ -97,8 +93,7 @@
             chosen { };
             aliases { };
             memory { device_type = &quot;memory&quot;; reg = &lt;0 0&gt;; };
-    };
-</code></pre>
+    };</code></pre>
 <p>Perhaps I built a kernel without devicetree support. Judging by the Linaro devicetree HOWTO(https://wiki.linaro.org/Resources/HowTo/KernelDeviceTree) v2.6.39 doesn’t support devicetrees (<code>CONFIG_USE_OF</code> doesn’t exist). Checkout v3.0. Ahh, I saved my original v3.0 .config and indeed CONFIG_USE_OF isn’t set. Damn. I wonder how the bootloader passed the memory amount to the kernel prior to devicetrees. Apparently this mechanism doesn’t work if the bootloader is configured to use devicetrees.</p>
 <p>After enabling <code>CONFIG_USE_OF</code> the machine hangs after “Uncompressing Linux… done, booting the kernel.” Bah.</p>
 <p>Ahhh, after chatting with landley in Freenode’s <code>#edev</code> I realized that <code>CONFIG_EARLY_PRINTK</code> isn’t enabled. It’s hidden behind <code>CONFIG_LL_DEBUG</code> in the Kernel Hacking category.</p>
@@ -143,8 +138,7 @@
     00000aa2	OMAP3 STALKER
     00000af0	ti8168evm
 
-    Please check your kernel config and/or bootloader.
-</code></pre>
+    Please check your kernel config and/or bootloader.</code></pre>
 <p>Hmm, now what does that mean?</p>
 <p>It seems that the <code>machine_desc</code> (defined in the board file) should provide a <code>dt_compat</code> list which defines the devicetree compatibility tags which that board file can boot. This isn’t defined in v3.0’s <code>board-omap3beagle.c</code>. Looking at the Linaro tree it appears these were added in 9d51c816. Cherry-picked.</p>
 <p>It Works!</p>
