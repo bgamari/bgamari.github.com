@@ -27,7 +27,8 @@
       </div>
 
       <section id="main">
-      <p>For others set with the unfortunately task of converting an Endnote database to Bibtex: fear not the command line.</p>
+      <h1 id="endnote-to-bibtex-without-pain">Endnote to Bibtex without pain</h1>
+<p>For others set with the unfortunate task of converting an Endnote database to Bibtex: fear not the command line.</p>
 <p>After several hours of fiddling around with Endnote’s own conversion facility, <a href="http://www.zotero.org/">Zotero</a>, <a href="http://www.citeulike.org/">Cite-U-Like</a>, <a href="http://launchpad.net/referencer/">Referencer</a>, and even writing my own poorly performing utility, I finally stumbled upon the one true solution: <a href="http://bibutils.refbase.org/"><code>bibutils</code></a>. This wonderful little package made this otherwise quite frustrating task as trivial as one can expect,</p>
 <pre><code>$ sudo apt-get install bibutils
 $ endx2xml refs.xml &gt; refs-mods.xml
