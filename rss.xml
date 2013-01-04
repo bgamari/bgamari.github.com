@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>bgamari.github.com</title>
+        <link>http://bgamari.github.com/</link>
+        <description><![CDATA[Various ramblings, generally of a technical nature]]></description>
+        <atom:link href="http://bgamari.github.com//rss.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Tue, 10 Jul 2012 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>Endnote to Bibtex without pain</title>
+    <link>http://bgamari.github.com//posts/2012-07-10-endnote-to-bibtex.html</link>
+    <description><![CDATA[$description$]]></description>
+    <pubDate>Tue, 10 Jul 2012 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2012-07-10-endnote-to-bibtex.html</guid>
+</item>
+<item>
+    <title>2012-07-16-beginnings-of-the-blotbot</title>
+    <link>http://bgamari.github.com//posts/2012-07-16-beginnings-of-the-blotbot.html</link>
+    <description><![CDATA[$description$]]></description>
+    <pubDate>Mon, 16 Jul 2012 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2012-07-16-beginnings-of-the-blotbot.html</guid>
+</item>
+<item>
+    <title>Running mesa from git on Ubuntu</title>
+    <link>http://bgamari.github.com//posts/2012-08-30-testing-mesa.html</link>
+    <description><![CDATA[$description$]]></description>
+    <pubDate>Thu, 30 Aug 2012 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2012-08-30-testing-mesa.html</guid>
+</item>
+<item>
+    <title>GHC on ARM update</title>
+    <link>http://bgamari.github.com//posts/2013-01-04-ghc-arm-update.html</link>
+    <description><![CDATA[$description$]]></description>
+    <pubDate>Fri, 04 Jan 2013 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2013-01-04-ghc-arm-update.html</guid>
+</item>
+<item>
+    <title>Adventures in devicetree land</title>
+    <link>http://bgamari.github.com//posts/adventures_in_devicetree_land.html</link>
+    <description><![CDATA[One experience debugging the transition to a devicetree-enable kernel on the BeagleBoard]]></description>
+    <pubDate>Sun, 16 Oct 2011 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/adventures_in_devicetree_land.html</guid>
+</item>
+<item>
+    <title>Installing Amber 11 and AmberTools 1.5 on Ubuntu 11.04</title>
+    <link>http://bgamari.github.com//posts/amber.html</link>
+    <description><![CDATA[My experience installing the Amber 11 Molecular Dynamics package on Ubuntu 11.04.]]></description>
+    <pubDate>Sun, 16 Oct 2011 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/amber.html</guid>
+</item>
+<item>
+    <title>Building BeagleDAQ and Tracker environment</title>
+    <link>http://bgamari.github.com//posts/beagledaq.html</link>
+    <description><![CDATA[$description$]]></description>
+    <pubDate>Sun, 16 Oct 2011 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/beagledaq.html</guid>
+</item>
+<item>
+    <title>Cross-compiling LLVM for ARM on Ubuntu</title>
+    <link>http://bgamari.github.com//posts/cross-compiling_llvm.html</link>
+    <description><![CDATA[$description$]]></description>
+    <pubDate>Mon, 17 Oct 2011 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/cross-compiling_llvm.html</guid>
+</item>
+<item>
+    <title>Getting started with mchck</title>
+    <link>http://bgamari.github.com//posts/getting-started-with-mchck.html</link>
+    <description><![CDATA[Initial steps with the mchck microcontroller design]]></description>
+    <pubDate>Mon, 25 Jun 2012 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/getting-started-with-mchck.html</guid>
+</item>
+<item>
+    <title>Installing LLVM and GHC on ARM</title>
+    <link>http://bgamari.github.com//posts/ghc-llvm-arm.html</link>
+    <description><![CDATA[A tutorial for building LLVM and the Glasgow Haskell compiler on a ARM box]]></description>
+    <pubDate>Fri, 27 Jan 2012 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/ghc-llvm-arm.html</guid>
+</item>
+<item>
+    <title>Installing OpenMM and GROMACS with AMBER force-field</title>
+    <link>http://bgamari.github.com//posts/gromacs.html</link>
+    <description><![CDATA[Installing the GROMACS molecular dynamics package with GPU acceleration and the AMBER force-field.]]></description>
+    <pubDate>Sun, 16 Oct 2011 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/gromacs.html</guid>
+</item>
+<item>
+    <title>JTAG debugging with a Bus Pirate, OpenOCD, and LPC1768</title>
+    <link>http://bgamari.github.com//posts/jtag_over_buspirate.html</link>
+    <description><![CDATA[Debugging an LPC1768 target over JTAG with a Bus Pirate and OpenOCD]]></description>
+    <pubDate>Wed, 28 Mar 2012 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/jtag_over_buspirate.html</guid>
+</item>
+<item>
+    <title>Self-built kernels on Linaro</title>
+    <link>http://bgamari.github.com//posts/linaro-kernel.html</link>
+    <description><![CDATA[Building custom kernels for Linaro]]></description>
+    <pubDate>Thu, 01 Mar 2012 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/linaro-kernel.html</guid>
+</item>
+<item>
+    <title>Toner transfer PCB etching in a (bio)physics laboratory</title>
+    <link>http://bgamari.github.com//posts/pcb-etching.html</link>
+    <description><![CDATA[$description$]]></description>
+    <pubDate>Fri, 20 Jan 2012 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/pcb-etching.html</guid>
+</item>
+
+    </channel> 
+</rss>
