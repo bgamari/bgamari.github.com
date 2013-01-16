@@ -24,7 +24,7 @@
 <item>
     <title>Building BeagleDAQ and Tracker environment</title>
     <link>http://bgamari.github.com//posts/2011-10-16-beagledaq.html</link>
-    <description><![CDATA[$description$]]></description>
+    <description><![CDATA[Compiling the software environment for the BeagleDAQ and particle tracker]]></description>
     <pubDate>Sun, 16 Oct 2011 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2011-10-16-beagledaq.html</guid>
 </item>
@@ -38,14 +38,14 @@
 <item>
     <title>Cross-compiling LLVM for ARM on Ubuntu</title>
     <link>http://bgamari.github.com//posts/2011-10-17-crosscompiling_llvm.html</link>
-    <description><![CDATA[$description$]]></description>
+    <description><![CDATA[A short guide on building the LLVM compiler framework to run on an ARM target]]></description>
     <pubDate>Mon, 17 Oct 2011 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2011-10-17-crosscompiling_llvm.html</guid>
 </item>
 <item>
     <title>Toner transfer PCB etching in a (bio)physics laboratory</title>
     <link>http://bgamari.github.com//posts/2012-01-20-pcb-etching.html</link>
-    <description><![CDATA[$description$]]></description>
+    <description><![CDATA[My methodology for PCB etching via toner transfer]]></description>
     <pubDate>Fri, 20 Jan 2012 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2012-01-20-pcb-etching.html</guid>
 </item>
@@ -80,28 +80,21 @@
 <item>
     <title>Endnote to Bibtex without pain</title>
     <link>http://bgamari.github.com//posts/2012-07-10-endnote-to-bibtex.html</link>
-    <description><![CDATA[$description$]]></description>
+    <description><![CDATA[In which an Endnote bibliography is converted to BibTeX]]></description>
     <pubDate>Tue, 10 Jul 2012 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2012-07-10-endnote-to-bibtex.html</guid>
 </item>
 <item>
-    <title>2012-07-16-beginnings-of-the-blotbot</title>
-    <link>http://bgamari.github.com//posts/2012-07-16-beginnings-of-the-blotbot.html</link>
-    <description><![CDATA[$description$]]></description>
-    <pubDate>Mon, 16 Jul 2012 00:00:00 UT</pubDate>
-    <guid>http://bgamari.github.com//posts/2012-07-16-beginnings-of-the-blotbot.html</guid>
-</item>
-<item>
     <title>Running mesa from git on Ubuntu</title>
     <link>http://bgamari.github.com//posts/2012-08-30-testing-mesa.html</link>
-    <description><![CDATA[$description$]]></description>
+    <description><![CDATA[Testing mesa from git on Ubuntu]]></description>
     <pubDate>Thu, 30 Aug 2012 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2012-08-30-testing-mesa.html</guid>
 </item>
 <item>
     <title>GHC on ARM update</title>
     <link>http://bgamari.github.com//posts/2013-01-04-ghc-arm-update.html</link>
-    <description><![CDATA[$description$]]></description>
+    <description><![CDATA[Status upon on my work in making the Glasgow Haskell Compiler run on the ARM architecture]]></description>
     <pubDate>Fri, 04 Jan 2013 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2013-01-04-ghc-arm-update.html</guid>
 </item>
