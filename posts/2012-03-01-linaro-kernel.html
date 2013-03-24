@@ -2,9 +2,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>bgamari.github.com - Self-built kernels on Linaro</title>
-    <link rel="stylesheet" type="text/css" href="../css/default.css"></link>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
   </head>
   <body>
     <div id="content">
@@ -37,10 +37,10 @@
  OMAP SD/MMC: 0
  reading u-boot.img
  reading u-boot.img
-
-
+ 
+ 
  U-Boot 2011.12-rc1 (Dec 19 2011 - 11:02:24)
-
+ 
  CPU  : OMAP4460 ES1.1
  Board: OMAP4 Panda
  I2C:   ready
@@ -48,29 +48,29 @@
  WARNING: Caches not enabled
  MMC:   OMAP SD/MMC: 0
  Using default environment
-
+ 
  In:    serial
  Out:   serial
  Err:   serial
  Net:   No ethernet found.
  Hit any key to stop autoboot:  0 
  reading uEnv.txt
-
+ 
  ** Unable to read &quot;uEnv.txt&quot; from mmc 0:1 **
  reading boot.scr
-
+ 
  514 bytes read
  Loaded script from boot.scr
  Running bootscript from mmc0 ...
  ## Executing script at 82000000
  reading uImage
-
+ 
  3409656 bytes read
  reading uInitrd
-
+ 
  1878123 bytes read
  reading board.dtb
-
+ 
  340 bytes read
  ## Booting kernel from Legacy Image at 80200000 ...
  Image Name:   Linux-3.3.0-rc5-00102-g6b3e075
@@ -92,21 +92,22 @@
  OK
  reserving fdt memory region: addr=9d000000 size=3000000
  Using Device Tree in place at 815f0000, end 815f3153
-
+ 
  Starting kernel ...
-
- Uncompressing Linux... done, booting the kernel.</code></pre>
+ 
+ Uncompressing Linux... done, booting the kernel.
+ </code></pre>
 <p>Alright, well, let’s try enabling <code>DEBUG_LL</code> and earlyprintk.</p>
 <p>At least now we have an error,</p>
 <pre><code> Starting kernel ...
-
+ 
  Uncompressing Linux... done, booting the kernel.
-
+ 
  Error: unrecognized/unsupported device tree compatible list:
  [ 'ti,omap4-panda' 'ti,omap4430' ]
-
+ 
  Available machine support:
-
+ 
  ID (hex)	NAME
  ffffffff	Generic OMAP4 (Flattened Device Tree)
  ffffffff	Generic OMAP3 (Flattened Device Tree)
@@ -114,7 +115,7 @@
  00000ae7	OMAP4 Panda board
  00000bbc	ti8148evm
  00000af0	ti8168evm
-
+ 
  Please check your kernel config and/or bootloader.</code></pre>
 <p>Ahh, so the devicetree file Linaro installed must not be compatible with this kernel. It seems that the kernel comes with some devicetrees. Let’s use one.</p>
 <pre><code> $ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- omap4-panda.dtb</code></pre>
@@ -123,7 +124,7 @@
  [    1.710784] Freeing init memory: 240K
  Loading, please wait...
  modprobe: FATAL: Could not load /lib/modules/3.3.0-rc5-00103-g613a465/modules.dep: No such file or directory
-
+ 
  mount: mounting udev on /dev failed: No such device
  W: devtmpfs not available, falling back to tmpfs for /dev
  Begin: Loading essential drivers ... FATAL: Could not load /lib/modules/3.3.0-rc5-00103-g613a465/modules.dep: No such file or directory

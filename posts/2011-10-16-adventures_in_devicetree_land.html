@@ -2,9 +2,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>bgamari.github.com - Adventures in devicetree land</title>
-    <link rel="stylesheet" type="text/css" href="../css/default.css"></link>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
   </head>
   <body>
     <div id="content">
@@ -96,31 +96,32 @@
                     reg = &lt;0x0 0x0&gt;;
             };
     };</code></pre>
-<p>Hmm, not sure what this means. Where is actual devicetree source for the beagleboard? Googling turns up many recent mentions <a href="https://patchwork.kernel.org/patch/932472/"><code class="url">https://patchwork.kernel.org/patch/932472/</code></a> of arch/arm/boot/dts in kernel tree, but this does not exist in v2.6.39 nor v3.0. It seems like the devicetree branch of a <a href="http://git.secretlab.ca/?p=linux-2.6.git;a=tree;f=arch/arm/boot/dts;h=714ec4bce2c5ff54a0873a67977758c1efd91a97;hb=refs/heads/devicetree/arm">random repository</a> has this directory with an omap3-beagle.dts. It includes <code>skeleton.dtsi</code> which claims that the bootloader will populate the memory node,</p>
+<p>Hmm, not sure what this means. Where is actual devicetree source for the beagleboard? Googling turns up many recent mentions <a href="https://patchwork.kernel.org/patch/932472/">https://patchwork.kernel.org/patch/932472/</a> of arch/arm/boot/dts in kernel tree, but this does not exist in v2.6.39 nor v3.0. It seems like the devicetree branch of a <a href="http://git.secretlab.ca/?p=linux-2.6.git;a=tree;f=arch/arm/boot/dts;h=714ec4bce2c5ff54a0873a67977758c1efd91a97;hb=refs/heads/devicetree/arm">random repository</a> has this directory with an omap3-beagle.dts. It includes <code>skeleton.dtsi</code> which claims that the bootloader will populate the memory node,</p>
 <pre><code>    /*
      * Skeleton device tree; the bare minimum needed to boot; just include and
      * add a compatible value.  The bootloader will typically populate the memory
      * node.
      */
-
+    
     / {
             #address-cells = &lt;1&gt;;
             #size-cells = &lt;1&gt;;
             chosen { };
             aliases { };
             memory { device_type = &quot;memory&quot;; reg = &lt;0 0&gt;; };
-    };</code></pre>
+    };
+    </code></pre>
 <p>Perhaps I built a kernel without devicetree support. Judging by the Linaro devicetree HOWTO(https://wiki.linaro.org/Resources/HowTo/KernelDeviceTree) v2.6.39 doesn’t support devicetrees (<code>CONFIG_USE_OF</code> doesn’t exist). Checkout v3.0. Ahh, I saved my original v3.0 .config and indeed CONFIG_USE_OF isn’t set. Damn. I wonder how the bootloader passed the memory amount to the kernel prior to devicetrees. Apparently this mechanism doesn’t work if the bootloader is configured to use devicetrees.</p>
 <p>After enabling <code>CONFIG_USE_OF</code> the machine hangs after “Uncompressing Linux… done, booting the kernel.” Bah.</p>
 <p>Ahhh, after chatting with landley in Freenode’s <code>#edev</code> I realized that <code>CONFIG_EARLY_PRINTK</code> isn’t enabled. It’s hidden behind <code>CONFIG_LL_DEBUG</code> in the Kernel Hacking category.</p>
 <p>Bingo! I have an error message,</p>
 <pre><code>    Uncompressing Linux... done, booting the kernel.
-
+    
     Error: unrecognized/unsupported device tree compatible list:
     [ 'ti,omap3-beagle' ]
-
+    
     Available machine support:
-
+    
     ID (hex)	NAME
     000001c4	Generic OMAP24xx
     000001fe	OMAP2420 H4 board
@@ -153,7 +154,7 @@
     00000898	OMAP3517/AM3517 EVM
     00000aa2	OMAP3 STALKER
     00000af0	ti8168evm
-
+    
     Please check your kernel config and/or bootloader.</code></pre>
 <p>Hmm, now what does that mean?</p>
 <p>It seems that the <code>machine_desc</code> (defined in the board file) should provide a <code>dt_compat</code> list which defines the devicetree compatibility tags which that board file can boot. This isn’t defined in v3.0’s <code>board-omap3beagle.c</code>. Looking at the Linaro tree it appears these were added in 9d51c816. Cherry-picked.</p>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>bgamari.github.com - A brief introduction to embedded development</title>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
+  </head>
+  <body>
+    <div id="content">
+      <div id="sidebar">
+        <nav>
+          <h1>Navigation</h1>
+          <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../posts.html">Blog-like thing</a></li>
+            <li><a href="../research-agenda.html">Research agenda</a></li>
+            <li><a href="../publications.html">Publications</a></li>
+            <li><a href="../past-research.html">Past research</a></li>
+            <li><a href="../media/cv.pdf">Curriculum Vitae</a></li>
+          </ul>
+          <h1>Related Links</h1>
+          <ul>
+            <li><a href="http://goldnerlab.physics.umass.edu/wiki/">Research group</a></li>
+            <li><a href="http://www.github.com/bgamari">Github</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <section id="main">
+      <h1 id="a-brief-introduction-to-embedded-development">A brief introduction to embedded development</h1>
+<h2 id="prelude">Prelude</h2>
+<p>This was the product of an email conversation to a friend. Embedded development can be tough to sink one’s teeth into; I wrote this an an attempt introduce him to the various considerations regarding tool-choice, design, and implementation on an embedded platform.</p>
+<p>Be aware that my experience is only as a hobbyist.</p>
+<h2 id="the-text">The text</h2>
+<blockquote>
+<p>Is this generally a good idea, or should I just use one of the gcc-arm-linux-gnueabi binary packages?</p>
+</blockquote>
+<p>I generally use the <a href="https://launchpad.net/gcc-arm-embedded">gcc-arm-embedded toolchain</a> which I’ve been very pleased with. Before this was available I used <a href="https://github.com/esden/summon-arm-toolchain">summon-arm-toolchain</a>, which is also quite easy to get running. That being said, it’s a useful exercise to build your own toolchain at least once.</p>
+<blockquote>
+<p>I don’t yet have the Bus Blaster or an ARM board to work with. Are there any next step tutorials that you think might be helpful now?</p>
+<p>Not that I know of. Thankfully (or not), embedded development is pretty much like any other low-level development (just less forgiving).</p>
+</blockquote>
+<p>At this point you need to make a few decisions. This includes what sort of library will you build upon. Having a good library is extremely helpful and will make development much less painful. There are several options here,</p>
+<ol style="list-style-type: decimal">
+<li><p><a href="http://www.arm.com/products/processors/cortex-m/cortex-microcontroller-software-interface-standard.php">CMSIS</a>. This is the ARM library which is provided with your chip. This will include headers with register definitions for the ARM core, as well as your device’s perhiperals. In my opinion, working with the CMSIS directly is terrible. It’s like programming a computer with a dull magnetized needle and dirty magnifying glass. Just don’t do it.</p></li>
+<li><p>A low-level library such as <a href="http://www.libopencm3.org/wiki/Main_Page">libopencm3</a> or <a href="https://github.com/zyp/laks">laks</a>. With this option you will have a slightly more sane interface to the hardware than provided by CMSIS but will still be on bare metal. I’ve most often found myself in this situation.</p></li>
+<li><p>A high-level library like <a href="https://github.com/leaflabs/libmaple">libmaple</a>, <a href="https://github.com/mbedmicro/mbed">mbed</a>, or <a href="https://code.google.com/p/libmanyuc/">libmanyuc</a>. These libraries provide some sort of hardware abstraction layer to make it slightly easier to port between devices. Whether this is desirable really depends upon your situation.</p></li>
+<li><p>A full RTOS such as <a href="http://www.chibios.org/dokuwiki/doku.php">ChiBIOS</a> or <a href="http://www.freertos.org/">FreeRTOS</a>. Here you’ll have a small operating system at your disposal. This will give you concurrency, synchronization primitives, and some a basic IO system, among other things. This means, however, that you will need to deal with a lot more complexity. Debugging low-level issues can become painful. In my uninformed opinion, it’s rarely worth the effort of working in this region of the design space. If there are really enough things to be done to warrant a full operating system, you should be using a full operating system (while off-loading only the real-time tasks to an MCU).</p></li>
+</ol>
+<p>I should stress that even with the support offered by any of the above, you will still need to be familiar with your hardware. Even if your library allows you to avoid poking at registers, you still need to know how to poke around when something goes wrong.</p>
+<p>Have a look at the technical reference manual for your device. Get to know it very well; you will be staring at it a lot. Begin by looking at basic details like the layout of the memory map, the basic interrupt assignments, and the structure of the clock tree. As the need arises, read the peripheral chapters carefully. Take note of details gotchas like what region of memory the device has access to (in the case of a DMA controller), what order functional blocks need to be initialized in, and how the peripheral behaves on an error. These may seem like details, but in my experience it is very easy to kill entire days looking for bugs arising from oversights of this type.</p>
+<p>I’ve often found that one of the hardest parts of bringing up a platform is bringing up a working build system. Things such as the <a href="http://sourceware.org/binutils/docs/ld/Scripts.html">linker script</a> can be a real pain to write. Thankfully, most libraries will come with a reasonably good starting point for your platform if you are on popular hardware. Even the process of uploading the firmware to your board can be tricky. Many MCUs have built-in bootloaders supporting SPI or UART interfaces. I generally find <a href="http://openocd.sourceforge.net/doc/html/Flash-Programming.html#Flash-Programming">JTAG</a> to be easiest, however.</p>
+<p>Another consideration is what language to use. Barring the more exotic options (for instance <a href="http://armpit.sourceforge.net/">Scheme</a> or <a href="http://hackage.haskell.org/package/copilot">Haskell</a> <a href="http://hackage.haskell.org/package/atom">libraries</a>, neither of which I’d recommend as a serious option at this point; alas, some day…), you pretty have much two options: C or C++. Which you use is largely a matter of taste. If you decide to use C, avail yourself of the features of <a href="http://en.wikipedia.org/wiki/C99">C99</a> [^ Highlights include standard inline functions, intermindled variable declarations and code, and the restrict keyword] (or even <a href="http://en.wikipedia.org/wiki/C11_(C_standard_revision)">C11</a> [^the most significant contribution of which is static assertions, I believe]). Recent work on the C standard introduces several features which make life easier.</p>
+<p>If you decide to use C++, you need to be aware of what features you can safely use. For reasons too technical to cover here, exceptions are generally out of the question. Templates are fine, but you want to be careful when using the STL as it’s very easy to allocate memory unknowingly (more on this later). Like C, you should avail yourself of the extensions of the latest language version, <a href="http://en.wikipedia.org/wiki/C++11">C++11</a>. Lambda functions are much less verbose than functors and more type-safe than function points. Range-based for makes iterators much less verbose, making it less painful to abstract your data structures. std::tuple is quite nice when you need to return a one-off product type. constexprs make it possible to do some really <a href="https://github.com/bgamari/Smoothie/blob/20c3039cd8408fdb96fb8ab5fbf65fc16b2ab2f2/src/libs/checksumm.h#L41">neat things</a> at compile-time.</p>
+<p>In general, unnecessary dynamic memory allocations should be avoided on an embedded platform. The reasons are two-fold:</p>
+<ol style="list-style-type: decimal">
+<li><p>You don’t have much memory and you need to be able to handle the cases when you run out. Even if technically your memory demands sum to less than the capacity of your device, heap fragmentation will sometimes nevertheless lead to allocation failures. Frequently allocating and freeing memory will only exacerbate this.</p></li>
+<li><p>It’s not always easy to ensure that functions which allocate aren’t called from an interrupt handler. Allocations done in an interrupt context is a Very Bad Thing: the heap allocator maintains state; manipulating that state in an interrupt context opens the door for race conditions which will eventually lead to crashes at best and silent corruption at worst.</p></li>
+</ol>
+<p>As always, use version control religiously. Make changes in as piece-wise a manner as possible. While you have a debugger, it won’t always help you; having small, easily verified commits is extremely important. Once you have an appreciable amount of code it becomes extremely difficult to track down certain classes of bugs. On an embedded device you are running on bare metal; there are no guards, no memory protection, there is <a href="http://en.wikipedia.org/wiki/Direct_memory_access">action at a distance</a> happening all the time. Every once in a while the only feasible debugging strategy is either staring down the bug or <a href="http://git-scm.com/book/en/Git-Tools-Debugging-with-Git">bisecting</a>.</p>
+<p>Anyways, that’s all for now.</p>
+      </section>
+    </div>
+
+    <footer id="footer">
+      <span>Generated by <a href="http://jaspervdj.be/hakyll/index.html">Hakyll</a>.</span>
+    </footer>
+  </body>
+</html>
+

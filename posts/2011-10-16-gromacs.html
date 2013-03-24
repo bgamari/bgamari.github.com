@@ -2,9 +2,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>bgamari.github.com - Installing OpenMM and GROMACS with AMBER force-field</title>
-    <link rel="stylesheet" type="text/css" href="../css/default.css"></link>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
   </head>
   <body>
     <div id="content">
@@ -56,7 +56,8 @@
 <pre><code>    $ sudo apt-get install gcc-4.4 g++-4.4
     $ sudo mkdir /usr/local/bin/gcc4.4
     $ sudo ln -s /usr/bin/gcc-4.4 /usr/local/bin/gcc4.4/gcc
-    $ sudo ln -s /usr/bin/g++-4.4 /usr/local/bin/gcc4.4/g++</code></pre>
+    $ sudo ln -s /usr/bin/g++-4.4 /usr/local/bin/gcc4.4/g++
+    </code></pre>
 <p>As seen <a href="http://www.alsvartr.de/?p=848">here</a>, the <code>cmake</code> build system allows you to pass arbitrary options to <code>nvcc</code>; We take advantage of this when building the CUDA binaries to specify our host compiler version. Also, when <code>cmake</code> chooses its <code>CMAKE_{C,CXX}_FLAGS</code> it is using gcc 4.5. Unfortunately, gcc 4.4 doesn’t recognize all of the options that 4.5 does, so we disable propagation of host flags to nvcc’s host compiler,</p>
 <pre><code>    $ export OPENMM_ROOT_DIR=~/gromacs/OpenMM3.1.1-Linux64
     $ cmake -DGMX_OPENMM=ON -DCUDA_NVCC_FLAGS=&quot;--compiler-bindir;/usr/local/bin/gcc4.4&quot; -DCUDA_PROPAGATE_HOST_FLAGS=OFF
@@ -64,7 +65,8 @@
     $ make install-mdrun</code></pre>
 <h2 id="finish">Finish</h2>
 <p>Add installation path to <code>PATH</code>,</p>
-<pre><code>    $ export PATH=$PATH:/usr/local/gromacs/bin</code></pre>
+<pre><code>    $ export PATH=$PATH:/usr/local/gromacs/bin
+    </code></pre>
 <p>Prepare a <a href="http://www.csc.fi/english/research/sciences/chemistry/gmx-files/simple_gromacs_run/">simple test</a>,</p>
 <pre><code>    $ mkdir hi
     $ wget http://www.csc.fi/english/research/sciences/chemistry/gmx-files/sample-input.tar
