@@ -105,6 +105,13 @@
     <pubDate>Sat, 23 Mar 2013 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2013-03-23-intro-to-edev.html</guid>
 </item>
+<item>
+    <title>Getting started with HackRF Jawbreaker</title>
+    <link>http://bgamari.github.com//posts/2013-06-15-hackrf.html</link>
+    <description><![CDATA[A tutorial for bringing up the HackRF Jawbreaker]]></description>
+    <pubDate>Sat, 15 Jun 2013 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2013-06-15-hackrf.html</guid>
+</item>
 
     </channel> 
 </rss>
