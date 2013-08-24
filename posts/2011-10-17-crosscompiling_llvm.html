@@ -42,7 +42,7 @@
 <p>At the time of writing, there was an <a href="http://comments.gmane.org/gmane.comp.compilers.clang.devel/11458">issue</a> with the LLVM build system which precludes running <code>configure</code> from the root of the source tree. For this reason, we build within a build directory,</p>
 <pre><code>    $ mkdir build
     $ cd build
-    $ ../configure --prefix=/mnt/data/ghc/usr --host=arm-linux-gnueabi</code></pre>
+    $ ../configure --prefix=/mnt/data/ghc/usr --host=arm-linux-gnueabi --target=arm-linux-gnueabi</code></pre>
 <p>Building,</p>
 <pre><code>    $ make</code></pre>
 <p>And now we wait; go for a walk, water your cat, do some laundry, get several cups of coffee; whatever it is you’d spend an afternoon doing. Sadly even on a 2.2GHz Core 2, LLVM still takes several hours to build.</p>

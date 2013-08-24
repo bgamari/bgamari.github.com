@@ -112,6 +112,20 @@
     <pubDate>Sat, 15 Jun 2013 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2013-06-15-hackrf.html</guid>
 </item>
+<item>
+    <title>Notes concerning LPC43xx and OpenOCD</title>
+    <link>http://bgamari.github.com//posts/2013-06-27-lpc43xx-and-openocd.html</link>
+    <description><![CDATA[Some of my notes taken while bringing up the LPC4330 with OpenOCD]]></description>
+    <pubDate>Thu, 27 Jun 2013 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2013-06-27-lpc43xx-and-openocd.html</guid>
+</item>
+<item>
+    <title>Flashing the BusBlaster's CPLD buffer with OpenOCD</title>
+    <link>http://bgamari.github.com//posts/2013-07-24-flashing-busblaster-cpld-with-openocd.html</link>
+    <description><![CDATA[Flashing the BusBlaster JTAG adapter's CPLD buffer with OpenOCD]]></description>
+    <pubDate>Wed, 24 Jul 2013 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2013-07-24-flashing-busblaster-cpld-with-openocd.html</guid>
+</item>
 
     </channel> 
 </rss>
