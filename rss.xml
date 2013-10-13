@@ -126,6 +126,13 @@
     <pubDate>Wed, 24 Jul 2013 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2013-07-24-flashing-busblaster-cpld-with-openocd.html</guid>
 </item>
+<item>
+    <title>Debugging stream fusion performance</title>
+    <link>http://bgamari.github.com//posts/2013-10-13-debugging-stream-fusion.html</link>
+    <description><![CDATA[Some tips for debugging performance of Haskell programs using stream fusion]]></description>
+    <pubDate>Sun, 13 Oct 2013 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2013-10-13-debugging-stream-fusion.html</guid>
+</item>
 
     </channel> 
 </rss>
