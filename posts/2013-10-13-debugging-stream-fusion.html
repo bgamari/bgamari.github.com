@@ -28,7 +28,7 @@
       </div>
 
       <section id="main">
-      <p>Stream fusion frameworks such as those in [<code>vector</code>][] and [<code>text</code>][] allow one to acheive impressive performance in Haskell code without compromising abstraction. That being said, debugging practices for working out when things are not fast aren’t terribly well documented. Using the profiler in these cases is generally not an option as this will disable the very optimizations that allow stream fusion produce fast code. Instead, one must take a slightly more low-level approach. In my experience, a few simple things should be checked,</p>
+      <p>Stream fusion frameworks such as those in <code>[vector]</code> and <code>[text]</code> allow one to acheive impressive performance in Haskell code without compromising abstraction. That being said, debugging practices for working out when things are not fast aren’t terribly well documented. Using the profiler in these cases is generally not an option as this will disable the very optimizations that allow stream fusion produce fast code. Instead, one must take a slightly more low-level approach. In my experience, a few simple things should be checked,</p>
 <ul>
 <li><p>Can the compiler see all of the code? In order for the compiler to optimize the stream combinators into a single loop, it must be able to see all of the code. To ensure this, all global bindings should be marked with an <code>INLINE</code> or <code>INLINEABLE</code> pragma.</p></li>
 <li><p>Is the compiler running the <code>SpecConstr</code> optimization pass? The <code>SpecConstr</code> pass optimizes away the intermediate state tokens used to coordinate the stream by generating specialized variants of the input code. This is an expensive optimization (and has historically even lead to effective <a href="http://ghc.haskell.org/trac/ghc/ticket/2598">non-termination</a> of the compiler) to perform and therefore is disabled by default, even in <code>-O1</code>. Modules defining stream combinators should either be explicitly compiled with <code>-O2</code> or <code>-fspec-constr</code>.</p></li>
@@ -41,9 +41,9 @@
 </ul>
 <h2 id="resources">Resources</h2>
 <ul>
-<li>Phase controlled inlining: (http://stackoverflow.com/questions/14446368/how-to-use-phase-control-of-inlining-in-haskell), (http://neocontra.blogspot.com/2013/02/controlling-inlining-phases-in-ghc.html)</li>
-<li>Edward Kmett’s tutorial on writing stream fusion combinators: (https://www.fpcomplete.com/user/edwardk/revisiting-matrix-multiplication/part-3#custom-stream-fusion)</li>
-<li>Some stream fusion combinators that I’ve written: (https://github.com/bgamari/hphoton/blob/master/hphoton-correlate/HPhoton/Corr/PackedVec.hs#L62)</li>
+<li>Phase controlled inlining: <a href="http://stackoverflow.com/questions/14446368/how-to-use-phase-control-of-inlining-in-haskell">http://stackoverflow.com/questions/14446368/how-to-use-phase-control-of-inlining-in-haskell</a>, <a href="http://neocontra.blogspot.com/2013/02/controlling-inlining-phases-in-ghc.html">http://neocontra.blogspot.com/2013/02/controlling-inlining-phases-in-ghc.html</a></li>
+<li>Edward Kmett’s tutorial on writing stream fusion combinators: <a href="https://www.fpcomplete.com/user/edwardk/revisiting-matrix-multiplication/part-3#custom-stream-fusion">https://www.fpcomplete.com/user/edwardk/revisiting-matrix-multiplication/part-3#custom-stream-fusion</a></li>
+<li>Some stream fusion combinators that I’ve written: <a href="https://github.com/bgamari/hphoton/blob/master/hphoton-correlate/HPhoton/Corr/PackedVec.hs#L62">https://github.com/bgamari/hphoton/blob/master/hphoton-correlate/HPhoton/Corr/PackedVec.hs#L62</a></li>
 </ul>
       </section>
     </div>
