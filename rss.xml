@@ -133,6 +133,20 @@
     <pubDate>Sun, 13 Oct 2013 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2013-10-13-debugging-stream-fusion.html</guid>
 </item>
+<item>
+    <title>Making Ubuntu usable with XMonad</title>
+    <link>http://bgamari.github.com//posts/2013-11-01-xmonad.html</link>
+    <description><![CDATA[Configuration Ubuntu around XMonad]]></description>
+    <pubDate>Fri, 01 Nov 2013 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2013-11-01-xmonad.html</guid>
+</item>
+<item>
+    <title>Running modern kernel on the PandaBoard</title>
+    <link>http://bgamari.github.com//posts/2013-11-17-running-modern-kernel-on-pandaboard.html</link>
+    <description><![CDATA[Bringing up the v3.12 kernel on the PandaBoard]]></description>
+    <pubDate>Sun, 17 Nov 2013 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2013-11-17-running-modern-kernel-on-pandaboard.html</guid>
+</item>
 
     </channel> 
 </rss>

@@ -49,6 +49,10 @@
 <pre><code>    $ wget http://www.gardas.roznovan.cz/llvm/llvm-2011-07-12.patch
     $ cd llvm
     $ patch -p1 &lt; ../llvm-2011-07-12.patch</code></pre>
+<p>Linking C++ with binutils’ default linker, <code>ld</code>, is quite memory intensive (especially the <code>clang</code> executable, for some reason). The build process can be made substantially faster by instead using <code>gold</code>,</p>
+<pre><code>    $ mkdir $GHCROOT/gold-bin
+    $ ln -s `which gold` $GHCROOT/gold-bin/ld
+    $ PATH=$GHCROOT/gold-bin:$PATH</code></pre>
 <p>Building is straightforward,</p>
 <pre><code>    $ ./configure --prefix=$GHCROOT/usr
     $ make
