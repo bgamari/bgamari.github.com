@@ -246,7 +246,7 @@ $ cd /boot/uboot
 $ cp u-boot.img u-boot.img.old
 $ cp ~/u-boot.img u-boot.img
 $ reboot</code></pre>
-<p>Trying booting again,</p>
+<p>Trying booting again (this time without setting <code>initrd_high</code>),</p>
 <pre><code>U-Boot# setenv loadbootenv load mmc ${mmcdev}:${mmcpart} ${loadaddr} uEnv-new.txt
 U-Boot# boot
 mmc0 is current device
@@ -269,12 +269,11 @@ Ramdisk image is corrupt or invalid
 ** Invalid partition 2 **</code></pre>
 <p>Hmm, but even stock kernel fails with the same image. Adding uboot header with,</p>
 <pre><code>$ tools/mkimage -A arm -O linux -T ramdisk -a 0x81650000 -d /media/ben/BOOT/initrd-new.img /media/ben/BOOT/uinitrd-new.img</code></pre>
-<p>unfortunately allows uboot to boot again but kernel crashes at same point while unpacking initramfs.</p>
-<p>Ahh, looking at TRM it seems there is no usable memory below 0x30000000. Using <code>initrd_high</code> of 90000000 allows system to boot.</p>
+<p>Unfortunately this allows uboot to boot again but kernel crashes at the same point while unpacking initramfs. Perhaps <code>initrd_high</code> really does need to be overridden.</p>
+<p>Setting <code>initrd_high=30000000</code> brings me back to u-boot failing with an allocation failure. Looking at TRM it seems there is no usable memory below 0x30000000; I suspect the address given in the documentation is simply inapplicable here. Using <code>initrd_high=90000000</code> allows system to boot.</p>
 <p>Sadly, while my PandaBoard A4 works fine, the PandaBoard ES appears to hang shortly before starting <code>init</code>. Reported this to the <a href="http://lists.infradead.org/pipermail/linux-arm-kernel/2013-November/212119.html">list</a>. It seems that this is due to cpuidle; this <a href="https://patchwork.kernel.org/patch/3084521/">patch</a> appears to fix the issue.</p>
 <p>After this things seem quite useable, although there is the occassional warning of the form,</p>
-<pre><code> gic_timer_retrigger: lost localtimer interrupt
- </code></pre>
+<pre><code> gic_timer_retrigger: lost localtimer interrupt</code></pre>
 <p>As Tony Lindgren <a href="http://marc.info/?l=linux-arm-kernel&amp;m=138497259220285&amp;w=2">points out</a> there are a few things that are known to be broken at the moment,</p>
 <ol style="list-style-type: decimal">
 <li>WLAN does not work after a soft reset or when brough down with <code>ifconfig down</code>.</li>
