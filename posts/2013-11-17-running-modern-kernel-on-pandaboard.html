@@ -272,6 +272,15 @@ Ramdisk image is corrupt or invalid
 <p>unfortunately allows uboot to boot again but kernel crashes at same point while unpacking initramfs.</p>
 <p>Ahh, looking at TRM it seems there is no usable memory below 0x30000000. Using <code>initrd_high</code> of 90000000 allows system to boot.</p>
 <p>Sadly, while my PandaBoard A4 works fine, the PandaBoard ES appears to hang shortly before starting <code>init</code>. Reported this to the <a href="http://lists.infradead.org/pipermail/linux-arm-kernel/2013-November/212119.html">list</a>. It seems that this is due to cpuidle; this <a href="https://patchwork.kernel.org/patch/3084521/">patch</a> appears to fix the issue.</p>
+<p>After this things seem quite useable, although there is the occassional warning of the form,</p>
+<pre><code> gic_timer_retrigger: lost localtimer interrupt
+ </code></pre>
+<p>As Tony Lindgren <a href="http://marc.info/?l=linux-arm-kernel&amp;m=138497259220285&amp;w=2">points out</a> there are a few things that are known to be broken at the moment,</p>
+<ol style="list-style-type: decimal">
+<li>WLAN does not work after a soft reset or when brough down with <code>ifconfig down</code>.</li>
+<li>Suspend and resume does not wake-up from serial console and spews a bunch of warnings.</li>
+<li>cpufreq unfortunately won’t be <a href="https://plus.google.com/112464029509057661457/posts/gvyZQcNieoq">supported</a> for a <a href="http://marc.info/?l=linux-omap&amp;m=138488225103388&amp;w=2">while</a></li>
+</ol>
       </section>
     </div>
 
