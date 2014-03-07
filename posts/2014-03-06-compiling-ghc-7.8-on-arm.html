@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>bgamari.github.com - The state of GHC on ARM</title>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
+  </head>
+  <body>
+    <div id="content">
+      <div id="sidebar">
+        <nav>
+          <h1>Navigation</h1>
+          <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../posts.html">Blog-like thing</a></li>
+            <li><a href="../research-agenda.html">Research agenda</a></li>
+            <li><a href="../publications.html">Publications</a></li>
+            <li><a href="../past-research.html">Past research</a></li>
+            <li><a href="../media/cv.pdf">Curriculum Vitae</a></li>
+          </ul>
+          <h1>Related Links</h1>
+          <ul>
+            <li><a href="http://goldnerlab.physics.umass.edu/wiki/">Research group</a></li>
+            <li><a href="http://www.github.com/bgamari">Github</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <section id="main">
+      <h1 id="the-state-of-ghc-on-arm">The state of GHC on ARM</h1>
+<p>tl;dr, GHC 7.8 should run well on ARM with the LLVM code generator and dynamic linking. The process of building GHC itself might be a bit hairy due to linker terribleness. After this, however, you’ll have fully-featured GHC installation supporting all of the modern amenities including GHCi and Template Haskell.</p>
+<p>ARM has long been a second-class citizen in the GHC world. At first, this was due to the lack of a native code generator. This however, was resolved with the arrival of the LLVM code generator. At this point the primary sticking point is the lack of a runtime linker, which GHC relies on for evaluating Template Haskell splices and GHCi. Over the last few years, there have been an effort by me and others to try to resolve this.</p>
+<p>Much of this effort has centered around improving ARM support in GHC’s own home-brew linker, neccessary as GHC until recently has loaded modules by linking static objects at runtime. Unfortunately, writing a fully functional linker is no <a href="https://ghc.haskell.org/trac/ghc/ticket/5839">small</a> <a href="https://ghc.haskell.org/trac/ghc/ticket/7316#comment:8">task</a>, especially in the case of ARM where one must worry about no fewer than <a href="https://en.wikipedia.org/wiki/Arm_architecture#Thumb">two</a> <a href="https://ghc.haskell.org/trac/ghc/ticket/8380">instruction</a> <a href="https://ghc.haskell.org/trac/ghc/ticket/7823">sets</a> and a seemingly endless set of relocation types (the curious reader is invited to look over the ELF for ARM <a href="http://infocenter.arm.com/help/topic/com.arm.doc.ihi0044e/IHI0044E_aaelf.pdf">specification</a> which defines some of what the linker must do; the rest is documented in the minds of various linker authors). Even while the code has seen numerous eyes over the years, GHC’s runtime linker still suffers from some rather serious bugs.</p>
+<p>Thankfully, there is another path for ARM support: recently, GHC has been gradually improving its support for dynamic linking. This carries with it the advantage that we can punt the details of section loading and relocation handling to the system’s dynamic linker, opening up an easy migration path away from the maintenance burden of GHC’s runtime linker.</p>
+<h2 id="plt-handling">PLT handling</h2>
+<p>Note: This section will be a bit technical; feel free to skip it.</p>
+<p>Enabling dynamic linking with the LLVM backend, while easier than writing a linker from the ground up, is <a href="https://ghc.haskell.org/trac/ghc/ticket/4210">complicated</a> by a small detail of relocation handling. The relocation of code references is often handled through the <a href="http://www.iecc.com/linker/linker10.html">procedure linkage table</a> (PLT). This is a table of trampoline fragments that allows the runtime linker to intercept function calls. The PLT is often the first choice of the compile-time linker when emitting function references as it allows the runtime linker perform just-in-time relocation, reducing process start-up times by deferring relocation of rarely used code to the point when the code is needed.</p>
+<p>As it turns out, the PLT interacts very badly with GHC’s runtime system (RTS), which requires that all Haskell objects (constructors or closures) are preceded by an info table, where RTS can track garbage collection and profiling information. If the PLT is used, pointers to what might otherwise refer to a closure (e.g. executable code) and its preceding info table instead point to a linker-generated trampoline. While things may appear to run fine at first, calamity ensues after the run-time system attempts its first garbage collection pass, usually ending in the untimely death of the process with an “evacuate(static): strange closure type” error from the RTS.</p>
+<p>dll-split: internal error: evacuate(static): strange closure type 0</p>
+<p>For this reason, GHC must ensure that no relocations in Haskell code go through the PLT. In assembler, one typically indicates to the compile-time linker that a symbol is a code (which can go through the PLT) or data (which must be handled with any of a number of other relocation schemes) with a <code>.type</code> <a href="https://sourceware.org/binutils/docs/as/Type.html">directive</a>. Unfortunately, it seems that LLVM provides no analogous mechanism in its own intermediate language. Lacking this, we must settle for a workaround, <a href="https://github.com/bgamari/ghc/commit/ed67d290e7389bd87a6feea269a0275e0f0f5e2f">adding</a> yet another hack to the LLVM code generator’s assembler <a href="https://github.com/bgamari/ghc/blob/arm-ghci/compiler/llvmGen/LlvmMangler.hs">mangler</a> to add <code>.type @object</code> directives to every emitted symbol.</p>
+<h2 id="installation">Installation</h2>
+<p>With the release of GHC 7.8 imminent, I’m happy to say that ARM support is now finally looking sustainable. With the dynamic linking now viable, the surface area of the ARM-specific code in GHC has been greatly reduced, most of the nasty details now being handled by either LLVM or the system’s dynamic linker.</p>
+<p>Unfortunately, there are still a few rough edges, mostly in the build process of GHC itself. This is largely due to a <a href="https://sourceware.org/bugzilla/show_bug.cgi?id=16177">bug</a> in BFD ld’s relocation support on ARM, the default linker in most Linux distributions. In short, <code>ld.bfd</code> needlessly produces <code>ARM_R_COPY</code> relocations for some Haskell objects. During dynamic linking, the linker copies the body of the function but not its info table. This will usually manifest itself as a failure of <code>dll-split</code> during the build process with <code>internal error: evacuate(static): strange closure type 0</code>.</p>
+<p>Until this is fixed, the <a href="https://en.wikipedia.org/wiki/Gold_%28linker%29">gold</a> linker will be the only supported linker with GHC on ARM (at least when tables-next-to-code is enabled). GHC now <a href="https://github.com/bgamari/ghc/commit/53856a43d9d1a901f70d96d22a31c6ea56903e0e">checks</a> that the linker being used isn’t affected by the bug in question, so hopefully users won’t be affected beyond needing to switch linkers.</p>
+<p>Unfortunately, gold doesn’t support producing dynamic objects with certain relocation types that seem to appear in (at least Debian’s) GHC 7.6 object code.</p>
+<p>This unfortunately means that users upgrading from GHC 7.6 to 7.8 may need to perform an awkward dance to ensure that the correct linker over the course of the build process. I’ve written a small <a href="https://gist.github.com/bgamari/9399430">script</a> to automate this process which works for me (tested on Debian Jessie on an Hardkernel Odroid XU). This ensures that <code>ld.bfd</code> is used while building with the phase 0 (GHC 7.6) compiler and <code>ld.gold</code> is used thereafter. After GHC has been built, <code>ld.gold</code> should be used.</p>
+<p>There are still a few more <a href="https://ghc.haskell.org/trac/ghc/ticket/8855">patches</a> that should go in to GHC 7.8 before release to make building on ARM as painless as possible.</p>
+<h2 id="the-proof-is-in-the-pudding">The proof is in the pudding</h2>
+<p>Of course, it is easy to <em>claim</em> that a compiler works. The proof, however, is in the testsuite results,</p>
+<pre><code>Unexpected results from:
+TEST=&quot;T8557 T7386 print021 print020 print022 Flags02 T8766 ghci053 T703 linker_unload T7574 T7850 rangeTest ghcirun002 ghcirun001&quot;
+
+OVERALL SUMMARY for test run started at Fri Mar  7 05:27:05 2014 CET
+ 0:58:11 spent to go through
+    3895 total tests, which gave rise to
+   12782 test cases, of which
+    9299 were skipped
+
+      28 had missing libraries
+    3368 expected passes
+      56 expected failures
+
+      20 caused framework failures
+       0 unexpected passes
+      16 unexpected failures</code></pre>
+<p>That is right, you can count the testsuite failures on the your fingers and toes combined!</p>
+      </section>
+    </div>
+
+    <footer id="footer">
+      <span>Generated by <a href="http://jaspervdj.be/hakyll/index.html">Hakyll</a>.</span>
+    </footer>
+  </body>
+</html>
+
