@@ -28,7 +28,7 @@
       </div>
 
       <section id="main">
-      <p>This is an attempt at documenting one of my sessions debugging [GHC’s] runtime system. In particular, I’ll try to write down some of the background I’ve accrued bringing up GHC on the ARM architecture. However, most of the below should be largely architecture agnostic.</p>
+      <p>This is an attempt at documenting one of my sessions debugging [GHC’s] runtime system. In particular, I’ll try to write down some of the background I’ve accrued bringing up GHC on the ARM architecture. However, most of the below should be largely architecture-agnostic.</p>
 <h2 id="the-symptom">The symptom</h2>
 <p>When debugging the GHC runtime system (RTS), one is often faced with errors of the form,</p>
 <pre><code>test: internal error: invalid closure, info=0x122a8
@@ -132,7 +132,20 @@ $3 = {layout = {payload = {ptrs = 0, nptrs = 1},
       type = 8,
       srt_bitmap = 0, 
       code = 0x455990 &lt;integerzmgmp_GHCziIntegerziType_Szh_static_info&gt; &quot;H\377\303\377e&quot;}</code></pre>
-<p>For this reas</p>
+<p>Let’s now check the shared library to see what it says,</p>
+<pre><code>(gdb) file libraries/base/dist-install/build/libHSbase-4.7.0.0-ghc7.8.0.20140317.so 
+A program is being debugged already.
+Are you sure you want to change the file? (y or n) y
+Load new symbol table from &quot;/home/ben/ghc/ghc/libraries/base/dist-install/build/libHSbase-4.7.0.0-ghc7.8.0.20140317.so&quot;? (y or n) y
+Reading symbols from /home/ben/ghc/ghc/libraries/base/dist-install/build/libHSbase-4.7.0.0-ghc7.8.0.20140317.so...(no debugging symbols found)...done.
+(gdb) print * ( (StgInfoTable *) integerzmgmp_GHCziIntegerziType_Szh_static_info - 1)
+$8 = {layout = {payload = {ptrs = 0, nptrs = 1},
+                bitmap = 65536,
+                large_bitmap_offset = 65536,
+                selector_offset = 65536},
+      type = 8,
+      srt_bitmap = 0, 
+      code = 0xb66f9dac &lt;integerzmgmp_GHCziIntegerziType_Szh_static_info&gt; &quot;&quot;}</code></pre>
 <h1 id="examining-the-core">Examining the core</h1>
 <p>However, I did notice at the outset that the code in question works without <code>-O</code>,</p>
 <pre><code>$ inplace/bin/ghc-stage2 testsuite/tests/boxy/T2193.hs -o test -dynamic -fforce-recomp
