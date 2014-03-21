@@ -28,11 +28,14 @@
       </div>
 
       <section id="main">
-      <p>When debugging the GHC runtime system (RTS), one is often faced with errors of the form,</p>
+      <p>This is an attempt at documenting one of my sessions debugging [GHC’s] runtime system. In particular, I’ll try to write down some of the background I’ve accrued bringing up GHC on the ARM architecture. However, most of the below should be largely architecture agnostic.</p>
+<h2 id="the-symptom">The symptom</h2>
+<p>When debugging the GHC runtime system (RTS), one is often faced with errors of the form,</p>
 <pre><code>test: internal error: invalid closure, info=0x122a8
 (GHC version 7.8.0.20140317 for arm_unknown_linux)
 Please report this as a GHC bug:  http://www.haskell.org/ghc/reportabug</code></pre>
 <p>This error is produced by GHC’s garbage collector. In particular, the garbage collector is trying to tell you that the runtime system has encountered an unrecognized closure type while traversing the heap, a likely sign of corruption.</p>
+<h2 id="finding-closures">Finding closure(s)</h2>
 <p>The first thing I do when faced with such a crash is to recompile the code in question with GHC’s <code>-debug</code> flag, linking against the debug build of the runtime system. After running the resulting executable in <code>gdb</code>, you’ll likely find a backtrace containing frames similar to frames 0 through 11 of the following,</p>
 <pre><code>(gdb) bt
 #0  __libc_do_syscall () at ../ports/sysdeps/unix/sysv/linux/arm/libc-do-syscall.S:44
@@ -54,9 +57,9 @@ Please report this as a GHC bug:  http://www.haskell.org/ghc/reportabug</code></
 #16 0xb65dcb9a in real_main () at rts/RtsMain.c:87
 #17 0xb65dcbf2 in hs_main (argc=1, argv=0xbefff6e4, main_closure=0x12268 &lt;ZCMain_main_closure&gt;, rts_config=...) at rts/RtsMain.c:114
 #18 0x00009e8e in main ()</code></pre>
-<p>Looking in <code>rts/sm/Eval.c</code>, we find the assert in question,</p>
+<p>Looking in <code>rts/sm/Eval.c</code>, we find the assertion in question,</p>
 <pre><code>ASSERTM(LOOKS_LIKE_CLOSURE_PTR(q), &quot;invalid closure, info=%p&quot;, q-&gt;header.info);</code></pre>
-<p>where we find the definition of <code>LOOKS_LIKE_CLOSURE_PTR</code> in <code>includes/rts/storage/ClosureMacros.h</code>,</p>
+<p>Here <code>q</code> is a pointer to an <a href="https://github.com/ghc/ghc/blob/master/includes/rts/storage/Closures.h#L80"><code>StgClosure</code></a>, GHC’s representation of an <a href="https://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/GeneratedCode">STG</a> closure. We find the definition of <code>LOOKS_LIKE_CLOSURE_PTR</code> in <code>includes/rts/storage/ClosureMacros.h</code>,</p>
 <pre><code>static inline StgClosure *
 UNTAG_CLOSURE(StgClosure * p)
 {
@@ -88,30 +91,48 @@ INLINE_HEADER rtsBool LOOKS_LIKE_INFO_PTR (StgWord p)
 <li>A forwarding pointer, having the low order bit set, or</li>
 <li>A valid info table pointer, therefore
 <ol style="list-style-type: decimal">
-<li>Is not of type <code>INVALID_OBJECT</code>, and</li>
+<li>Is not of type <code>INVALID_OBJECT</code> (0), and</li>
 <li>Has a type in the valid range of closure types (defined in <code>includes/rts/storage/ClosureTypes.h</code>; in GHC 7.8 <code>N_CLOSURE_TYPES == 61</code>)</li>
 </ol></li>
 </ol>
+<p>If we look at the definition of <code>INFO_PTR_TO_STRUCT</code> we will notice there is a slight subtly here, however,</p>
+<pre><code>#ifdef TABLES_NEXT_TO_CODE
+EXTERN_INLINE StgInfoTable *INFO_PTR_TO_STRUCT(const StgInfoTable *info) {return (StgInfoTable *)info - 1;}
+#else
+EXTERN_INLINE StgInfoTable *INFO_PTR_TO_STRUCT(const StgInfoTable *info) {return (StgInfoTable *)info;}</code></pre>
+<h1 id="endif">endif</h1>
+<p>This is where GHC handles <em>tables-next-to-code</em>, a memory-layout optimization GHC performs to keep info tables local to the objects they describe. We should keep this in mind as we traverse the heap.</p>
 <p>In this example, the object in question is,</p>
 <pre><code>(gdb) print *q
 $5 = {header = {info = 0x122a8 &lt;integerzmgmp_GHCziIntegerziType_Szh_static_info&gt;},
       payload = 0xb6fb7ab4 &lt;base_SystemziPosixziInternals_fdFileSizze2_closure+4&gt;}</code></pre>
-<p><code>q-&gt;header.info</code> is not <code>NULL</code> so let’s look at the info table itself,</p>
-<pre><code>(gdb) print q-&gt;header.info[0]
-$6 = {layout = {payload = {ptrs = 12288, nptrs = 58773},
-                bitmap = 3851759616,
-                large_bitmap_offset = -443207680,
-                selector_offset = 3851759616},
-      type = 28673,
-      srt_bitmap = 57991, 
-      code = 0x122b0 &lt;integerzmgmp_GHCziIntegerziType_Szh_static_info+8&gt; &quot;3\377/\341\036\377&quot;, &lt;incomplete sequence \341&gt;}</code></pre>
-<p>So clearly this info table is quite insane. Besides having an invalid <code>type</code>, its layout looks quite suspicious. First, let’s see if it was trampled by something,</p>
-<pre><code>(gdb) print &amp;q-&gt;header.info[0].type
-$9 = (StgHalfWord *) 0x122ac &lt;integerzmgmp_GHCziIntegerziType_Szh_static_info+4&gt;
-(gdb) watch *0x122ac
-Watchpoint 2: * 0x122ac
-(gdb) run</code></pre>
-<p>Unfortunately hardware watchpoint support on my platform/board (ARM) isn’t terribly great, so this didn’t get anywhere.</p>
+<p>We see here that the object in question is an <code>Integer</code>, namely the <code>S#</code> <a href="https://github.com/ghc/packages-integer-gmp/blob/master/GHC/Integer/Type.lhs#L109">constructor</a> from <code>integer-gmp</code>,</p>
+<pre><code>data Integer
+   = S# Int# -- ^ \&quot;small\&quot; integers fitting into an 'Int#'
+   | J# Int# ByteArray# -- ^ \&quot;big\&quot; integers represented as GMP's @mpz_t@ structure.</code></pre>
+<p>The fact that the constructor’s field is of type <code>Int#</code> tells us that the <code>payload</code> should be an integer,</p>
+<pre><code>(gdb) print *(int *) q-&gt;payload
+$14 = -1</code></pre>
+<p><code>q-&gt;header.info</code> is not <code>NULL</code> so let’s look at the info table itself (keeping in mind tables-next-to-code),</p>
+<pre><code>(gdb) print q-&gt;header.info[-1]
+$3 = {layout = {payload = {ptrs = 50404, nptrs = 46814},
+                bitmap = 3068052708,
+                large_bitmap_offset = -1226914588,
+                selector_offset = 3068052708},
+      type = 0,
+      srt_bitmap = 0, 
+      code = 0x122a8 &lt;integerzmgmp_GHCziIntegerziType_Szh_static_info&gt; &quot;&quot;}</code></pre>
+<p>While <code>type == INVALID_OBJECT</code> is clearly concerning, it is unclear whether the rest of this is reasonable. With a simple test program on my x86-64 box we find that a healthy-looking <code>integerzmgmp_GHCziIntegerziType_Szh_static_info</code> should look something like,</p>
+<pre><code>(gdb) print * ( (StgInfoTable *) integerzmgmp_GHCziIntegerziType_Szh_static_info - 1)
+$3 = {layout = {payload = {ptrs = 0, nptrs = 1},
+                bitmap = 4294967296,
+                large_bitmap_offset = 0,
+                __pad_large_bitmap_offset = 0,
+                selector_offset = 4294967296},
+      type = 8,
+      srt_bitmap = 0, 
+      code = 0x455990 &lt;integerzmgmp_GHCziIntegerziType_Szh_static_info&gt; &quot;H\377\303\377e&quot;}</code></pre>
+<p>For this reas</p>
 <h1 id="examining-the-core">Examining the core</h1>
 <p>However, I did notice at the outset that the code in question works without <code>-O</code>,</p>
 <pre><code>$ inplace/bin/ghc-stage2 testsuite/tests/boxy/T2193.hs -o test -dynamic -fforce-recomp
