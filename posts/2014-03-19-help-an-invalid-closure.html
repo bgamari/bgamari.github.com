@@ -99,8 +99,8 @@ INLINE_HEADER rtsBool LOOKS_LIKE_INFO_PTR (StgWord p)
 <pre><code>#ifdef TABLES_NEXT_TO_CODE
 EXTERN_INLINE StgInfoTable *INFO_PTR_TO_STRUCT(const StgInfoTable *info) {return (StgInfoTable *)info - 1;}
 #else
-EXTERN_INLINE StgInfoTable *INFO_PTR_TO_STRUCT(const StgInfoTable *info) {return (StgInfoTable *)info;}</code></pre>
-<h1 id="endif">endif</h1>
+EXTERN_INLINE StgInfoTable *INFO_PTR_TO_STRUCT(const StgInfoTable *info) {return (StgInfoTable *)info;}
+#endif</code></pre>
 <p>This is where GHC handles <em>tables-next-to-code</em>, a memory-layout optimization GHC performs to keep info tables local to the objects they describe. We should keep this in mind as we traverse the heap.</p>
 <p>In this example, the object in question is,</p>
 <pre><code>(gdb) print *q
