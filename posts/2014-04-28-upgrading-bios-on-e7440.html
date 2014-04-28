@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>bgamari.github.com - 2014-04-28-upgrading-bios-on-e7440</title>
+    <title>bgamari.github.com - Upgrading BIOS on Dell Latitude E7440</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
   </head>
   <body>
@@ -28,8 +28,7 @@
       </div>
 
       <section id="main">
-      <p>bg— title: Upgrading BIOS on Dell Latitude E7440 date: 2014-04-28 description: Creating a FreeDOS environment for upgrading firmware with a large update image tags: bios, upgrade, linux —</p>
-<p>Modern computers have a lot of firmware, much of which is rather tricky for non-Windows users to upgrade. My Dell Latitude E7440 is no exception. While there are many well-documented <a href="https://wiki.archlinux.org/index.php/Flashing_BIOS_from_Linux">options</a> for flashing the BIOS with FreeDOS, this computer is particularly tricky as the upgrade executable weighs in at over 9 megabytes, larger than even the largest <code>biosdisk</code> image.</p>
+      <p>Modern computers have a lot of firmware, much of which is rather tricky for non-Windows users to upgrade. My Dell Latitude E7440 is no exception. While there are many well-documented <a href="https://wiki.archlinux.org/index.php/Flashing_BIOS_from_Linux">options</a> for flashing the BIOS with FreeDOS, this computer is particularly tricky as the upgrade executable weighs in at over 9 megabytes, larger than even the largest <code>biosdisk</code> image.</p>
 <p>First we’ll grab a FreeDOS boot image (specifically a 10 MB hard disk image),</p>
 <pre><code>$ wget http://downloads.joelinoff.com/fdos11.tar.gz
 $ tar -zxf fdos11.tar.gz
