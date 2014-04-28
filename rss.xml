@@ -3,7 +3,7 @@
     <channel>
         <title>bgamari.github.com</title>
         <link>http://bgamari.github.com/</link>
-        <description><![CDATA[Various ramblings, generally of a technical nature]]></description>
+        <description><![CDATA[Various ramblings, usually of a technical nature]]></description>
         <atom:link href="http://bgamari.github.com//rss.xml" rel="self"
                    type="application/rss+xml" />
         <lastBuildDate>Sun, 16 Oct 2011 00:00:00 UT</lastBuildDate>
