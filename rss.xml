@@ -161,6 +161,13 @@
     <pubDate>Thu, 20 Mar 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-03-19-help-an-invalid-closure.html</guid>
 </item>
+<item>
+    <title>Upgrading BIOS on Dell Latitude E7440</title>
+    <link>http://bgamari.github.com//posts/2014-04-28-upgrading-bios-on-e7440.html</link>
+    <description><![CDATA[Creating a FreeDOS environment for upgrading firmware with a large update image]]></description>
+    <pubDate>Mon, 28 Apr 2014 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2014-04-28-upgrading-bios-on-e7440.html</guid>
+</item>
 
     </channel> 
 </rss>
