@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>bgamari.github.com - Flashing the BusBlaster's CPLD buffer with OpenOCD</title>
+    <title>bgamari.github.com - Flashing the Bus Blaster's CPLD buffer with OpenOCD</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
   </head>
   <body>
@@ -28,8 +28,14 @@
       </div>
 
       <section id="main">
-      <p>Recently an unfortunate incident involving 20V or so resulted in a small plume of smoke rising from my BusBlaster, followed by the smell of burned electronics. After examining the wreckage, it seemed likely that the CPLD took most, if not all, of the damage. Not wanting to wait another month for Seeed to send a new device, I ordered some XC2C32A CPLD’s and replaced the burnt part.</p>
-<p>The BusBlaster’s <a href="http://dangerousprototypes.com/docs/Bus_Blaster_buffer_logic">documentation</a> provides instructions for reflashing the CPLD with <code>urjag</code>. Sadly, urJTAG refused to acknowledge the existence of the device, despite having gone through USB enumeration. Having recalled having similar problems while trying to use urJTAG in the past, I set out to use openocd instead. I was pleasantly surprised by how easy this was.</p>
+      <h1 id="flashing-the-bus-blaster-jtag-adapters-cpld-buffer-with-openocd">Flashing the Bus Blaster JTAG adapter’s CPLD buffer with OpenOCD</h1>
+<p>Recently an unfortunate incident involving 20V and a slipped probe resulted in a small plume of smoke rising from my Bus Blaster, followed by the smell of burnt electronics. After examining the wreckage, it seemed likely that the CPLD took most, if not all, of the damage. Not wanting to wait another month for Seeed to send a whole new device, I ordered some XC2C32A CPLD’s and replaced the burnt part. This, however, requires that the new part if FLASHed with the appropriate buffer logic. Below I describe how this can be accomplished using OpenOCD.</p>
+<h2 id="new-approach">New Approach</h2>
+<p>With sufficiently recent OpenOCD releases (<code>ae806d8f4</code>, included in the 0.8.0 release), this process is much simpler than it used to be as the package now ships with a board file for the Bus Blaster<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. Simply <a href="https://code.google.com/p/dangerous-prototypes-open-hardware/source/browse/trunk/Bus_Blaster/buffer_logic/">download</a> the desired SVF and run,</p>
+<pre><code>$ openocd -f board/dp_busblaster_v3.cfg -c &quot;adapter_khz 1000; init; svf &lt;path_to_svf&gt;; shutdown&quot;</code></pre>
+<p>This one-liner is due to <code>PaulFertser</code> of <code>#openocd</code> on Freenode (a lovely place to be if you have OpenOCD-related questions). Below the old procedure is reproduced for those not fortunate enough to have a recent OpenOCD installation.</p>
+<h2 id="old-openocd">Old OpenOCD</h2>
+<p>The Bus Blaster’s <a href="http://dangerousprototypes.com/docs/Bus_Blaster_buffer_logic">documentation</a> provides instructions for reflashing the CPLD with <code>urjag</code>. Sadly, urJTAG refused to acknowledge the existence of the device, despite having gone through USB enumeration. Having recalled having similar problems while trying to use urJTAG in the past, I set out to use openocd instead. I was pleasantly surprised by how easy this was.</p>
 <p>First, we’ll need to define an interface script to configure openocd’s <code>ftdi</code> driver to use the second MPSSE channel, to which the CPLD is attached. For this I started with the <code>openocd/tcl/interface/ftdi/dp_busblaster.cfg</code> and added the appropriate <code>ftdi_channel</code> directive (I intend on proposing this for merge upstream),</p>
 <pre><code>interface ftdi
 ftdi_device_desc &quot;Dual RS232-HS&quot;
@@ -64,6 +70,13 @@ Open On-Chip Debugger
 Time used: 0m0s767ms 
 svf file programmed successfully for 579 commands</code></pre>
 <p>Well, that doesn’t look so bad and indeed attempting to debug a target works as expected. Yay!</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>At first glance, the filename <code>board/dp_busblaster_v3.cfg</code> is a bit confusing as there is nothing to directly suggest that this will flash the buffer instead of the target device. However, if we look more carefully we notice that this is a <em>board</em> file, not to be confused with <code>interface/ftdi/dp_busblaster.cfg</code>, the interface file describing the Bus Blaster.</p>
+<p>In fact, if we examine the board file, we’ll notice that it simply <code>source</code>’s the interface file, sets the <code>ftdi_channel</code> and defines the TAP parameters for the buffer CPLD.<a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
       </section>
     </div>
 

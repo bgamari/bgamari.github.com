@@ -28,7 +28,8 @@
       </div>
 
       <section id="main">
-      <p>This is an attempt at documenting one of my sessions debugging [GHC’s] runtime system. In particular, I’ll try to write down some of the background I’ve accrued bringing up GHC on the ARM architecture. However, most of the below should be largely architecture-agnostic.</p>
+      <h1 id="a-walk-through-debugging-session-of-ghc-runtime-system">A walk-through debugging session of GHC runtime system</h1>
+<p>This is an attempt at documenting one of my sessions debugging [GHC’s] runtime system. In particular, I’ll try to write down some of the background I’ve accrued bringing up GHC on the ARM architecture. However, most of the below should be largely architecture-agnostic.</p>
 <h2 id="the-symptom">The symptom</h2>
 <p>When debugging the GHC runtime system (RTS), one is often faced with errors of the form,</p>
 <pre><code>test: internal error: invalid closure, info=0x122a8
