@@ -168,6 +168,13 @@
     <pubDate>Mon, 28 Apr 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-04-28-upgrading-bios-on-e7440.html</guid>
 </item>
+<item>
+    <title>SWD with OpenOCD and a Bus Blaster</title>
+    <link>http://bgamari.github.com//posts/2014-08-23-swd-with-busblaster-and-openocd.html</link>
+    <description><![CDATA[A brief walk-through of bringing up an SWD interface with OpenOCD and a Bus Blaster JTAG adapter]]></description>
+    <pubDate>Sat, 23 Aug 2014 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2014-08-23-swd-with-busblaster-and-openocd.html</guid>
+</item>
 
     </channel> 
 </rss>
