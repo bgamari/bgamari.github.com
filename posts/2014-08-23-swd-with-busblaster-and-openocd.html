@@ -36,7 +36,7 @@
 <pre><code>$ git clone https://github.com/bharrisau/busblaster.git
 $ cd busblaster/synthesis
 $ openocd -f board/dp_busblaster_v3.cfg -c &quot;adapter_khz 1000; init; svf system.svf; shutdown&quot;</code></pre>
-<p>At this point I consulted the <a href="https://github.com/ntfreak/openocd/blob/master/tcl/interface/ftdi/swd-resistor-hack.cfg">SWD resistor hack</a> that the incredibly helpful <code>PaulFerster</code> once referred me to on <code>#openocd</code>. This describes the connections necessary for SWD with an FTDI-based adapter like the Bus Blaster,</p>
+<p>At this point I consulted the <a href="https://github.com/ntfreak/openocd/blob/master/tcl/interface/ftdi/swd-resistor-hack.cfg">SWD resistor hack</a> that the incredibly helpful <code>PaulFertser</code> once referred me to on <code>#openocd</code>. This describes the connections necessary for SWD with an FTDI-based adapter like the Bus Blaster,</p>
 <pre><code>     adapter                      target
 
      TCK ──────────────────────── SWDCK
