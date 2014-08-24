@@ -31,41 +31,29 @@
       <h1 id="swd-with-openocd-and-a-bus-blaster">SWD with OpenOCD and a Bus Blaster</h1>
 <p>For a while now <a href="http://openocd.sourceforge.net/">OpenOCD</a> has had some support for <a href="http://en.wikipedia.org/wiki/Joint_Test_Action_Group#Serial_Wire_Debug">Serial Wire Debug (SWD)</a>. SWD is an alternative to the JTAG wire protocol used largely on ARM microcontrollers and has the advantage of requiring only two I/O pins (data and clock), power, and ground (as opposed two JTAG’s four data pins, two resets, power, and ground).</p>
 <p>Unfortunately, the <a href="http://openocd.sourceforge.net/doc/html/Debug-Adapter-Configuration.html#Debug-Adapter-Configuration">documentation</a> surrounding OpenOCD’s SWD implementation is a bit sparse. This afternoon I finally grew frustrated with the mess of wires required by JTAG and forged ahead into OpenOCD’s SWD support.</p>
-<p>The target in this case in my <a href="https://github.com/bgamari/solar-charger-v2">solar battery charger</a> which has an STM32L151 microcontroller. The adapter is a Bus Blaster v3.</p>
-<h2 id="flashing-the-kt-link-buffer">Flashing the KT-link buffer</h2>
+<p>The target in this case in my <a href="https://github.com/bgamari/solar-charger-v2">solar battery charger</a> which has an STM32L151 microcontroller. The adapter is a Bus Blaster v3. Testing was done with OpenOCD <code>bd0409aa938875ea5a8d8235f8996116be171b69</code>.</p>
+<h2 id="approach-1-kt-link">Approach #1: KT-link</h2>
+<p>One nice property of the Bus Blaster is it has a CPLD which performs the role of a reconfigurable buffer. While the device comes flashed with the not-SWD-capable JTAGkey buffer, it’s trivial to flash this device with an SWD-capable buffer instead. KT-link is one such buffer configuration.</p>
+<h3 id="flashing-the-kt-link-buffer">Flashing the KT-link buffer</h3>
 <p>The first step was to flash the Bus Blaster’s CPLD with a KT-link buffer. While Dangerous Prototypes’s <a href="https://code.google.com/p/dangerous-prototypes-open-hardware/source/browse/#svn%2Ftrunk%2FBus_Blaster%2Fbuffer_logic">repository</a> only contains sources for Bus Blaster v2, Ben Harris has a <a href="https://github.com/bharrisau/busblaster">convenient implementation</a> for the v3 hardware complete with SVF bitcode. Flashing the buffer is easily accomplished with OpenOCD, as <a href="http://bgamari.github.io/posts/2013-07-24-flashing-busblaster-cpld-with-openocd.html">previously documented</a>,</p>
 <pre><code>$ git clone https://github.com/bharrisau/busblaster.git
 $ cd busblaster/synthesis
 $ openocd -f board/dp_busblaster_v3.cfg -c &quot;adapter_khz 1000; init; svf system.svf; shutdown&quot;</code></pre>
-<h2 id="setting-up-openocd">Setting up OpenOCD</h2>
-<p>At this point I consulted the <a href="https://github.com/ntfreak/openocd/blob/master/tcl/interface/ftdi/swd-resistor-hack.cfg">SWD resistor hack</a> that the incredibly helpful <code>PaulFertser</code> once referred me to on <code>#openocd</code>. This describes the connections necessary for SWD with an FTDI-based adapter like the Bus Blaster,</p>
-<pre><code>     adapter                      target
-
-     TCK ──────────────────────── SWDCK
-     
-     TDO ────────────────┬─────── SWDIO
-                         │
-     TDI ──────/\/\/\/───┘
-               220 ohm</code></pre>
-<p>Now it’s simply a matter of a little configuration,</p>
-<pre><code>$ cat &gt;dp_busblaster_ktlink.cfg &lt;&lt;EOF
-# BusBlaster with KT-link buffer
-# This is derived from interface/ftdi/kt-link.cfg and
-# interface/ftdi/dp_busblaster.cfg
-interface ftdi
-ftdi_vid_pid 0x0403 0x6010
-ftdi_layout_init 0x8c28 0xff3b
-ftdi_layout_signal nTRST -data 0x0100 -noe 0x0400
-ftdi_layout_signal nSRST -data 0x0200 -noe 0x0800
-ftdi_layout_signal LED -data 0x8000
-EOF
-$ cat &gt;openocd-swd.cfg &lt;&lt;EOF
-source dp_busblaster_ktlink.cfg
-source [find interface/ftdi/swd-resistor-hack.cfg]
+<h3 id="setting-up-openocd">Setting up OpenOCD</h3>
+<p>The ever-helpful PaulFertser offered this soon-to-be-merged <a href="http://openocd.zylin.com/#/c/2269/">patch</a> adding a Bus Blaster-with-KT-link configuration to OpenOCD-proper. With it, configuration is trivial,</p>
+<pre><code>$ cat &gt;openocd-swd.cfg &lt;&lt;EOF
+source dp_busblaster_kt-link.cfg
 transport select swd
 reset_config none
 source [find target/stm32l.cfg]
 EOF</code></pre>
+<p>Now just connect things as follows,</p>
+<pre><code>     adapter         ┊            target
+                     ┊
+     TCK ──────────────────────── SWCK
+                     ┊
+     TMS ──────────────────────── SWDAT
+                     ┊</code></pre>
 <p>And voila,</p>
 <pre><code>$ openocd -f openocd-swd.cfg 
 Open On-Chip Debugger 0.9.0-dev-00141-g11db2c2 (2014-08-23-14:32)
@@ -80,6 +68,25 @@ cortex_m reset_config sysresetreq
 Info : clock speed 300 kHz
 Info : SWD IDCODE 0x2ba01477
 Info : stm32l.cpu: hardware has 6 breakpoints, 4 watchpoints</code></pre>
+<h2 id="approach-2-resistor-hack">Approach #2: Resistor hack</h2>
+<p>If you for whatever reason do not want to reflash the Bus Blaster buffer it is also possible to emulate an SWD-capable buffer with a current limiting resistor and a bit of wire. [<code>swd-resistor-hack.cfg</code>] in the OpenOCD repository describes the connections necessary for SWD with an FTDI-based adapter like the Bus Blaster,</p>
+<pre><code>     adapter                   ┊       target
+                               ┊
+     TCK ───────────────────────────── SWCK
+                               ┊
+     TDO ────────────────┬──────────── SWDAT
+                         │     ┊
+     TDI ─────/\/\/\/────┘     ┊
+              220 ohm          ┊</code></pre>
+<p>Now it’s simply a matter of a little configuration,</p>
+<pre><code>$ cat &gt;openocd-swd-hack.cfg &lt;&lt;EOF
+source dp_busblaster.cfg
+source [find interface/ftdi/swd-resistor-hack.cfg]
+transport select swd
+reset_config none
+source [find target/stm32l.cfg]
+EOF</code></pre>
+<p>To reiterate, this can be done with any FTDI-based JTAG adapter, including the Bus Blaster with any buffer configuration.</p>
 <h2 id="gotchas">Gotchas</h2>
 <p>While I’ve found that the SWD interface is actually more reliable that JTAG with my hardware (likely a reflection of my poor wiring), there are still a few rough edges in OpenOCD’s SWD implementation. Most notably, if the target loses power OpenOCD’s polling procedure will fail to reestablish communications. This is because the target’s debug port comes up in JTAG mode and OpenOCD makes no attempt to move it back to SWD.</p>
 <h2 id="related-resources">Related resources</h2>
