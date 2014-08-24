@@ -44,7 +44,6 @@ $ openocd -f board/dp_busblaster_v3.cfg -c &quot;adapter_khz 1000; init; svf sys
 <pre><code>$ cat &gt;openocd-swd.cfg &lt;&lt;EOF
 source dp_busblaster_kt-link.cfg
 transport select swd
-reset_config none
 source [find target/stm32l.cfg]
 EOF</code></pre>
 <p>Now just connect things as follows,</p>
@@ -83,7 +82,6 @@ Info : stm32l.cpu: hardware has 6 breakpoints, 4 watchpoints</code></pre>
 source dp_busblaster.cfg
 source [find interface/ftdi/swd-resistor-hack.cfg]
 transport select swd
-reset_config none
 source [find target/stm32l.cfg]
 EOF</code></pre>
 <p>To reiterate, this can be done with any FTDI-based JTAG adapter, including the Bus Blaster with any buffer configuration.</p>
