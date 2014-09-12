@@ -175,6 +175,13 @@
     <pubDate>Sat, 23 Aug 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-08-23-swd-with-busblaster-and-openocd.html</guid>
 </item>
+<item>
+    <title>Bringing up Debian on BeagleBoard Black</title>
+    <link>http://bgamari.github.com//posts/2014-09-12-bringing-up-debian-on-bbb.html</link>
+    <description><![CDATA[Bringing up a BeagleBoard Black with Debian]]></description>
+    <pubDate>Fri, 12 Sep 2014 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2014-09-12-bringing-up-debian-on-bbb.html</guid>
+</item>
 
     </channel> 
 </rss>
