@@ -67,13 +67,13 @@ $ sudo apt-get install tmux git bash-completion</code></pre></li>
 $ cd dtb-rebuilder/src/arm
 $ cp am335x-boneblack-audio.dts am335x-boneblack-mycape.dts
 $ make -C../..</code></pre>
-<p>Next, copy <code>am335x-boneblack-mycape.dtb</code> to <code>/boot/dtbs/$KERNEL_VERSION</code> on the device. Finally, you need to configure u-boot to use your new Devicetree: set <code>DTB</code> to, e.g., <code>am335x-boneblack-mycape.dtb</code> in <code>/boot/uEnv.txt</code>. Reboot and hopefully things work.</p>
+<p>Next, copy <code>am335x-boneblack-mycape.dtb</code> to <code>/boot/dtbs/$KERNEL_VERSION</code> on the device. Finally, you need to configure u-boot to use your new Devicetree: in <code>/boot/uEnv.txt</code> set <code>dtb</code> to, e.g., <code>am335x-boneblack-mycape.dtb</code>. Reboot and hopefully things work.</p>
 <h2 id="building-a-new-kernel">Building a new kernel</h2>
 <p>The official BeagleBoard kernel tree is now hosted by the <code>beagleboard</code> organization on Github.</p>
 <pre><code>$ git clone git@github.com/beagleboard/linux
 $ git checkout 3.14.17-ti-r17
 $ make menuconfig ARCH=arm
-$ KDEB_PKGVERSION=1wheezy KBUILD_DEBARCH=armhf make deb-pkg ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-</code></pre>
+$ KDEB_PKGVERSION=1wheezy KBUILD_DEBARCH=armhf make deb-pkg ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- LOCALVERSION=-mycape</code></pre>
 <p>Copy the resulting <code>.deb</code>s in the parent directory to the device and install with <code>dpkg -i</code>.</p>
         </section>
       </div>
