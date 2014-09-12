@@ -44,13 +44,37 @@
 <li>Plug in Ethernet cable</li>
 <li>Apply power to BBB</li>
 <li>Monitor DHCP logs for BBB’s request</li>
-<li><p>SSH to BBB. Then,</p>
-<pre><code>$ sudo apt-get install wpasupplicant firmware-ralink vim iw tmux usb-tools</code></pre></li>
+<li><p>SSH to BBB (the default username is <code>debian</code>, password is <code>temppwd</code>). Then,</p>
+<pre><code>$ sudo adduser ben
+$ sudo adduser ben adm
+$ sudo adduser ben admin
+$ sudo passwd -d debian
+$ sudo apt-get update
+$ sudo apt-get install wpasupplicant firmware-ralink vim iw usbutils lsb-release
+$ sudo apt-get install tmux git bash-completion</code></pre></li>
 <li><p>Unfortunately the <code>rt2800usb</code> drivers perform very poorly with power-saving enabled (the default). Thankfully Stack Overflow has the <a href="http://superuser.com/questions/629039/disabling-power-save-option-on-wifi-device">answer</a> to this,</p>
 <pre><code>$ echo 'ACTION==&quot;add&quot;, SUBSYSTEM==&quot;net&quot;, KERNEL==&quot;wlan*&quot; RUN+=&quot;/usr/bin/iw dev %k set power_save off&quot;' | sudo tee /etc/udev/rules.d/70-wifi-disable-powersave.rules</code></pre></li>
 <li>Configure <code>wlan0</code> in <code>/etc/network/interfaces</code>.</li>
 <li><p>Reboot and ensure that <code>wlan0</code> comes up.</p></li>
 </ol>
+<h2 id="upgrading-the-kernel">Upgrading the kernel</h2>
+<p>The image I downloaded included a rather ancient 3.8 kernel. Let’s try the 3.14 kernel currently under testing,</p>
+<pre><code>$ sudo apt-get install linux-image-3.14.17-ti-r19</code></pre>
+<p>Things appear to still work after reboot.</p>
+<h2 id="modifying-the-devicetree">Modifying the Devicetree</h2>
+<p>Robert Nelson’s [<code>dtb-rebuilder</code>][] repository has sources for the upstream Devicetrees,</p>
+<pre><code>$ git clone https://github.com/RobertCNelson/dtb-rebuilder
+$ cd dtb-rebuilder/src/arm
+$ cp am335x-boneblack-audio.dts am335x-boneblack-mycape.dts
+$ make -C../..</code></pre>
+<p>Next, copy <code>am335x-boneblack-mycape.dtb</code> to <code>/boot/dtbs/$KERNEL_VERSION</code> on the device. Finally, you need to configure u-boot to use your new Devicetree: set <code>DTB</code> to, e.g., <code>am335x-boneblack-mycape.dtb</code> in <code>/boot/uEnv.txt</code>. Reboot and hopefully things work.</p>
+<h2 id="building-a-new-kernel">Building a new kernel</h2>
+<p>The official BeagleBoard kernel tree is now hosted by the <code>beagleboard</code> organization on Github.</p>
+<pre><code>$ git clone git@github.com/beagleboard/linux
+$ git checkout 3.14.17-ti-r17
+$ make menuconfig ARCH=arm
+$ KDEB_PKGVERSION=1wheezy KBUILD_DEBARCH=armhf make deb-pkg ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-</code></pre>
+<p>Copy the resulting <code>.deb</code>s in the parent directory to the device and install with <code>dpkg -i</code>.</p>
         </section>
       </div>
 
