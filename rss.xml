@@ -182,6 +182,13 @@
     <pubDate>Fri, 12 Sep 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-09-12-bringing-up-debian-on-bbb.html</guid>
 </item>
+<item>
+    <title>Unbricking a secured Freescale K20</title>
+    <link>http://bgamari.github.com//posts/2014-09-18-unbricking-a-secured-k20.html</link>
+    <description><![CDATA[A brief note on how to unbrick a K20 with OpenOCD]]></description>
+    <pubDate>Thu, 18 Sep 2014 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2014-09-18-unbricking-a-secured-k20.html</guid>
+</item>
 
     </channel> 
 </rss>
