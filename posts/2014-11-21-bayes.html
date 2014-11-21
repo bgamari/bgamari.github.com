@@ -35,7 +35,7 @@
 <blockquote>
 <p>Most of the sources I have came across explain the use of Bayes’ Theorem and how it can be applied to real world situations, but nothing that can contrast the two interpretations. Could you provide any insight into this?</p>
 </blockquote>
-<p>I am not a statistician nor have I played one of TV. There are certainly many more qualified people to comment on this matter than me: [Andrew Gelman][Gelman] has written a remarkable amount on various aspects of Bayesian statistics; a quick web search turns up dozens of other blogs and articles on the matter.</p>
+<p>I am not a statistician nor have I played one of TV. There are certainly many more qualified people to comment on this matter than me: <a href="http://andrewgelman.com/">Andrew Gelman</a> has written a remarkable amount on various aspects of Bayesian statistics; a quick web search turns up dozens of other blogs and articles on the matter.</p>
 <p>That being said, I thought it might be a fun exercise to write down that which I know. Here I hope to introduce these notions and shed a bit of light on the meaning of these interpretations, particularly with an eye towards inference.</p>
 <p>Let’s begin with the basics. Frequentist and Bayesian statistics differ in what types of information can be encoded as probabilities. The frequentist would claim that probabilities are to be strictly interpreted as fractions of event outcomes from some ensemble. This stands in contrast to the Bayesian, who would argue that we need not be so strict: in addition to representing outcome frequencies, probabilities may also serve to encode our belief about the likelihood of an event. Ultimately the difference comes down to whether you admit subjective “beliefs” into your probabilistic calculus.</p>
 <p>The relationship between Bayes’ theorem and Bayesian statistics is often misunderstood, but serves as a very nice place to start discussion. Let’s dive in.</p>
@@ -86,11 +86,11 @@ P(\alpha {\,\vert\,}\mathrm{tails}) = \frac{P(\mathrm{tails} {\,\vert\,}\alpha) 
 <div class="figure">
 <img src="../media/bayes/ml-inference.svg" alt="The Agresti-Coull estimate of \alpha from the observations shown in Figure 1. The error bars are given by the 5% confidence interval." /><p class="caption">The Agresti-Coull estimate of <span class="math">\(\alpha\)</span> from the observations shown in Figure 1. The error bars are given by the 5% confidence interval.</p>
 </div>
-<p>Now let’s consider a Bayesian inference. Let’s first start with a uniform prior: we disregard your friend’s observations and assume no prior knowledge of <span class="math">\(\alpha\)</span> (there are a few details concerning the nature of non-informativeness buried in this statement that we’ll sweep under the rug; see [Zhu2004] for more on this). [Zhu2004]: http://www.amstat.org/publications/jse/v12n2/zhu.pdf</p>
+<p>Now let’s consider a Bayesian inference. Let’s first start with a uniform prior: we disregard your friend’s observations and assume no prior knowledge of <span class="math">\(\alpha\)</span> (there are a few details concerning the nature of non-informativeness buried in this statement that we’ll sweep under the rug; see <a href="http://www.amstat.org/publications/jse/v12n2/zhu.pdf">Zhu2004</a> for more on this).</p>
 <div class="figure">
 <img src="../media/bayes/bayes.svg" alt="A Bayesian inference of \alpha from the observations shown in Figure 1." /><p class="caption">A Bayesian inference of <span class="math">\(\alpha\)</span> from the observations shown in Figure 1.</p>
 </div>
-<p>We start with a prior informed by your friend’s experience (encoded as a [Beta distribution][]) and update it after every flip. [Beta distribution]: https://en.wikipedia.org/wiki/Beta_distribution</p>
+<p>We start with a prior informed by your friend’s experience (encoded as a <a href="https://en.wikipedia.org/wiki/Beta_distribution">Beta distribution</a>) and update it after every flip.</p>
 <div class="figure">
 <img src="../media/bayes/bayes-prior.svg" alt="A Bayesian inference of \alpha from the observations shown in Figure 1 including a prior." /><p class="caption">A Bayesian inference of <span class="math">\(\alpha\)</span> from the observations shown in Figure 1 including a prior.</p>
 </div>
