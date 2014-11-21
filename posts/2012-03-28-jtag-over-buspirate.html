@@ -5,6 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>bgamari.github.com - JTAG debugging with a Bus Pirate, OpenOCD, and LPC1768</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   </head>
   <body>
     <div id="container">
@@ -32,50 +33,13 @@
         <h1 id="jtag-debugging-with-a-bus-pirate-openocd-and-lpc1768">JTAG debugging with a Bus Pirate, OpenOCD, and LPC1768</h1>
 <p>This was done on an LPCXpresso LPC1769 board. The debug harness was wired as follows,</p>
 <table>
-	<tr><th>
-LPCXpresso
-</th> <th>
-Signal
-</th> <th>
-Bus Pirate
-</th></tr>
-	<tr><td>
-2
-</td>  <td>
-TMS
-</td>  <td>
-CS
-</td></tr>
-	<tr><td>
-3
-</td>  <td>
-TCLK
-</td> <td>
-CLK
-</td></tr>
-	<tr><td>
-4
-</td>  <td>
-TDO
-</td>  <td>
-MISO
-</td></tr>
-	<tr><td>
-5
-</td>  <td>
-TDI
-</td>  <td>
-MOSI
-</td></tr>
-	<tr><td>
-8
-</td>  <td>
-GND
-</td>  <td>
-GND
-</td></tr>
+<pre><code>&lt;tr&gt;&lt;th&gt;LPCXpresso&lt;/th&gt; &lt;th&gt;Signal&lt;/th&gt; &lt;th&gt;Bus Pirate&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;2&lt;/td&gt;  &lt;td&gt;TMS&lt;/td&gt;  &lt;td&gt;CS&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;3&lt;/td&gt;  &lt;td&gt;TCLK&lt;/td&gt; &lt;td&gt;CLK&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;4&lt;/td&gt;  &lt;td&gt;TDO&lt;/td&gt;  &lt;td&gt;MISO&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;5&lt;/td&gt;  &lt;td&gt;TDI&lt;/td&gt;  &lt;td&gt;MOSI&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;8&lt;/td&gt;  &lt;td&gt;GND&lt;/td&gt;  &lt;td&gt;GND&lt;/td&gt;&lt;/tr&gt;</code></pre>
 <table>
-
 <h1 id="preliminaries">Preliminaries</h1>
 <p>Get OpenOCD from git,</p>
 <pre><code>$ git clone</code></pre>

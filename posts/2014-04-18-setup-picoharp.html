@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>bgamari.github.com - Endnote to Bibtex without pain</title>
+    <title>bgamari.github.com - Installing PicoHarp under modern Ubuntu with Wine</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   </head>
@@ -30,13 +30,25 @@
         </div>
   
         <section id="main">
-        <h1 id="endnote-to-bibtex-without-pain">Endnote to Bibtex without pain</h1>
-<p>For others set with the unfortunate task of converting an Endnote database to Bibtex: fear not the command line.</p>
-<p>After several hours of fiddling around with Endnote’s own conversion facility, <a href="http://www.zotero.org/">Zotero</a>, <a href="http://www.citeulike.org/">Cite-U-Like</a>, <a href="http://launchpad.net/referencer/">Referencer</a>, and even writing my own poorly performing utility, I finally stumbled upon the one true solution: <a href="http://bibutils.refbase.org/"><code>bibutils</code></a>. This wonderful little package made this otherwise quite frustrating task as trivial as one can expect,</p>
-<pre><code>$ sudo apt-get install bibutils
-$ endx2xml refs.xml &gt; refs-mods.xml
-$ xml2bib refs-mods.xml &gt; refs.bib</code></pre>
-<p>Beautiful. The <a href="http://en.wikipedia.org/wiki/Unix_philosophy">UNIX philosophy</a> wins again.</p>
+        <h1 id="installing-picoharp-under-modern-ubuntu-with-wine">Installing PicoHarp under modern Ubuntu with Wine</h1>
+<p>Version used: PicoHarp 300 v2.3</p>
+<p>The udev rules that ship with the distribution were a bit out of date, so we use our own,</p>
+<pre><code>$ cat &gt;99-picoquant.rules &lt;&lt;EOF
+ACTION==&quot;add&quot;, SUBSYSTEM==&quot;usb&quot;, ATTRS{idVendor}==&quot;0e0d&quot;, ATTRS{idProduct}==&quot;0003&quot;, MODE=&quot;0666&quot;
+EOF
+$ sudo mv 99-picoquant.rules /etc/udev/rules.d/
+$ sudo chmod 644 /etc/udev/rules.d/99-picoquant.rules
+$ sudo cp $CDROM/Linux/pquwstub.dll.so /usr/lib/i386-linux-gnu/wine/pquwstub.dll.so
+$ sudo chmod ugo+rx /usr/lib/i386-linux-gnu/wine/pquwstub.dll.so
+$ wine $CDROM/setup.exe</code></pre>
+<p>Finally, a script to easily start it,</p>
+<pre><code>$ cat &gt;/usr/local/bin/picoharp &lt;&lt;EOF
+#!/bin/bash
+wine $HOME/.wine/drive_c/Program\ Files\ \(x86\)/PicoQuant/PicoHarp300v23/PicoHarp.exe
+EOF
+$ chmod ugo+rx /usr/local/bin/picoharp</code></pre>
+<p>To start,</p>
+<pre><code>$ picoharp</code></pre>
         </section>
       </div>
 

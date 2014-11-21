@@ -5,6 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>bgamari.github.com - Adventures in devicetree land</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   </head>
   <body>
     <div id="container">
@@ -97,7 +98,7 @@
                     reg = &lt;0x0 0x0&gt;;
             };
     };</code></pre>
-<p>Hmm, not sure what this means. Where is actual devicetree source for the beagleboard? Googling turns up many recent mentions <a href="https://patchwork.kernel.org/patch/932472/">https://patchwork.kernel.org/patch/932472/</a> of arch/arm/boot/dts in kernel tree, but this does not exist in v2.6.39 nor v3.0. It seems like the devicetree branch of a <a href="http://git.secretlab.ca/?p=linux-2.6.git;a=tree;f=arch/arm/boot/dts;h=714ec4bce2c5ff54a0873a67977758c1efd91a97;hb=refs/heads/devicetree/arm">random repository</a> has this directory with an omap3-beagle.dts. It includes <code>skeleton.dtsi</code> which claims that the bootloader will populate the memory node,</p>
+<p>Hmm, not sure what this means. Where is actual devicetree source for the beagleboard? Googling turns up many recent mentions <a href="https://patchwork.kernel.org/patch/932472/" class="uri">https://patchwork.kernel.org/patch/932472/</a> of arch/arm/boot/dts in kernel tree, but this does not exist in v2.6.39 nor v3.0. It seems like the devicetree branch of a <a href="http://git.secretlab.ca/?p=linux-2.6.git;a=tree;f=arch/arm/boot/dts;h=714ec4bce2c5ff54a0873a67977758c1efd91a97;hb=refs/heads/devicetree/arm">random repository</a> has this directory with an omap3-beagle.dts. It includes <code>skeleton.dtsi</code> which claims that the bootloader will populate the memory node,</p>
 <pre><code>    /*
      * Skeleton device tree; the bare minimum needed to boot; just include and
      * add a compatible value.  The bootloader will typically populate the memory

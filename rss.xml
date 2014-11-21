@@ -162,6 +162,13 @@
     <guid>http://bgamari.github.com//posts/2014-03-19-help-an-invalid-closure.html</guid>
 </item>
 <item>
+    <title>Installing PicoHarp under modern Ubuntu with Wine</title>
+    <link>http://bgamari.github.com//posts/2014-04-18-setup-picoharp.html</link>
+    <description><![CDATA[Notes on configuring the Picoquant PicoHarp TCSPC instrument on Ubuntu]]></description>
+    <pubDate>Fri, 18 Apr 2014 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2014-04-18-setup-picoharp.html</guid>
+</item>
+<item>
     <title>Upgrading BIOS on Dell Latitude E7440</title>
     <link>http://bgamari.github.com//posts/2014-04-28-upgrading-bios-on-e7440.html</link>
     <description><![CDATA[Creating a FreeDOS environment for upgrading firmware with a large update image]]></description>
@@ -188,6 +195,20 @@
     <description><![CDATA[A brief note on how to unbrick a K20 with OpenOCD]]></description>
     <pubDate>Thu, 18 Sep 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-09-18-unbricking-a-secured-k20.html</guid>
+</item>
+<item>
+    <title>Semihosting on ARM with GCC and OpenOCD</title>
+    <link>http://bgamari.github.com//posts/2014-10-31-semihosting.html</link>
+    <description><![CDATA[A brief tutorial]]></description>
+    <pubDate>Fri, 31 Oct 2014 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2014-10-31-semihosting.html</guid>
+</item>
+<item>
+    <title>Bayes theorem, Bayesian probability, and inference</title>
+    <link>http://bgamari.github.com//posts/2014-11-21-bayes.html</link>
+    <description><![CDATA[A brief introduction to Bayesian probability]]></description>
+    <pubDate>Fri, 21 Nov 2014 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2014-11-21-bayes.html</guid>
 </item>
 
     </channel> 

@@ -5,6 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>bgamari.github.com - Installing LLVM and GHC on ARM</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   </head>
   <body>
     <div id="container">
@@ -120,7 +121,7 @@
 <li><code>GhcStage2HcOpts</code> from <code>-fasm</code> to <code>-fllvm</code></li>
 <li><code>SRC_HC_OPTS</code> remove <code>-fasm</code> (not quite sure what this should be but this works)</li>
 </ul>
-<p>Additionally, if you are planning on hacking on the tree, you may want to follow some of the recommendations at <a href="http://hackage.haskell.org/trac/ghc/wiki/Building/Using">http://hackage.haskell.org/trac/ghc/wiki/Building/Using</a> to speed up the build process. The build then proceeds as usual,</p>
+<p>Additionally, if you are planning on hacking on the tree, you may want to follow some of the recommendations at <a href="http://hackage.haskell.org/trac/ghc/wiki/Building/Using" class="uri">http://hackage.haskell.org/trac/ghc/wiki/Building/Using</a> to speed up the build process. The build then proceeds as usual,</p>
 <pre><code>    $ ./configure --prefix=$GHCROOT/usr
     $ make
     $ sudo make install</code></pre>
