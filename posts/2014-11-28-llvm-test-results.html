@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>bgamari.github.com - GHC and LLVM: Tests</title>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="content">
+        <div id="sidebar">
+          <nav>
+            <h1>Navigation</h1>
+            <ul>
+              <li><a href="../index.html">Home</a></li>
+              <li><a href="../posts.html">Blog-like thing</a></li>
+              <li><a href="../research-agenda.html">Research agenda</a></li>
+              <li><a href="../publications.html">Publications</a></li>
+              <li><a href="../past-research.html">Past research</a></li>
+              <li><a href="../media/cv.pdf">Curriculum Vitæ</a></li>
+            </ul>
+            <h1>Related Links</h1>
+            <ul>
+              <li><a href="http://goldnerlab.physics.umass.edu/wiki/">Research group</a></li>
+              <li><a href="http://www.github.com/bgamari">Github</a></li>
+            </ul>
+          </nav>
+        </div>
+  
+        <section id="main">
+        <h1 id="ghc-llvm-compatibility-tests">GHC-LLVM compatibility tests</h1>
+<p>Here are results from a series of compatibility tests of GHC’s LLVM backend. See the <a href="../posts/2014-11-28-state-of-llvm-backend.html">main article</a> for conclusions.</p>
+<p>These were taken on an x86-64 EC2 instance running Ubuntu 14.04.1 LTS.</p>
+<h2 id="llvm-3.5-ghc-7.8.3-with-rework-internal-symbols">LLVM 3.5, GHC 7.8.3 with rework, internal symbols</h2>
+<pre><code>Unexpected results from:
+TEST=&quot;T7571 T8256&quot;
+
+OVERALL SUMMARY for test run started at Fri Nov 28 21:14:53 2014 UTC
+ 0:00:47 spent to go through
+    3953 total tests, which gave rise to
+   21343 test cases, of which
+   19720 were skipped
+
+      27 had missing libraries
+    1577 expected passes
+      17 expected failures
+
+       0 caused framework failures
+       0 unexpected passes
+       2 unexpected failures
+
+Unexpected failures:
+   codeGen/should_run   T8256 [exit code non-0] (llvm)
+   llvm/should_compile  T7571 [stderr mismatch] (llvm)</code></pre>
+<h2 id="llvm-3.4-ghc-7.8.3-with-rework-internal-symbols">LLVM 3.4, GHC 7.8.3 with rework, internal symbols</h2>
+<p>Everything is broken,</p>
+<pre><code>/tmp/ghc98211_0/ghc98211_6.s: Assembler messages:
+
+/tmp/ghc98211_0/ghc98211_6.s:87:0:
+     Error: can't resolve `.rodata' {.rodata section} - `Main_main_info$def' {.text section}
+
+/tmp/ghc98211_0/ghc98211_6.s:108:0:
+     Error: can't resolve `.rodata' {.rodata section} - `ZCMain_main_info$def' {.text section}</code></pre>
+<h2 id="llvm-3.3-ghc-7.8.3-with-rework-internal-symbols">LLVM 3.3, GHC 7.8.3 with rework, internal symbols</h2>
+<pre><code>Unexpected results from:
+TEST=&quot;T7571 T8256&quot;
+
+OVERALL SUMMARY for test run started at Fri Nov 28 21:43:10 2014 UTC
+ 0:00:46 spent to go through
+    3953 total tests, which gave rise to
+   21343 test cases, of which
+   19720 were skipped
+
+      27 had missing libraries
+    1577 expected passes
+      17 expected failures
+
+       0 caused framework failures
+       0 unexpected passes
+       2 unexpected failures
+
+Unexpected failures:
+   codeGen/should_run   T8256 [exit code non-0] (llvm)
+   llvm/should_compile  T7571 [stderr mismatch] (llvm)
+</code></pre>
+<h2 id="llvm-3.2-ghc-7.8.3-with-rework-internal-symbols">LLVM 3.2, GHC 7.8.3 with rework, internal symbols</h2>
+<pre><code>Unexpected results from:
+TEST=&quot;T7571 T8256&quot;
+
+OVERALL SUMMARY for test run started at Fri Nov 28 21:44:33 2014 UTC
+ 0:00:46 spent to go through
+    3953 total tests, which gave rise to
+   21343 test cases, of which
+   19720 were skipped
+
+      27 had missing libraries
+    1577 expected passes
+      17 expected failures
+
+       0 caused framework failures
+       0 unexpected passes
+       2 unexpected failures
+
+Unexpected failures:
+   codeGen/should_run   T8256 [exit code non-0] (llvm)
+   llvm/should_compile  T7571 [stderr mismatch] (llvm)
+</code></pre>
+<h2 id="llvm-3.5-ghc-7.8.3-with-rework-external-symbols">LLVM 3.5, GHC 7.8.3 with rework, external symbols</h2>
+<pre><code>Unexpected results from:
+TEST=&quot;T7571 T8256 T5313 dynCompileExpr&quot;
+
+OVERALL SUMMARY for test run started at Fri Nov 28 21:35:10 2014 UTC
+ 0:00:46 spent to go through
+    3953 total tests, which gave rise to
+   21343 test cases, of which
+   19720 were skipped
+
+      27 had missing libraries
+    1575 expected passes
+      17 expected failures
+
+       0 caused framework failures
+       0 unexpected passes
+       4 unexpected failures
+
+Unexpected failures:
+   codeGen/should_run      T8256 [exit code non-0] (llvm)
+   driver                  T5313 [exit code non-0] (llvm)
+   ghc-api/dynCompileExpr  dynCompileExpr [exit code non-0] (llvm)
+   llvm/should_compile     T7571 [stderr mismatch] (llvm)</code></pre>
+<h2 id="llvm-3.4-ghc-7.8.3-with-rework-external-symbols">LLVM 3.4, GHC 7.8.3 with rework, external symbols</h2>
+<pre><code>Unexpected results from:
+TEST=&quot;T7571 T8256 T5313 dynCompileExpr&quot;
+
+OVERALL SUMMARY for test run started at Fri Nov 28 21:30:30 2014 UTC
+ 0:00:46 spent to go through
+    3953 total tests, which gave rise to
+   21343 test cases, of which
+   19720 were skipped
+
+      27 had missing libraries
+    1575 expected passes
+      17 expected failures
+
+       0 caused framework failures
+       0 unexpected passes
+       4 unexpected failures
+
+Unexpected failures:
+   codeGen/should_run      T8256 [exit code non-0] (llvm)
+   driver                  T5313 [exit code non-0] (llvm)
+   ghc-api/dynCompileExpr  dynCompileExpr [exit code non-0] (llvm)
+   llvm/should_compile     T7571 [stderr mismatch] (llvm)</code></pre>
+<h2 id="llvm-3.3-ghc-7.8.4-with-rework-external-symbols">LLVM 3.3, GHC 7.8.4 with rework, external symbols</h2>
+<pre><code>Unexpected results from:
+TEST=&quot;T7571 T8256 T5313 dynCompileExpr&quot;
+
+OVERALL SUMMARY for test run started at Fri Nov 28 21:32:31 2014 UTC
+ 0:00:45 spent to go through
+    3953 total tests, which gave rise to
+   21343 test cases, of which
+   19720 were skipped
+
+      27 had missing libraries
+    1575 expected passes
+      17 expected failures
+
+       0 caused framework failures
+       0 unexpected passes
+       4 unexpected failures
+
+Unexpected failures:
+   codeGen/should_run      T8256 [exit code non-0] (llvm)
+   driver                  T5313 [exit code non-0] (llvm)
+   ghc-api/dynCompileExpr  dynCompileExpr [exit code non-0] (llvm)
+   llvm/should_compile     T7571 [stderr mismatch] (llvm)</code></pre>
+<h2 id="llvm-3.2-ghc-7.8.4-with-rework-external-symbols">LLVM 3.2, GHC 7.8.4 with rework, external symbols</h2>
+<pre><code>Unexpected results from:
+TEST=&quot;T7571 T8256 T5313 dynCompileExpr&quot;
+
+OVERALL SUMMARY for test run started at Fri Nov 28 21:33:52 2014 UTC
+ 0:00:46 spent to go through
+    3953 total tests, which gave rise to
+   21343 test cases, of which
+   19720 were skipped
+
+      27 had missing libraries
+    1575 expected passes
+      17 expected failures
+
+       0 caused framework failures
+       0 unexpected passes
+       4 unexpected failures
+
+Unexpected failures:
+   codeGen/should_run      T8256 [exit code non-0] (llvm)
+   driver                  T5313 [exit code non-0] (llvm)
+   ghc-api/dynCompileExpr  dynCompileExpr [exit code non-0] (llvm)
+   llvm/should_compile     T7571 [stderr mismatch] (llvm)</code></pre>
+        </section>
+      </div>
+
+      <footer id="footer">
+        <span>Generated by <a href="http://jaspervdj.be/hakyll/index.html">Hakyll</a>.</span>
+      </footer>
+    </div>
+  </body>
+</html>
+

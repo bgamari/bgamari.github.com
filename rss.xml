@@ -210,6 +210,20 @@
     <pubDate>Fri, 21 Nov 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-11-21-bayes.html</guid>
 </item>
+<item>
+    <title>GHC and LLVM: Tests</title>
+    <link>http://bgamari.github.com//posts/2014-11-28-llvm-test-results.html</link>
+    <description><![CDATA[Results from compatbility tests between LLVM and GHC.]]></description>
+    <pubDate>Fri, 28 Nov 2014 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2014-11-28-llvm-test-results.html</guid>
+</item>
+<item>
+    <title>GHC and LLVM: A status update</title>
+    <link>http://bgamari.github.com//posts/2014-11-28-state-of-llvm-backend.html</link>
+    <description><![CDATA[A status update on GHC's LLVM code generation backend.]]></description>
+    <pubDate>Fri, 28 Nov 2014 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2014-11-28-state-of-llvm-backend.html</guid>
+</item>
 
     </channel> 
 </rss>
