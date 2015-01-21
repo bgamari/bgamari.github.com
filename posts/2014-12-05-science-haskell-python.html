@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>bgamari.github.com - 2014-12-05-science-haskell-python</title>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="content">
+        <div id="sidebar">
+          <nav>
+            <h1>Navigation</h1>
+            <ul>
+              <li><a href="../index.html">Home</a></li>
+              <li><a href="../posts.html">Blog-like thing</a></li>
+              <li><a href="../research-agenda.html">Research agenda</a></li>
+              <li><a href="../publications.html">Publications</a></li>
+              <li><a href="../past-research.html">Past research</a></li>
+              <li><a href="../media/cv.pdf">Curriculum Vitæ</a></li>
+            </ul>
+            <h1>Related Links</h1>
+            <ul>
+              <li><a href="http://goldnerlab.physics.umass.edu/wiki/">Research group</a></li>
+              <li><a href="http://www.github.com/bgamari">Github</a></li>
+            </ul>
+          </nav>
+        </div>
+  
+        <section id="main">
+        <h1 id="programming-lanaguages-in-science-the-good-the-bad-and-the-dynamically-typed">Programming lanaguages in Science: The Good, the Bad, and the dynamically typed</h1>
+<p>For the last five years of my life I have worked as a graduate student in the experimental physical sciences. Recently I while speaking with a fellow Haskeller the matter of the relative merits of Python and Haskell in my field came up. I threw in some off-the-cuff thoughts, but since the discussion I’ve realized that the relationship is even more nuanced that I originally thought.</p>
+<p>Physical scientists work with a lot of data: data is the tea-leaf that you must read to decode nature’s secrets. Some data you look at for mere seconds, other analyses will last for a few minutes of playing while others will be on-going for months, being poked, tweaked, and twisted all along. For some analyses (particularly those that make it into publications) correctness is of the utmost importances; for others an eyeball estimate is sufficient. Some analyses are carried out by one person, while others (particularly those in high-energy physics) are contributed to by hundreds of participants.</p>
+<p>This incredible variety of needs makes data analysis a hard task for many languages to do well. Up until very recently, the toolchain one would were likely prefer was heavily field-specific: R heavily used in fields requiring heavy statistics, MATLAB if you needed to crunch numerical data (especially in engineering), Mathematica popped up often in physics, and Python in astronomy. In recent years, however, Python has slowly emerged from its corner, gradually gaining mindshare in a growing number of fields.</p>
+<p>There are a few very good reasons for this.</p>
+<p>Pro-Python * Libraries: scipy, numpy, matplotlib, scikit-learn, scikits-image, sympy, lmfit, pandas, … * Low initial investment * Archivability: IPython Notebook * can save figures, code, and even data in one file * even if the code bitrots I still have a (hopefully consistent) set of code and analysis products for future reference * Relatively low cognitive overhead to syntax: type <code>pyplot.plot(x, y,    color='blue')</code> and things do as you’d expect * Easy to teach: can get users with little-to-no experience programming up and running in a day or two * Existing mindshare: * Others can use code * Widely available distributions specifically targetting those needing data analysis tools (e.g. Enthought)</p>
+<p>Anti-Python * Dynamically typed: * large (often ill-defined)) interface surface * Poorly defined semantics * Poor discoverability of interfaces * Occassional WTFs * Correctness: * Difficult to test, in practice few people do it * side-effects everywhere * for published data analyses this is bad * Mutability everywhere: * Partially a library/convention problem * language also just isn’t expressive enough * lack of things like <code>let</code> bindings in comprehensions makes them painful * Difficult to write fast code for many applications: Loops are terrible, the reason Cython, boost-python exists * Parallellism story is unfortunately quite poor (<code>multiprocessing</code> is just the beginning of the story)</p>
+<p>Pro-Haskell * Statically typed: * Smaller interface-surface to reason about * self-documenting * much easier to read, modify later * Really excellent libraries in some areas: * <code>diagrams</code>, HTML generation, <code>accelerate</code>, <code>linear</code>, <code>lens</code> * although they don’t address the core problems of data analysis, these can be useful for some tasks * can encode rich invariants in types if one chooses * Easy to (safely) bind to existing tools (FFI) (although it’s often necessary to write these bindings oneself) * Laziness: A can produce data even if I don’t necessarily need it later; allows for consistent interfaces at minimal cost * Performance: * I can write loopy code in the same language as my glue code * Streaming data is no longer a problem * Can write reusable code * Haskell is intrinsically much more composable due to level of abstraction and enforced contracts by typing * Python is composable by <em>convention</em> (e.g. standard numpy arrays), Haskell is closer to composable by <em>construction</em> * Duck-typing isn’t really enough to guarantee composability as the interface is so fluid * Can easily move from research to production if necessary without fearing for life</p>
+<p>Anti-Haskell * Arguably harder to teach * Laziness: * Working with large data can easily explode (the dreaded thunk leak) * in practice this tends not to be a problem once you have learned to reason about evaluation (but, this is yet another barrier standing between the researcher and their plot) * Immature library ecosystem: * Some just don’t exist: Robust, Haskellish linear algebra * Others are just a bit unwieldy: * reading tab-separated data with <code>cassava</code> (should be one line; is in practice six) * Can be addressed with libraries * Some is quite unwieldy: * <code>chart</code>: field accessor names * like using <code>matplotlib</code> without <code>pyplot</code> * Can mostly be addressed with libraries (but the resulting solution likely won’t look like idiomatic Haskell; e.g. overload names via typeclasses to keep namespace small) * Some are the same problems that all Haskellers face (e.g. Cabal Hell) but immensely amplified by the fact that user just wants a data analysis tool, not a programming language * need to develop a sense for what libraries on Hackage are actually trustworthy; in Python this is somewhat mitigated by the batteries-included nature and the few solid data-analysis libraries. * Time-to-plot: * Often the faster I can get to a plot, the better * Bringing up a Haskell analysis is “heavier” than in Python * Generally more <code>imports</code> are needed (perhaps addressed by libraries) * field name overlap (OverloadedRecordFields?) * Occassional type annotations due to inference failure (typically not an issue) * etc. * Rigidity imposed by type system: Often in research code I want to be able to just hack something together * This can be partially mitigated by self-restraint: Just because I <em>can</em> make my analysis type-safe, doesn’t mean I should</p>
+<p>Conclusions: * Types offer incredible advantages * In practice using Haskell in research suffers from papercuts, immature tooling, and lack of mindshare * But, most of these are fixable! * IHaskell is very promising, still many many more voids in library ecosystem to fill * Julia: * Faster? * Batteries-included * Appears to be committing many of the same correctness mistakes as Python</p>
+        </section>
+      </div>
+
+      <footer id="footer">
+        <span>Generated by <a href="http://jaspervdj.be/hakyll/index.html">Hakyll</a>.</span>
+      </footer>
+    </div>
+  </body>
+</html>
+
