@@ -224,6 +224,13 @@
     <pubDate>Fri, 28 Nov 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-11-28-state-of-llvm-backend.html</guid>
 </item>
+<item>
+    <title>Building Scipy on the ROCKS</title>
+    <link>http://bgamari.github.com//posts/2015-01-21-building-scipy-on-rocks.html</link>
+    <description><![CDATA[Installing Scipy on brain-dead distributions.]]></description>
+    <pubDate>Wed, 21 Jan 2015 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2015-01-21-building-scipy-on-rocks.html</guid>
+</item>
 
     </channel> 
 </rss>
