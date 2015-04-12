@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
     <channel>
         <title>bgamari.github.com</title>
         <link>http://bgamari.github.com/</link>
@@ -13,6 +14,7 @@
     <description><![CDATA[One experience debugging the transition to a devicetree-enable kernel on the BeagleBoard]]></description>
     <pubDate>Sun, 16 Oct 2011 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2011-10-16-adventures_in_devicetree_land.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Installing Amber 11 and AmberTools 1.5 on Ubuntu 11.04</title>
@@ -20,6 +22,7 @@
     <description><![CDATA[My experience installing the Amber 11 Molecular Dynamics package on Ubuntu 11.04.]]></description>
     <pubDate>Sun, 16 Oct 2011 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2011-10-16-amber.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Building BeagleDAQ and Tracker environment</title>
@@ -27,6 +30,7 @@
     <description><![CDATA[Compiling the software environment for the BeagleDAQ and particle tracker]]></description>
     <pubDate>Sun, 16 Oct 2011 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2011-10-16-beagledaq.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Installing OpenMM and GROMACS with AMBER force-field</title>
@@ -34,6 +38,7 @@
     <description><![CDATA[Installing the GROMACS molecular dynamics package with GPU acceleration and the AMBER force-field.]]></description>
     <pubDate>Sun, 16 Oct 2011 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2011-10-16-gromacs.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Cross-compiling LLVM for ARM on Ubuntu</title>
@@ -41,6 +46,7 @@
     <description><![CDATA[A short guide on building the LLVM compiler framework to run on an ARM target]]></description>
     <pubDate>Mon, 17 Oct 2011 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2011-10-17-crosscompiling_llvm.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Toner transfer PCB etching in a (bio)physics laboratory</title>
@@ -48,6 +54,7 @@
     <description><![CDATA[My methodology for PCB etching via toner transfer]]></description>
     <pubDate>Fri, 20 Jan 2012 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2012-01-20-pcb-etching.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Installing LLVM and GHC on ARM</title>
@@ -55,6 +62,7 @@
     <description><![CDATA[A tutorial for building LLVM and the Glasgow Haskell compiler on a ARM box]]></description>
     <pubDate>Fri, 27 Jan 2012 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2012-01-27-ghc-llvm-arm.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Self-built kernels on Linaro</title>
@@ -62,6 +70,7 @@
     <description><![CDATA[Building custom kernels for Linaro]]></description>
     <pubDate>Thu, 01 Mar 2012 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2012-03-01-linaro-kernel.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>JTAG debugging with a Bus Pirate, OpenOCD, and LPC1768</title>
@@ -69,6 +78,7 @@
     <description><![CDATA[Debugging an LPC1768 target over JTAG with a Bus Pirate and OpenOCD]]></description>
     <pubDate>Wed, 28 Mar 2012 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2012-03-28-jtag-over-buspirate.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Getting started with mchck</title>
@@ -76,6 +86,7 @@
     <description><![CDATA[Initial steps with the mchck microcontroller design]]></description>
     <pubDate>Mon, 25 Jun 2012 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2012-06-25-getting-started-with-mchck.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Endnote to Bibtex without pain</title>
@@ -83,6 +94,7 @@
     <description><![CDATA[In which an Endnote bibliography is converted to BibTeX]]></description>
     <pubDate>Tue, 10 Jul 2012 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2012-07-10-endnote-to-bibtex.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Running mesa from git on Ubuntu</title>
@@ -90,6 +102,7 @@
     <description><![CDATA[Testing mesa from git on Ubuntu]]></description>
     <pubDate>Thu, 30 Aug 2012 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2012-08-30-testing-mesa.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>GHC on ARM update</title>
@@ -97,6 +110,7 @@
     <description><![CDATA[Status upon on my work in making the Glasgow Haskell Compiler run on the ARM architecture]]></description>
     <pubDate>Fri, 04 Jan 2013 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2013-01-04-ghc-arm-update.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>A brief introduction to embedded development</title>
@@ -104,6 +118,7 @@
     <description><![CDATA[Some notes on embedded development written up for a friend.]]></description>
     <pubDate>Sat, 23 Mar 2013 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2013-03-23-intro-to-edev.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Getting started with HackRF Jawbreaker</title>
@@ -111,6 +126,7 @@
     <description><![CDATA[A tutorial for bringing up the HackRF Jawbreaker]]></description>
     <pubDate>Sat, 15 Jun 2013 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2013-06-15-hackrf.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Notes concerning LPC43xx and OpenOCD</title>
@@ -118,6 +134,7 @@
     <description><![CDATA[Some of my notes taken while bringing up the LPC4330 with OpenOCD]]></description>
     <pubDate>Thu, 27 Jun 2013 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2013-06-27-lpc43xx-and-openocd.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Flashing the Bus Blaster's CPLD buffer with OpenOCD</title>
@@ -125,6 +142,7 @@
     <description><![CDATA[Flashing the Bus Blaster JTAG adapter's CPLD buffer with OpenOCD]]></description>
     <pubDate>Wed, 24 Jul 2013 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2013-07-24-flashing-busblaster-cpld-with-openocd.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Debugging stream fusion performance</title>
@@ -132,6 +150,7 @@
     <description><![CDATA[Some tips for debugging performance of Haskell programs using stream fusion]]></description>
     <pubDate>Sun, 13 Oct 2013 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2013-10-13-debugging-stream-fusion.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Making Ubuntu usable with XMonad</title>
@@ -139,6 +158,7 @@
     <description><![CDATA[Configuration Ubuntu around XMonad]]></description>
     <pubDate>Fri, 01 Nov 2013 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2013-11-01-xmonad.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Running a modern kernel on the PandaBoard</title>
@@ -146,6 +166,7 @@
     <description><![CDATA[Bringing up the v3.12 kernel on the PandaBoard]]></description>
     <pubDate>Sun, 17 Nov 2013 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2013-11-17-running-modern-kernel-on-pandaboard.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>The state of GHC on ARM</title>
@@ -153,6 +174,7 @@
     <description><![CDATA[A brief history of my efforts in bringing first-class ARM support to GHC]]></description>
     <pubDate>Thu, 06 Mar 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-03-06-compiling-ghc-7.8-on-arm.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Help! An invalid closure</title>
@@ -160,6 +182,7 @@
     <description><![CDATA[A walk-through of debugging GHC's runtime system]]></description>
     <pubDate>Thu, 20 Mar 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-03-19-help-an-invalid-closure.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Installing PicoHarp under modern Ubuntu with Wine</title>
@@ -167,6 +190,7 @@
     <description><![CDATA[Notes on configuring the Picoquant PicoHarp TCSPC instrument on Ubuntu]]></description>
     <pubDate>Fri, 18 Apr 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-04-18-setup-picoharp.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Upgrading BIOS on Dell Latitude E7440</title>
@@ -174,6 +198,7 @@
     <description><![CDATA[Creating a FreeDOS environment for upgrading firmware with a large update image]]></description>
     <pubDate>Mon, 28 Apr 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-04-28-upgrading-bios-on-e7440.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>SWD with OpenOCD and a Bus Blaster</title>
@@ -181,6 +206,7 @@
     <description><![CDATA[A brief walk-through of bringing up an SWD interface with OpenOCD and a Bus Blaster JTAG adapter]]></description>
     <pubDate>Sat, 23 Aug 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-08-23-swd-with-busblaster-and-openocd.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Bringing up Debian on BeagleBone Black</title>
@@ -188,6 +214,7 @@
     <description><![CDATA[Bringing up a BeagleBone Black with Debian]]></description>
     <pubDate>Fri, 12 Sep 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-09-12-bringing-up-debian-on-bbb.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Unbricking a secured Freescale K20</title>
@@ -195,6 +222,7 @@
     <description><![CDATA[A brief note on how to unbrick a K20 with OpenOCD]]></description>
     <pubDate>Thu, 18 Sep 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-09-18-unbricking-a-secured-k20.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Semihosting on ARM with GCC and OpenOCD</title>
@@ -202,6 +230,7 @@
     <description><![CDATA[A brief tutorial]]></description>
     <pubDate>Fri, 31 Oct 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-10-31-semihosting.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Bayes theorem, Bayesian probability, and inference</title>
@@ -209,6 +238,7 @@
     <description><![CDATA[A brief introduction to Bayesian probability]]></description>
     <pubDate>Fri, 21 Nov 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-11-21-bayes.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>GHC and LLVM: Tests</title>
@@ -216,6 +246,7 @@
     <description><![CDATA[Results from compatbility tests between LLVM and GHC.]]></description>
     <pubDate>Fri, 28 Nov 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-11-28-llvm-test-results.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>GHC and LLVM: A status update</title>
@@ -223,6 +254,7 @@
     <description><![CDATA[A status update on GHC's LLVM code generation backend.]]></description>
     <pubDate>Fri, 28 Nov 2014 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2014-11-28-state-of-llvm-backend.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Building Scipy on the ROCKS</title>
@@ -230,7 +262,16 @@
     <description><![CDATA[Installing Scipy on brain-dead distributions.]]></description>
     <pubDate>Wed, 21 Jan 2015 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2015-01-21-building-scipy-on-rocks.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
+<item>
+    <title>First experiences debugging systemd</title>
+    <link>http://bgamari.github.com//posts/2015-05-13-debugging-systemd.html</link>
+    <description><![CDATA[a]]></description>
+    <pubDate>Sun, 12 Apr 2015 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2015-05-13-debugging-systemd.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
 </item>
 
-    </channel> 
+    </channel>
 </rss>
