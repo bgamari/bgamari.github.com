@@ -92,7 +92,7 @@ E: USEC_INITIALIZED=472111</code></pre>
 <p>and indeed <code>/lib/udev/rules.d/99-systemd.rules</code> includes the appropriate rule,</p>
 <pre><code>SUBSYSTEM==&quot;tty&quot;, KERNEL==&quot;tty[a-zA-Z]*|hvc*|xvc*|hvsi*|ttysclp*|sclp_line*|3270/tty[0-9]*&quot;, TAG+=&quot;systemd&quot;</code></pre>
 <p>Well, there goes that hypothesis.</p>
-<p>After some amount of Googling I find a StackExchange <a href="https://unix.stackexchange.com/questions/169935/no-login-prompt-on-serial-console">answer</a> which seems to fit the bill, suggesting that my kernel is too old (3.4, it is quite old).</p>
+<p>After some amount of Googling I find a StackExchange <a href="https://unix.stackexchange.com/questions/169935/no-login-prompt-on-serial-console">answer</a> which seems to fit the bill, suggesting that my kernel is too old (3.4, it is quite old). Compiling a new kernel indeed allows the machine to boot. Yay!</p>
         </section>
       </div>
 
