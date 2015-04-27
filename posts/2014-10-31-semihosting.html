@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>bgamari.github.com - Semihosting on ARM with GCC and OpenOCD</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   </head>
   <body>
@@ -28,7 +28,7 @@
             </ul>
           </nav>
         </div>
-  
+
         <section id="main">
         <h1 id="semihosting-with-arm-gcc-and-openocd">Semihosting with ARM, GCC, and OpenOCD</h1>
 <p>One of the many nice features of the ARM Cortex microcontrollers is the ability to use the JTAG debug interface as a sink for <code>printf</code> messages. This capability is known as <em>semihosting</em>. It’s actually quite straightforward to configure with open source tooling (the <a href="https://www.sourceware.org/newlib/"><code>newlib</code></a> C standard library and <a href="http://openocd.org/">OpenOCD</a> JTAG implementation).</p>

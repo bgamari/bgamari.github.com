@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>bgamari.github.com - Debugging stream fusion performance</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   </head>
   <body>
@@ -28,7 +28,7 @@
             </ul>
           </nav>
         </div>
-  
+
         <section id="main">
         <h1 id="debugging-stream-fusion-performance">Debugging stream fusion performance</h1>
 <p>Stream fusion frameworks such as those in <a href="http://hackage.haskell.org/package/vector"><code>vector</code></a> and <a href="http://hackage.haskell.org/package/text"><code>text</code></a> allow one to acheive impressive performance in Haskell code without compromising abstraction. That being said, debugging practices for working out when things are not fast aren’t terribly well documented. Using the profiler in these cases is generally not an option as this will disable the very optimizations that allow stream fusion produce fast code. Instead, one must take a slightly more low-level approach. In my experience, a few simple things should be checked,</p>

@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>bgamari.github.com - Building Scipy on the ROCKS</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   </head>
   <body>
@@ -28,7 +28,7 @@
             </ul>
           </nav>
         </div>
-  
+
         <section id="main">
         <p>ROCKS is one of many Redhat-based distributions often found on large-ish compute clusters. Unfortunately, ROCKS and its breatheren all share a distinctive flavor of brokenness and apparent contempt of the user that is truly remarkable, even among operating systems. This is most often encountered on the evening of a large deadline. In this scenario, you copy your compute task to the cluster, eager to see the machine churn away at your handiwork. Your enthusiasm is quickly quenched, however, when you realize that <code>scipy</code> is not available (or more likely, from a package build at some point during middle of the Carter administration).</p>
 <p>In this case, it’s typically easiest to just build your own environment. When it comes to Python applications, it’s best to do this within <code>virtualenv</code>,</p>

@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>bgamari.github.com - Running a modern kernel on the PandaBoard</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   </head>
   <body>
@@ -28,7 +28,7 @@
             </ul>
           </nav>
         </div>
-  
+
         <section id="main">
         <h1 id="running-a-modern-kernel-on-the-pandaboard">Running a modern kernel on the PandaBoard</h1>
 <p>Several years ago TI began offering the <a href="http://pandaboard.org/">PandaBoard</a>, a dual-core ARM7 development board based around the OMAP 4430. The relatively fast OMAP made this board an excellent substrate for development (in my case, hacking on the <a href="../posts/2012-01-27-ghc-llvm-arm.html">Glasgow Haskell Compiler</a>). Sadly, the group offering the board has since dissolved, leaving me with two PandaBoards with little software support. Moreover, older kernels <a href="https://bugzilla.kernel.org/show_bug.cgi?id=58541">lack</a> support for much of what this hardware is capable of. This write-up will be my notes for trying to bring up a modern kernel (3.12) on the PandaBoard. I’ll be building on a Debian Wheezy installation installed in the <a href="http://elinux.org/BeagleBoardDebian#Debian_NetInstall">usual way</a>.</p>

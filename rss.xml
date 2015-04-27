@@ -272,6 +272,14 @@
     <guid>http://bgamari.github.com//posts/2015-05-13-debugging-systemd.html</guid>
     <dc:creator>Ben Gamari</dc:creator>
 </item>
+<item>
+    <title>Performance implications of software RAID</title>
+    <link>http://bgamari.github.com//posts/2015-24-27-software-raid-performance.html</link>
+    <description><![CDATA[How many CPU cycles does software RAID actually require?]]></description>
+    <pubDate>Mon, 27 Apr 2015 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2015-24-27-software-raid-performance.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
 
     </channel>
 </rss>

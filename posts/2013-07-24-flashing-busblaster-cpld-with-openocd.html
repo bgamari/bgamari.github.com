@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>bgamari.github.com - Flashing the Bus Blaster's CPLD buffer with OpenOCD</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   </head>
   <body>
@@ -28,7 +28,7 @@
             </ul>
           </nav>
         </div>
-  
+
         <section id="main">
         <h1 id="flashing-the-bus-blaster-jtag-adapters-cpld-buffer-with-openocd">Flashing the Bus Blaster JTAG adapter’s CPLD buffer with OpenOCD</h1>
 <p>Recently an unfortunate incident involving 20V and a slipped probe resulted in a small plume of smoke rising from my Bus Blaster, followed by the smell of burnt electronics. After examining the wreckage, it seemed likely that the CPLD took most, if not all, of the damage. Not wanting to wait another month for Seeed to send a whole new device, I ordered some XC2C32A CPLD’s and replaced the burnt part. This, however, requires that the new part if FLASHed with the appropriate buffer logic. Below I describe how this can be accomplished using OpenOCD.</p>

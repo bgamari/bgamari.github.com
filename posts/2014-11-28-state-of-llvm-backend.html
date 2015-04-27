@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>bgamari.github.com - GHC and LLVM: A status update</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   </head>
   <body>
@@ -28,7 +28,7 @@
             </ul>
           </nav>
         </div>
-  
+
         <section id="main">
         <h1 id="ghc-and-llvm-a-status-update">GHC and LLVM: A status update</h1>
 <p>GHC and LLVM have had a long and somewhat tumultuous relationship. At this point David Terei’s lovely LLVM code generation backend has been with us now for almost five years and nine LLVM releases. GHC has benefited significantly from its use of LLVM; LLVM has enabled us to support new platforms, given us access to a state-of-the-art low-level optimizer, and enabled support for SIMD instructions all with very little man-power.</p>
@@ -41,7 +41,7 @@
 <p>As of GHC 7.8, we have fair support for LLVM 3.2 through 3.4 on most architectures, supporting tables-next-to-code and dynamic linking on x86_64 and ARM (and possibly others). For the reasons stated above, this is actually quite an achievement.</p>
 <p>The astute reader will notice that the latest release, 3.5, is notably missing from this list. As of 3.5 the LLVM team decided that the aliases that we used to fool LLVM into thinking our code is well-typed (even when the C– doesn’t tell us a type) were no longer acceptable. One can’t really fault them for this change as our usage essentially relied on the optimizer to resolve aliases to proper symbol references in order to produce valid object code.</p>
 <p>GHC Differential <a href="https://phabricator.haskell.org/D155">D155</a> reworks our use of aliases reflect the newly enforced rules concerning their usage. In principle this patch should allow us to produce code that will compile with LLVM 3.2 through 3.5 at the expense of producing a few extra symbols. In practice these symbols should pose no trouble whatsoever as we can simply mark them as having <code>internal</code> linkage. Unfortunately, LLVM 3.4 appear to forget which section internal symbols belong to causing massive breakage. If this weren’t the second-to-newest release I would say we should ignore this; unfortunately it’s very likely that 3.4 will be the most commonly encountered release in the wild for some time to come. For this reason, we will most likely be forced to mark these symbols as external in GHC 7.10. If you see object files filled with symbols ending in <code>$def</code> in GHC 7.8.4, this is the reason.</p>
-<p>Moreover, the LLVM 3.5 rework appears to uncover new optimization opportunities for LLVM on ARM. Usually I would be elated to report this but sadly said opportunities uncover a <a href="http://reviews.llvm.org/D6445">bug</a> in LLVM’s implementation GHC calling convention. This will hopefully be fixed in an LLVM bugfix release.</p>
+<p>Moreover, the LLVM 3.5 rework appears to uncover new optimization opportunities for LLVM on ARM. Usually I would be elated to report this but sadly said opportunities uncover a <a href="http://reviews.llvm.org/D6445">bug</a> in LLVM’s implementation GHC calling convention. This will hopefully be fixed in an LLVM bugfix release (<em>update</em> this fix is present in LLVM 3.5.1 and later).</p>
 <p>Below is a table describing the current support matrix on ARM and x86-64. “GHC 7.8” denotes the current state of the 7.8 branch (7.8.3 tested). “alias rework, internal” denotes the 7.8 branch with D155 applied and <code>$def</code> symbols marked as internal. “alias rework, external” denotes the same with these symbols marked as externally visible. See the <a href="../posts/2014-11-28-llvm-test-results.html">test results</a> article for the raw test-suite results.</p>
 <table>
 <thead>
