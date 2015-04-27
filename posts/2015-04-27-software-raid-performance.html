@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>bgamari.github.com - Performance implications of software RAID</title>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="content">
+        <div id="sidebar">
+          <nav>
+            <h1>Navigation</h1>
+            <ul>
+              <li><a href="../index.html">Home</a></li>
+              <li><a href="../posts.html">Blog-like thing</a></li>
+              <li><a href="../research-agenda.html">Research agenda</a></li>
+              <li><a href="../publications.html">Publications</a></li>
+              <li><a href="../past-research.html">Past research</a></li>
+              <li><a href="../media/cv.pdf">Curriculum Vitæ</a></li>
+            </ul>
+            <h1>Related Links</h1>
+            <ul>
+              <li><a href="http://goldnerlab.physics.umass.edu/wiki/">Research group</a></li>
+              <li><a href="http://www.github.com/bgamari">Github</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <section id="main">
+        <h1 id="performance-implications-of-software-raid">Performance implications of software RAID</h1>
+<p>The choice between hardware assisted and software RAID seems to draw strong opinions on all sides. I’ve recently been specifying a moderately-sized storage system for a research setting. In this application, I/O throughput is nice to have but most users will be CPU bound; space requirements are in the dozens of terabytes, with the potential to scale up to 100 TB or so.</p>
+<p>While there are many things that can be said about the durability offered by a hardware RAID controller with battery-backed writeback buffer, I’ve always been a bit skeptical of black-boxes. In the best case they are merely a nuisance to manage, in the worst case they are a binary-blob-laden nightmare. Further, the boards are fairly expensive, there is <a href="https://blog.cloudflare.com/a-tour-inside-cloudflares-latest-generation-servers/">evidence</a> to suggest that they often don’t offer the performance that one might expect, and they represent a single-point of failure where recovery requires finding hardware identical to the original controller.</p>
+<p>So, while the durability of hardware RAID may be necessary for banking, it doesn’t seem necessary for the current application, where we will already have redundant, independent power supplies and the data is largely static. With this in mind, it seems that the decision largely comes down to performance. When reading about RAID solutions it doesn’t take long to encounter some argument around the CPU time required to compute RAID parity. Given the quite [weak hardware][] driving most commercial RAID solutions are compared to the typical multi-GHz Haswell with &gt;256 bit SIMD paths, this argument seems a tad empty. After all, RAID 5 is essentially block-wise XORs (RAID 6 is a bit trickier); how bad could it possibly be?</p>
+<p>Take, for instance, my laptop. It features a Core i5 4300U running at 1.9GHz; a pretty quick machine but certainly nothing special. Every time I boot the kernel informs me of these useful numbers while initializing the <code>md</code> RAID subsystem,</p>
+<pre><code>raid6: sse2x1    9154 MB/s
+raid6: sse2x2   11477 MB/s
+raid6: sse2x4   13291 MB/s
+raid6: avx2x1   17673 MB/s
+raid6: avx2x2   20432 MB/s
+raid6: avx2x4   23755 MB/s
+raid6: using algorithm avx2x4 (23755 MB/s)
+raid6: using avx2x2 recovery algorithm
+xor: automatically using best checksumming function:
+    avx       : 28480.000 MB/sec
+</code></pre>
+<p>Or on a slightly older Ivy Bridge machine (which lacks AVX support),</p>
+<pre><code>raid6: sse2x4   12044 MB/s
+raid6: using algorithm sse2x4 (12044 MB/s)
+raid6: using ssse3x2 recovery algorithm
+xor: automatically using best checksumming function:
+   avx       : 22611.000 MB/sec</code></pre>
+<p>Taken alone these numbers are pretty impressive. Of course this isn’t surprising; a lot of people have put a great deal of <a href="http://kernel.org/pub/linux/kernel/people/hpa/raid6.pdf">effort</a> into making these routines extremely efficient. For comparison, at this throughput it would require somewhere around 2% of a single core’s cycles to rebuild an eight-drive array (assuming each drive pushes somewhere around 60MByte/s, which itself it a rather generous number).</p>
+<p>Looking at the <a href="https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/lib/raid6/algos.c?id=v4.0#n149">code</a> responsible for these messages, these figures arise from timing a simple loop to generate syndromes from a dummy buffer. As this buffer fits in cache these performance numbers clearly aren’t what we will see under actual workloads.</p>
+<p>Thankfully, it is fairly straightforward (see below) to construct a (very rough) approximation of an actual workload. Here we build a md level-6 volume on an SSD. Using <code>fio</code> to produce I/O, we can measure the transfer rate sustained by the volume along with the number of cycles consumed by md’s kernel threads.</p>
+<p>On my Haswell machine I find that <code>md</code> can push roughly 400MByte/s of writes with <code>md</code>’s kernel worker eating just shy of 10% of a core. As expected, reads from the non-degraded volume see essentially no CPU time used by <code>md</code>. On an Ivy Bridge machine (lacking AVX instructions; also tested against a different SSD), on the other hand I find that I can push roughly 250 MByte/s with closer to 20% CPU time eaten by md. Clearly AVX pulls its weight very nicely here.</p>
+<p>Given that the workload in question are largely read-oriented, it seems like this is a perfectly reasonable price to pay, assuming AVX is available.</p>
+<h2 id="benchmark">Benchmark</h2>
+<p>Here is the benchmark, to be sourced and invoked with <code>run_all</code>. As usual, this is provided as-is; assume it will kill your cat and burn your house down.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash -e</span>
+
+<span class="co"># Where to put the images</span>
+<span class="ot">root=</span><span class="st">&quot;/tmp&quot;</span>
+<span class="ot">processes=</span><span class="st">&quot;md md127_raid6&quot;</span>
+
+<span class="co"># damn you bash</span>
+<span class="ot">time=</span><span class="st">&quot;/usr/bin/time&quot;</span>
+
+<span class="co"># Setup RAID &quot;devices&quot;</span>
+<span class="kw">function</span><span class="fu"> setup()</span> <span class="kw">{</span>
+    <span class="ot">loopbacks=</span>
+    <span class="kw">for</span> <span class="kw">i</span> in 1 2 3 4<span class="kw">;</span> <span class="kw">do</span>
+        <span class="kw">touch</span> <span class="ot">$root</span>/test<span class="ot">$i</span>
+        <span class="kw">fallocate</span> -l <span class="ot">$(</span><span class="kw">echo</span> 8*1024*1024*1024 <span class="kw">|</span> <span class="kw">bc</span><span class="ot">)</span> -z <span class="ot">$root</span>/test<span class="ot">$i</span>
+        <span class="ot">loopbacks=</span><span class="st">&quot;</span><span class="ot">$loopbacks</span><span class="st"> </span><span class="ot">$(</span><span class="kw">sudo</span> losetup --find --show <span class="ot">$root</span>/test<span class="ot">$i)</span><span class="st">&quot;</span>
+    <span class="kw">done</span>
+    <span class="kw">sudo</span> mdadm --create --level=6 --raid-devices=4 /dev/md/bench <span class="ot">$loopbacks</span>
+    <span class="kw">sudo</span> mkfs.ext4 /dev/md/bench
+    <span class="kw">sudo</span> mkdir /mnt/bench
+    <span class="kw">sudo</span> mount /dev/md/bench /mnt/bench
+<span class="kw">}</span>
+
+<span class="co"># Measure it!</span>
+<span class="ot">tick=</span><span class="st">&quot;</span><span class="ot">$(</span><span class="kw">getconf</span> CLK_TCK<span class="ot">)</span><span class="st">&quot;</span>
+<span class="kw">function</span><span class="fu"> show_processes()</span> <span class="kw">{</span>
+    <span class="kw">for</span> <span class="kw">p</span> in <span class="ot">$@</span><span class="kw">;</span> <span class="kw">do</span>
+        <span class="ot">pid=</span><span class="st">&quot;</span><span class="ot">$(</span><span class="kw">pidof</span> <span class="ot">$p)</span><span class="st">&quot;</span>
+        <span class="co"># pid, comm, user, system</span>
+        <span class="kw">cat</span> /proc/<span class="ot">$pid</span>/stat <span class="kw">|</span> <span class="kw">awk</span> <span class="st">&quot;{print </span><span class="dt">\$</span><span class="st">1,</span><span class="dt">\$</span><span class="st">2,</span><span class="dt">\$</span><span class="st">14 / </span><span class="ot">$tick</span><span class="st">,</span><span class="dt">\$</span><span class="st">15 / </span><span class="ot">$tick</span><span class="st">}&quot;</span>
+    <span class="kw">done</span>
+<span class="kw">}</span>
+
+<span class="kw">function</span><span class="fu"> write_test()</span> <span class="kw">{</span>
+    <span class="kw">echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">n================================&quot;</span> <span class="kw">&gt;&gt;</span> times.log
+    <span class="kw">echo</span> -e <span class="st">&quot;Write test&quot;</span> <span class="kw">&gt;&gt;</span> times.log
+    <span class="kw">(echo</span> <span class="st">&quot;Before&quot;</span><span class="kw">;</span> <span class="kw">show_processes</span> <span class="ot">$processes</span><span class="kw">)</span> <span class="kw">&gt;&gt;</span> <span class="kw">times.log</span>
+    <span class="ot">$time</span> <span class="kw">-a</span> -o times.log sudo fio --bs=64k --ioengine=libaio \
+        --iodepth=4 --size=7g --direct=1 --runtime=60 \
+        --directory=/mnt/bench --filename=test --name=seq-write \
+        --rw=write
+    <span class="kw">(echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">nAfter&quot;</span><span class="kw">;</span> <span class="kw">show_processes</span> <span class="ot">$processes</span><span class="kw">)</span> <span class="kw">&gt;&gt;</span> <span class="kw">times.log</span>
+<span class="kw">}</span>
+
+<span class="kw">function</span><span class="fu"> read_test()</span> <span class="kw">{</span>
+    <span class="kw">echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">n================================&quot;</span> <span class="kw">&gt;&gt;</span> times.log
+    <span class="kw">echo</span> -e <span class="st">&quot;Read test&quot;</span> <span class="kw">&gt;&gt;</span> times.log
+    <span class="kw">(echo</span> <span class="st">&quot;Before&quot;</span><span class="kw">;</span> <span class="kw">show_processes</span> <span class="ot">$processes</span><span class="kw">)</span> <span class="kw">&gt;&gt;</span> <span class="kw">times.log</span>
+    <span class="ot">$time</span> <span class="kw">-a</span> -o times.log sudo fio --bs=64k --ioengine=libaio \
+        --iodepth=4 --size=7g --direct=1 --runtime=60 \
+        --directory=/mnt/bench --filename=test --name=seq-read \
+        --rw=read
+    <span class="kw">(echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">nAfter&quot;</span><span class="kw">;</span> <span class="kw">show_processes</span> <span class="ot">$processes</span><span class="kw">)</span> <span class="kw">&gt;&gt;</span> <span class="kw">times.log</span>
+<span class="kw">}</span>
+
+<span class="kw">function</span><span class="fu"> rebuild_test()</span> <span class="kw">{</span>
+    <span class="kw">echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">n================================&quot;</span> <span class="kw">&gt;&gt;</span> times.log
+    <span class="kw">echo</span> <span class="st">&quot;Rebuild test&quot;</span> <span class="kw">&gt;&gt;</span> times.log
+    <span class="kw">(echo</span> <span class="st">&quot;Before&quot;</span><span class="kw">;</span> <span class="kw">show_processes</span> <span class="ot">$processes</span><span class="kw">)</span> <span class="kw">&gt;&gt;</span> <span class="kw">times.log</span>
+    <span class="kw">echo</span> check <span class="kw">|</span> <span class="kw">sudo</span> tee /sys/block/md127/md/sync_action
+    <span class="kw">sudo</span> mdadm --monitor <span class="kw">|</span> <span class="kw">grep</span> RebuildFinished <span class="kw">|</span> <span class="kw">head</span> -n1
+    <span class="kw">(echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">nAfter&quot;</span><span class="kw">;</span> <span class="kw">show_processes</span> <span class="ot">$processes</span><span class="kw">)</span> <span class="kw">&gt;&gt;</span> <span class="kw">times.log</span>
+<span class="kw">}</span>
+
+<span class="co"># Clean up</span>
+<span class="kw">function</span><span class="fu"> cleanup()</span> <span class="kw">{</span>
+    <span class="kw">sudo</span> umount /mnt/bench
+    <span class="kw">sudo</span> mdadm -S /dev/md/bench
+    <span class="kw">echo</span> <span class="ot">$loopbacks</span> <span class="kw">|</span> <span class="kw">sudo</span> xargs -n1 -- losetup --detach
+    <span class="kw">sudo</span> rm -R /mnt/bench
+    <span class="kw">rm</span> <span class="ot">$root</span>/test[1234]
+<span class="kw">}</span>
+
+<span class="kw">function</span><span class="fu"> run_all()</span> <span class="kw">{</span>
+    <span class="kw">echo</span> <span class="kw">&gt;</span> times.log
+    <span class="kw">setup</span>
+    <span class="kw">write_test</span>
+    <span class="kw">read_test</span>
+    <span class="kw">umount</span> /mnt/bench
+    <span class="kw">rebuild_test</span>
+    <span class="kw">cleanup</span>
+    <span class="kw">cat</span> times.log
+<span class="kw">}</span></code></pre></div>
+        </section>
+      </div>
+
+      <footer id="footer">
+        <span>Generated by <a href="http://jaspervdj.be/hakyll/index.html">Hakyll</a>.</span>
+      </footer>
+    </div>
+  </body>
+</html>
+
