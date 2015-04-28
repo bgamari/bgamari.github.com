@@ -33,13 +33,41 @@
         <h1 id="jtag-debugging-with-a-bus-pirate-openocd-and-lpc1768">JTAG debugging with a Bus Pirate, OpenOCD, and LPC1768</h1>
 <p>This was done on an LPCXpresso LPC1769 board. The debug harness was wired as follows,</p>
 <table>
-<pre><code>&lt;tr&gt;&lt;th&gt;LPCXpresso&lt;/th&gt; &lt;th&gt;Signal&lt;/th&gt; &lt;th&gt;Bus Pirate&lt;/th&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;2&lt;/td&gt;  &lt;td&gt;TMS&lt;/td&gt;  &lt;td&gt;CS&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;3&lt;/td&gt;  &lt;td&gt;TCLK&lt;/td&gt; &lt;td&gt;CLK&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;4&lt;/td&gt;  &lt;td&gt;TDO&lt;/td&gt;  &lt;td&gt;MISO&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;5&lt;/td&gt;  &lt;td&gt;TDI&lt;/td&gt;  &lt;td&gt;MOSI&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;8&lt;/td&gt;  &lt;td&gt;GND&lt;/td&gt;  &lt;td&gt;GND&lt;/td&gt;&lt;/tr&gt;</code></pre>
-<table>
+<thead>
+<tr class="header">
+<th align="left">LPCXpresso</th>
+<th align="left">Signal</th>
+<th align="left">Bus Pirate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2</td>
+<td align="left">TMS</td>
+<td align="left">CS</td>
+</tr>
+<tr class="even">
+<td align="left">3</td>
+<td align="left">TCLK</td>
+<td align="left">CLK</td>
+</tr>
+<tr class="odd">
+<td align="left">4</td>
+<td align="left">TDO</td>
+<td align="left">MISO</td>
+</tr>
+<tr class="even">
+<td align="left">5</td>
+<td align="left">TDI</td>
+<td align="left">MOSI</td>
+</tr>
+<tr class="odd">
+<td align="left">8</td>
+<td align="left">GND</td>
+<td align="left">GND</td>
+</tr>
+</tbody>
+</table>
 <h1 id="preliminaries">Preliminaries</h1>
 <p>Get OpenOCD from git,</p>
 <pre><code>$ git clone</code></pre>
@@ -116,33 +144,33 @@ JTAG tap: lpc1768.cpu tap/device found: 0x4ba00477 (mfg: 0x23b, part: 0xba00, ve
 <p>It works!</p>
 <h2 id="flashing-new-firmware">Flashing new firmware</h2>
 <p>First, build a <code>.bin</code> of the desired firmware. The LPC1769’s ROM bootloader verifies that the user code in FLASH is valid before booting by way of a checksum of the interrupt vector table. The checksum is of the first eight interrupt vectors and is stored in vector 7 (0x0000001c). The easiest way to ensure this is set correctly is to run the binary image through the following C,</p>
-<pre><code>#include &lt;stdio.h&gt;
-#include &lt;unistd.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;sys/stat.h&gt;
-#include &lt;fcntl.h&gt;
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="ot">#include &lt;stdio.h&gt;</span>
+<span class="ot">#include &lt;unistd.h&gt;</span>
+<span class="ot">#include &lt;sys/types.h&gt;</span>
+<span class="ot">#include &lt;sys/stat.h&gt;</span>
+<span class="ot">#include &lt;fcntl.h&gt;</span>
 
-int main(int argc, char **argv) {
-        int fw, count, crc;
-        char buf[28];
+<span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">char</span> **argv) {
+    <span class="dt">int</span> fw, count, crc;
+    <span class="dt">char</span> buf[<span class="dv">28</span>];
 
-        fw = open(argv[1], O_RDWR);
-        // read fist 28 bytes
-        read(fw, &amp;buf, 28);
+    fw = open(argv[<span class="dv">1</span>], O_RDWR);
+    <span class="co">// read fist 28 bytes</span>
+    read(fw, &amp;buf, <span class="dv">28</span>);
 
-        // find 2's complement of entries 0 to 6
-        for (count=0, crc=0; count &lt; 7; count++) {
-                crc += *((int*)(buf+count*4));
-        }
-        crc = (~crc) + 1;
+    <span class="co">// find 2's complement of entries 0 to 6</span>
+    <span class="kw">for</span> (count=<span class="dv">0</span>, crc=<span class="dv">0</span>; count &lt; <span class="dv">7</span>; count++) {
+            crc += *((<span class="dt">int</span>*)(buf+count*<span class="dv">4</span>));
+    }
+    crc = (~crc) + <span class="dv">1</span>;
 
-        // write it at offset 0x0000001C 
-        lseek(fw, 0x0000001C, SEEK_SET);
-        write(fw, &amp;crc, 4);
-        close(fw);
+    <span class="co">// write it at offset 0x0000001C </span>
+    lseek(fw, <span class="bn">0x0000001C</span>, SEEK_SET);
+    write(fw, &amp;crc, <span class="dv">4</span>);
+    close(fw);
 
-        return 0;
-}</code></pre>
+    <span class="kw">return</span> <span class="dv">0</span>;
+}</code></pre></div>
 <h2 id="debugging-on-arm">Debugging on ARM</h2>
 <p>While sometimes my system’s native gdb will somehow understand the ARM architecture after attaching to the remote target, I haven’t figured out how to do this reliably. For this reason, I build gdb for ARM.</p>
 <p>Start by grabbing a GDB source tarball; extract it, and then configure and build as follows,</p>

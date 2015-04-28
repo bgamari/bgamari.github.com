@@ -175,30 +175,93 @@ $ make</code></pre>
 <p>Now you have a <code>blink.bin</code> image ready to be uploaded to the mkchk. This can be done through one of the device’s two debug ports: the five-pin JTAG interface or the two-pin Serial Wire Debug (SWD) interface. The appropriate wiring configurations are shown in the tables below.</p>
 <p>To interface with the device I used a <a href="http://dangerousprototypes.com/docs/Bus_Pirate">Bus Pirate</a> in conjunction with a variant of Will Donnelley’s <a href="http://www.willdonnelly.net/blog/bus-pirate-serial-wire/"><code>pirate-swd</code></a>. While Will’s <a href="http://www.willdonnelly.net/blog/bus-pirate-serial-wire/">description</a> is helpful, details on the hardware configuration are pretty sparse.</p>
 <div style="float:right;">
-<pre><code>&lt;table&gt;
-    &lt;tr&gt;&lt;th&gt;Signal&lt;/th&gt;&lt;th&gt;Bus Pirate&lt;/th&gt;&lt;th&gt;mchck&lt;/th&gt;&lt;/tr&gt;
-    &lt;tr&gt;&lt;td&gt;TCK&lt;/td&gt;   &lt;td&gt;PA14&lt;/td&gt;  &lt;td&gt;CLK&lt;/td&gt;  &lt;td&gt;P4-4&lt;/td&gt;&lt;/tr&gt;
-    &lt;tr&gt;&lt;td&gt;TMS&lt;/td&gt;   &lt;td&gt;PA13&lt;/td&gt;  &lt;td&gt;CS&lt;/td&gt;   &lt;td&gt;P4-3&lt;/td&gt;&lt;/tr&gt;
-    &lt;tr&gt;&lt;td&gt;TDI&lt;/td&gt;   &lt;td&gt;PA15&lt;/td&gt;  &lt;td&gt;MOSI&lt;/td&gt; &lt;td&gt;P3-1&lt;/td&gt;&lt;/tr&gt;
-    &lt;tr&gt;&lt;td&gt;TDO&lt;/td&gt;   &lt;td&gt;PB3&lt;/td&gt;   &lt;td&gt;MISO&lt;/td&gt; &lt;td&gt;P3-2&lt;/td&gt;&lt;/tr&gt;
-    &lt;tr&gt;&lt;td&gt;NJTRSR&lt;/td&gt;&lt;td&gt;PB4&lt;/td&gt;   &lt;td&gt;MISO&lt;/td&gt; &lt;td&gt;P3-3&lt;/td&gt;&lt;/tr&gt;
-    &lt;tr&gt;&lt;td&gt;GND&lt;/td&gt;   &lt;td&gt;&lt;/td&gt;      &lt;td&gt;GND&lt;/td&gt;  &lt;td&gt;P4-2&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;
-&lt;b&gt;JTAG interface pins&lt;/b&gt;</code></pre>
-</div>
-<div style="float:right; background-color: grey50;">
-<pre><code>&lt;table&gt;
-  &lt;tr&gt;&lt;th&gt;Signal&lt;/th&gt;&lt;th&gt;STM32 Pin&lt;/th&gt;&lt;th&gt;Bus Pirate&lt;/th&gt;&lt;th&gt;mchck&lt;/th&gt;&lt;/tr&gt;
-  &lt;tr&gt;&lt;td&gt;SWCLK&lt;/td&gt; &lt;td&gt;PA14&lt;/td&gt;  &lt;td&gt;CLK&lt;/td&gt;  &lt;td&gt;P4-4&lt;/td&gt;&lt;/tr&gt;
-  &lt;tr&gt;&lt;td&gt;SWDIO&lt;/td&gt; &lt;td&gt;PA13&lt;/td&gt;  &lt;td&gt;MOSI&lt;/td&gt; &lt;td&gt;P4-3&lt;/td&gt;&lt;/tr&gt;
-  &lt;tr&gt;&lt;td&gt;GND&lt;/td&gt;   &lt;td&gt;&lt;/td&gt;      &lt;td&gt;GND&lt;/td&gt;  &lt;td&gt;P4-2&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;
-&lt;b&gt;Serial Wire Debug interface pins&lt;/b&gt;</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Signal</th>
+<th align="left">Bus Pirate</th>
+<th align="left">mchck</th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">TCK</td>
+<td align="left">PA14</td>
+<td align="left">CLK</td>
+<td align="left">P4-4</td>
+</tr>
+<tr class="even">
+<td align="left">TMS</td>
+<td align="left">PA13</td>
+<td align="left">CS</td>
+<td align="left">P4-3</td>
+</tr>
+<tr class="odd">
+<td align="left">TDI</td>
+<td align="left">PA15</td>
+<td align="left">MOSI</td>
+<td align="left">P3-1</td>
+</tr>
+<tr class="even">
+<td align="left">TDO</td>
+<td align="left">PB3</td>
+<td align="left">MISO</td>
+<td align="left">P3-2</td>
+</tr>
+<tr class="odd">
+<td align="left">NJTRSR</td>
+<td align="left">PB4</td>
+<td align="left">MISO</td>
+<td align="left">P3-3</td>
+</tr>
+<tr class="even">
+<td align="left">GND</td>
+<td align="left"></td>
+<td align="left">GND</td>
+<td align="left">P4-2</td>
+</tr>
+</tbody>
+</table>
+<p><b>JTAG interface pins</b></p>
 </div>
 <p>Since I use SWD (due to its lower pin count) I will detail my experiences with this below.</p>
 <p>Using the <code>flashSTM32</code> program available in my <code>pirate-swd</code> Github <a href="https://github.com/bgamari/pirate-swd">repository</a>, upload the new image,</p>
 <pre><code>$ python pirate-swd/flashSTM32.py mchck/examples/blink/blink.bin</code></pre>
 <p>If all goes well, you should see a variety of status messages, followed by a message informing you that the script has reset the device. Hopefully now you will see the LED on the device blinking.</p>
+<div style="float:right; background-color: grey50;">
+<table>
+<thead>
+<tr class="header">
+<th align="left">Signal</th>
+<th align="left">STM32 Pin</th>
+<th align="left">Bus Pirate</th>
+<th align="left">mchck</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">SWCLK</td>
+<td align="left">PA14</td>
+<td align="left">CLK</td>
+<td align="left">P4-4</td>
+</tr>
+<tr class="even">
+<td align="left">SWDIO</td>
+<td align="left">PA13</td>
+<td align="left">MOSI</td>
+<td align="left">P4-3</td>
+</tr>
+<tr class="odd">
+<td align="left">GND</td>
+<td align="left"></td>
+<td align="left">GND</td>
+<td align="left">P4-2</td>
+</tr>
+</tbody>
+</table>
+<p><b>SWD Debug interface pins</b></p>
+</div>
 <p>If the script dies of a protocol error, don’t worry, there are many possible issues, few of which are serious. First double-check the wiring and ensure that the device has power. If this is the correct, next look at the three bits listed in the script’s error message. These are the acknowledgement bits of the frame during which it lost synchronization with the device.</p>
 <p>If the acknowledgement bits aren’t all the same value, then you probably have noise on your clock line. This can be tested by placing your finger on the mchck’s SWD header pins. If the bus becomes more stable, this is evidence that your connection configuration is picking up RF noise from your surroundings, leading to false cycles. When using my Bus Pirate’s grabber cable, I found it necessary to place a capacitor between CLK and GND to provide better noise rejection. Without this the bus was extremely unstable.</p>
 <p>Finally, if the acknowledgement bits are all either 0 or 1, things aren’t good; it seems the chip isn’t making any attempt at communicating. Double check your soldering, the orientation of the chip, and if all else fails try replacing it.</p>
