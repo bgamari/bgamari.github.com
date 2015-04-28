@@ -275,7 +275,7 @@
 <item>
     <title>First experiences debugging systemd</title>
     <link>http://bgamari.github.com//posts/2015-05-13-debugging-systemd.html</link>
-    <description><![CDATA[a]]></description>
+    <description><![CDATA[First impressions on debugging the systemd boot process]]></description>
     <pubDate>Sun, 12 Apr 2015 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2015-05-13-debugging-systemd.html</guid>
     <dc:creator>Ben Gamari</dc:creator>
