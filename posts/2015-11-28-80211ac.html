@@ -30,7 +30,23 @@
         </div>
 
         <section id="main">
-        <h1 id="ac-with-ath10k">802.11ac with ath10k</h1>
+        <article>
+    <h1>802.11ac with ath10k</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2015-11-28" class="pubdate">2015-11-28</time> | tagged with <ul class="tags"><li>wireless</li><li>ath10k</li></ul>
+        </div>
+    </header>
+
+    <p>These are my notes from an attempt at bringing up an 802.11ac wireless adapter in master mode. Unfortunately, this attempt was largely a failure,</p>
+<ol style="list-style-type: decimal">
+<li>Two Android devices and a Roku were unable to see the network at all</li>
+<li>Range was rather disappointing (largely due to the fact that I was operating at 5GHz)</li>
+<li>Convincing the driver that in fact lived in Germany and could therefore initiate radiation on the 5GHz band required a great deal of fragile</li>
+<li>Throughput was not worth the complexity that 802.11ac wrought</li>
+</ol>
+<p>This was with a Compex WLE600V5-27 adapter supported by the <a href="https://wireless.wiki.kernel.org/en/users/Drivers/ath10k">ath10k</a>.</p>
+<h2 id="regulatory">Regulatory</h2>
 <pre><code>$ git clone git://git.kernel.org/pub/scm/linux/kernel/git/linville/wireless-regdb.git
 $ cd wireless-regdb
 $ openssl req -x509  -nodes -days 365 -sha256 -newkey rsa:2048 -keyout ben.pem -out ben.pem
@@ -44,6 +60,8 @@ $ PUBKEY_DIR=/lib/crda/pubkeys RUNTIME_PUBKEY_DIR=$PUBKEY_DIR make
 $ sudo PREFIX= make install
 $ ln -s debian-example debian</code></pre>
 <p>Add <code>CFLAGS := -fpic</code> to <code>debian/rules</code>.</p>
+</article>
+
         </section>
       </div>
 

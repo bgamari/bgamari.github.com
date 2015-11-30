@@ -34,11 +34,12 @@
     <h1>Understanding GHC Core</h1>
     <header>
         <div class="meta">
-            <time datetime="2015-11-29" class="pubdate">2015-11-29</time> | tagged with <ul class="tags"><li>ghc</li><li>core</li></ul>
+            <time datetime="2015-11-29" class="pubdate">2015-11-29</time> | tagged with <ul class="tags"><li>ghc</li><li>core</li><li>work-in-progress</li></ul>
         </div>
     </header>
 
-    <p>While there have been a variety of writings about GHC’s Core representation, the language is a living entity which changes quickly in ways that aren’t always documented in</p>
+    <p><strong>This document is a work-in-progress.</strong> If there is something that you would like to see discussed feel free to let me know.</p>
+<p>While there have been a variety of writings about GHC’s Core representation, the language is a living entity which changes quickly in ways that aren’t always well documented. This</p>
 <h2 id="what-is-core">What is Core?</h2>
 <p>GHC Core is a close relative of the <a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/ext-f/fc-tldi.pdf">System FC</a> language and the first of a series of intermediate representations used by GHC to turn Haskell into machine code (the others being STG and C–).</p>
 <p>While on face value Core appears very similar to Haskell, there are a few</p>
@@ -115,7 +116,7 @@
 </tbody>
 </table>
 <h3 id="unfolding-templates">Unfolding templates</h3>
-<p>Unfolding (sometimes known as inlining (TODO)) is one of the central optimizations performed by GHC’s Core optimizer. In this optimization, identifier occurrences are substituted by the right-hand side of their respective definition.</p>
+<p>Unfolding (sometimes known as inlining) is one of the central optimizations performed by GHC’s Core optimizer. In this optimization, identifier occurrences are substituted by the right-hand side of their respective definition.</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">Unf</span><span class="fu">=</span><span class="dt">Unf</span>{<span class="dt">Src</span><span class="fu">=</span><span class="dt">InlineStable</span>, <span class="dt">TopLvl</span><span class="fu">=</span><span class="dt">True</span>, <span class="dt">Value</span><span class="fu">=</span><span class="dt">True</span>, <span class="dt">ConLike</span><span class="fu">=</span><span class="dt">True</span>,
         <span class="dt">WorkFree</span><span class="fu">=</span><span class="dt">True</span>, <span class="dt">Expandable</span><span class="fu">=</span><span class="dt">True</span>,
         <span class="dt">Guidance</span><span class="fu">=</span><span class="dt">ALWAYS_IF</span>(arity<span class="fu">=</span><span class="dv">1</span>,unsat_ok<span class="fu">=</span><span class="dt">True</span>,boring_ok<span class="fu">=</span><span class="dt">False</span>)

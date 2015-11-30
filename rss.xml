@@ -275,7 +275,7 @@
 <item>
     <title>Performance implications of software RAID</title>
     <link>http://bgamari.github.com//posts/2015-04-27-software-raid-performance.html</link>
-    <description><![CDATA[How many CPU cycles does software RAID actually require?]]></description>
+    <description><![CDATA[How many cycles does software RAID actually require?]]></description>
     <pubDate>Mon, 27 Apr 2015 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2015-04-27-software-raid-performance.html</guid>
     <dc:creator>Ben Gamari</dc:creator>
@@ -315,17 +315,17 @@
 <item>
     <title>802.11ac with ath10k</title>
     <link>http://bgamari.github.com//posts/2015-11-28-80211ac.html</link>
-    <description><![CDATA[hi]]></description>
+    <description><![CDATA[Notes from a failed attempt at bringing up an 802.11ac adapter in master mode]]></description>
     <pubDate>Sat, 28 Nov 2015 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2015-11-28-80211ac.html</guid>
     <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
     <title>Cross-compiling a kernel for the Odroid XU4 on Debian</title>
-    <link>http://bgamari.github.com//posts/odroid-kernel.html</link>
+    <link>http://bgamari.github.com//posts/2015-11-30-odroid-kernel.html</link>
     <description><![CDATA[Cross-compiling a kernel for the Odroid XU4]]></description>
     <pubDate>Mon, 30 Nov 2015 00:00:00 UT</pubDate>
-    <guid>http://bgamari.github.com//posts/odroid-kernel.html</guid>
+    <guid>http://bgamari.github.com//posts/2015-11-30-odroid-kernel.html</guid>
     <dc:creator>Ben Gamari</dc:creator>
 </item>
 
