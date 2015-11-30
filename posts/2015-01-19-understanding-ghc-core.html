@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>bgamari.github.com - Understanding GHC Core</title>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="content">
+        <div id="sidebar">
+          <nav>
+            <h1>Navigation</h1>
+            <ul>
+              <li><a href="../index.html">Home</a></li>
+              <li><a href="../posts.html">Blog</a></li>
+              <li><a href="../research-agenda.html">Research agenda</a></li>
+              <li><a href="../publications.html">Publications</a></li>
+              <li><a href="../past-research.html">Past research</a></li>
+              <li><a href="../media/cv.pdf">Curriculum Vitæ</a></li>
+            </ul>
+            <h1>Related Links</h1>
+            <ul>
+              <li><a href="http://goldnerlab.physics.umass.edu/wiki/">Research group</a></li>
+              <li><a href="http://www.github.com/bgamari">Github</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <section id="main">
+        <h1 id="understanding-ghc-core">Understanding GHC Core</h1>
+<p>While there have been a variety of writings about GHC’s Core representation, the language is a living entity which changes quickly in ways that aren’t always documented in</p>
+<h2 id="what-is-core">What is Core?</h2>
+<p>GHC Core is a close relative of the <a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/ext-f/fc-tldi.pdf">System FC</a> language and the first of a series of intermediate representations used by GHC to turn Haskell into machine code (the others being STG and C–).</p>
+<p>While on face value Core appears very similar to Haskell, there are a few</p>
+<p>Type application</p>
+<h2 id="coercions">Coercions</h2>
+<p>Core preserves <code>newtypes</code> as types unique from their representation (e.g. the type that they wrap). Wrapping and unwrapping of <code>newtype</code> values are represented by applications of the <code>cast</code> function. This essentially has the type,</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Coercion</span> a b
+
+<span class="ot">cast ::</span> a <span class="ot">-&gt;</span> <span class="dt">Coercion</span> a b <span class="ot">-&gt;</span> b</code></pre></div>
+<p><code>Coercion</code>s are GHC’s internal representation for type equalities<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. On account of various</p>
+<p>TODO <code>~R#</code></p>
+<p>TODO: What is <code>@~</code>?</p>
+<p><code>cast</code></p>
+<p><code>Sym</code></p>
+<p><code>Sub</code></p>
+<p><code>&lt;ty&gt;_R</code> is a type parameter with representational role. Roughly speaking this means that given a type constructor <code>T</code> and types <code>A</code> and <code>B</code>, <code>T &lt;A&gt;_R</code> and <code>T &lt;B&gt;_R</code> are representationally distinct. <code>@~</code></p>
+<h2 id="idinfo">IdInfo</h2>
+<p>Attached to identifiers GHC will often keep metadata known as <a href="https://git.haskell.org/ghc.git/blob/a6f0f5ab45b2643b561e0a0a54a4f14745ab2152:/compiler/basicTypes/IdInfo.hs#l144"><code>IdInfo</code></a> to inform various optimization passes. This information can be found within brackets in Core’s textual representation. In the event that you just want to merely see the “shape” of a program <code>IdInfo</code> annotations are often noise that can be safely suppressed with <code>-dsuppress-idinfo</code>.</p>
+<p>The information in <code>IdInfo</code> can be useful when examining the optimization with respect to specific passes. In this case it can be useful hto have a rough understanding of what these annotations mean. A brief summary of the IdInfo annotations used by GHC 7.10 is included below although these will likely change with future compiler versions.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">annotation</th>
+<th align="left">example</th>
+<th align="left">definition</th>
+<th align="left">meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>Caf</code></td>
+<td align="left"><code>Caf=NoCafRefs</code></td>
+<td align="left"><code>basicTypes/IdInfo.hs(CafInfo)</code></td>
+<td align="left">The value is a a function or static constructor that refers to no CAFs</td>
+</tr>
+<tr class="even">
+<td align="left"><code>Arity</code></td>
+<td align="left"><code>Arity=1</code></td>
+<td align="left"><code>basicTypes/IdInfo.hs(ArityInfo)</code></td>
+<td align="left">An <code>ArityInfo</code> of <span class="math inline">\(n\)</span> tells us that partial application of the value to up to <span class="math inline">\(n-1\)</span> value arguments does essentially no work.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>GlbId</code></td>
+<td align="left"><code>GblId[[RecSel]]</code></td>
+<td align="left">TODO</td>
+<td align="left">TODO</td>
+</tr>
+<tr class="even">
+<td align="left"><code>Unf</code></td>
+<td align="left"><code>Unf=Unf{...}</code></td>
+<td align="left"></td>
+<td align="left">The value has an associated unfolding template.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>SpecInfo</code></td>
+<td align="left">TODO</td>
+<td align="left"><code>basicTypes/IdInfo.hs(SpecInfo)</code></td>
+<td align="left">Records the available specializations of the identifier</td>
+</tr>
+<tr class="even">
+<td align="left"><code>OS</code></td>
+<td align="left"><code>OS=OneShot</code></td>
+<td align="left"></td>
+<td align="left">Records that the identifier will be used precisely once TODO</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>Str</code></td>
+<td align="left"><code>Str=DmdType &lt;S(L...)</code></td>
+<td align="left"><code>basicTypes/Demand.hs(DmdType)</code></td>
+<td align="left">The result of demand analysis</td>
+</tr>
+<tr class="even">
+<td align="left"><code>Occ</code></td>
+<td align="left"><code>Occ=Dead</code></td>
+<td align="left">TODO</td>
+<td align="left">The result of occurrence analysis</td>
+</tr>
+</tbody>
+</table>
+<h3 id="unfolding-templates">Unfolding templates</h3>
+<p>Unfolding (sometimes known as inlining (TODO)) is one of the central optimizations performed by GHC’s Core optimizer. In this optimization, identifier occurrences are substituted by the right-hand side of their respective definition.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">Unf</span><span class="fu">=</span><span class="dt">Unf</span>{<span class="dt">Src</span><span class="fu">=</span><span class="dt">InlineStable</span>, <span class="dt">TopLvl</span><span class="fu">=</span><span class="dt">True</span>, <span class="dt">Value</span><span class="fu">=</span><span class="dt">True</span>, <span class="dt">ConLike</span><span class="fu">=</span><span class="dt">True</span>,
+        <span class="dt">WorkFree</span><span class="fu">=</span><span class="dt">True</span>, <span class="dt">Expandable</span><span class="fu">=</span><span class="dt">True</span>,
+        <span class="dt">Guidance</span><span class="fu">=</span><span class="dt">ALWAYS_IF</span>(arity<span class="fu">=</span><span class="dv">1</span>,unsat_ok<span class="fu">=</span><span class="dt">True</span>,boring_ok<span class="fu">=</span><span class="dt">False</span>)
+        <span class="dt">Tmpl</span><span class="fu">=</span> \ (ds_daj5 [<span class="dt">Occ</span><span class="fu">=</span><span class="dt">Once</span><span class="fu">!</span>]<span class="ot"> ::</span> <span class="dt">Memcpy2Dargs</span>) <span class="ot">-&gt;</span>
+                <span class="kw">case</span> ds_daj5
+                <span class="kw">of</span> _ [<span class="dt">Occ</span><span class="fu">=</span><span class="dt">Dead</span>]
+                { <span class="dt">Memcpy2Dargs</span> _ [<span class="dt">Occ</span><span class="fu">=</span><span class="dt">Dead</span>] ds2_daj7 [<span class="dt">Occ</span><span class="fu">=</span><span class="dt">Once</span>] _ [<span class="dt">Occ</span><span class="fu">=</span><span class="dt">Dead</span>]
+                               _ [<span class="dt">Occ</span><span class="fu">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="fu">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="fu">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="fu">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="fu">=</span><span class="dt">Dead</span>]
+                               _ [<span class="dt">Occ</span><span class="fu">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="fu">=</span><span class="dt">Dead</span>] <span class="ot">-&gt;</span>
+                ds2_daj7
+                }}]</code></pre></div>
+<p><code>Src</code></p>
+<h3 id="how-are-values-used">How are values used?</h3>
+<p>GHC uses a variety of local <a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/demand-anal/demand.ps">analyses</a> to determine various ways function arguments are used (or unused). These analyses include,</p>
+<ul>
+<li>demand (or strictness) analysis: Is an argument definitely forced (partially or completely) by a function?</li>
+<li>absence analysis: Is an argument entirely unused in the body?</li>
+<li>occurrence analysis:</li>
+</ul>
+<p>When optimization is enabled GHC runs these analyses on all top-level bindings and records the results in the binding’s <code>IdInfo</code>. These results are then examined by later stages of compilation to help guide further optimizations (notably the worker-wrapper transformation).</p>
+<p>In the external Core output, the results of demand analysis can be found in the <code>Str=</code> section of <code>IdInfo</code>,</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">foldl' ::</span> forall a b<span class="fu">.</span> (b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> b
+[<span class="dt">Str</span><span class="fu">=</span><span class="dt">DmdType</span> <span class="fu">&lt;</span><span class="dt">L</span>,<span class="dt">C</span>(<span class="dt">C1</span>(<span class="dt">U</span>))<span class="fu">&gt;&lt;</span><span class="dt">S</span>,<span class="dv">1</span><span class="fu">*</span><span class="dt">U</span><span class="fu">&gt;&lt;</span><span class="dt">S</span>,<span class="dv">1</span><span class="fu">*</span><span class="dt">U</span><span class="fu">&gt;</span>]
+foldl' <span class="fu">=</span> <span class="fu">...</span></code></pre></div>
+<p>Here we see the <code>IdInfo</code> of the usual strict left fold on list. Here we see that GHC has associated with each argument a tuple enclosed in angle brackets. These tuples consist of the strictness and usage annotations of the argument. Let’s look at each,</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">argument type</th>
+<th align="left">demand annotation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>b -&gt; a -&gt; a</code></td>
+<td align="left"><code>&lt;L,C(C1(U))&gt;</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>b</code></td>
+<td align="left"><code>&lt;S,1*U&gt;</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>[a]</code></td>
+<td align="left"><code>&lt;S,1*U&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<p>We will discuss the meaning of these annotations in the following sections.</p>
+<h4 id="demand-analysis">Demand analysis</h4>
+<p><a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/demand-anal/demand.ps">Demand analysis</a> (or strictness analysis) is an analysis which attempts to determine how the arguments of a function are used by its definition. The result of the analysis is a <em>demand signature</em></p>
+<table style="width:99%;">
+<colgroup>
+<col width="18%" />
+<col width="80%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">signature</th>
+<th align="left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><em>strictness</em></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><code>L</code></td>
+<td align="left"><em>lazy</em>. As far as the analysis could tell, the argument isn’t demanded</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>S</code></td>
+<td align="left"><em>head-strict</em>. The analysis determined that the argument will be evaluated at least to head-normal form.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>S(...)</code></td>
+<td align="left"><em>structured demand</em>. The argument will itself be evaluated to at least head-normal form and the values within it (e.g. its fields) will be evaluated to at least the given strictness.</td>
+</tr>
+<tr class="odd">
+<td align="left"><em>usage</em></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><code>U</code></td>
+<td align="left"><em>used</em>: the</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>1*</code></td>
+<td align="left"><em>used once</em>. The argument is used precisely once.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>A</code></td>
+<td align="left"><em>definitely unused</em>. Indicates that the binder is certainly not used.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>B</code></td>
+<td align="left"><em>hyper-strict</em>.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>C</code></td>
+<td align="left"><em>call</em>. Applied to functio</td>
+</tr>
+<tr class="odd">
+<td align="left"><em>suffixes</em></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><code>m</code></td>
+<td align="left"><em>returns a constructed product result</em>.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>b</code></td>
+<td align="left"><em>bottoming</em>. The function is known to diverge.</td>
+</tr>
+</tbody>
+</table>
+<p>Let’s consider a few examples (stolen from <a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/demand-anal/demand.ps">the paper</a>),</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Demand signature: &lt;S,1*U&gt;</span>
+null<span class="ot"> ::</span> [a] <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+null v <span class="fu">=</span> <span class="kw">case</span> v <span class="kw">of</span> []   <span class="ot">-&gt;</span> <span class="dt">True</span>
+                   x<span class="fu">:</span>xs <span class="ot">-&gt;</span> <span class="dt">False</span></code></pre></div>
+<p>The <code>S</code> here arises from the case-analysis, which implies that if we evaluate <code>null v</code> then <code>v</code> must be evaluated to at least WHNF.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Demand signature: &lt;S(SL),1*U(1*U,A)&gt;</span>
+fst<span class="ot"> ::</span> (a,b) <span class="ot">-&gt;</span> a
+fst p <span class="fu">=</span> <span class="kw">case</span> p <span class="kw">of</span> (x,_) <span class="ot">-&gt;</span> x</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Demand signature: &lt;S,1*U(U,U)&gt;m</span>
+<span class="ot">swap ::</span> (a,b) <span class="ot">-&gt;</span> (b,a)
+swap p <span class="fu">=</span> <span class="kw">case</span> p <span class="kw">of</span> (x,y) <span class="ot">-&gt;</span> (y,x)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Demand signature: &lt;S,1*U(U)&gt;&lt;L,A&gt;m</span>
+<span class="ot">f ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>
+f x y <span class="fu">=</span> x <span class="fu">+</span> <span class="dv">1</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Demand signature: &lt;L,C(C1(U))&gt;&lt;S,1*U&gt;&lt;S,1*U&gt;</span>
+<span class="ot">foldl' ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> [b] <span class="ot">-&gt;</span> a
+foldl' f x0</code></pre></div>
+<h4 id="absence-analysis">Absence analysis</h4>
+<h2 id="trick-locating-outputable-instances">Trick: Locating <code>Outputable</code> instances</h2>
+<p>As GHC Core is an internal representation there is a tendency for documentation to fall behind what GHC actually emits. For this reason, it can be useful to quickly find the <code>Outputable</code> instance defintion from which a given piece of output originated. <code>ghci</code> is quite handy for this purpose,</p>
+<pre><code>$ ghci
+GHCi, version 7.10.2.20151118: http://www.haskell.org/ghc/  :? for help
+λ&gt; :set -package ghc
+package flags have changed, resetting and loading new packages...
+λ&gt; import GHC
+λ&gt; import Outputable
+λ&gt; :info Outputable
+class Outputable a where
+  ppr :: a -&gt; SDoc
+  pprPrec :: Rational -&gt; a -&gt; SDoc
+    -- Defined in ‘Outputable’
+instance Outputable BreakInfo -- Defined in ‘ByteCodeInstr’
+instance Outputable Type -- Defined in ‘TypeRep’
+instance Outputable TyThing -- Defined in ‘TypeRep’
+instance Outputable TyCon -- Defined in ‘TyCon’
+instance Outputable ClsInst -- Defined in ‘InstEnv’</code></pre>
+<h2 id="optimizations">Optimizations</h2>
+<h3 id="float-out">Float-out</h3>
+<h3 id="float-in">Float-in</h3>
+<h3 id="float-">Float-</h3>
+<p>In brackets: <a href="https://git.haskell.org/ghc.git/blob/a6f0f5ab45b2643b561e0a0a54a4f14745ab2152:/compiler/basicTypes/IdInfo.hs#l144">IdInfo</a></p>
+<p>Role annotations</p>
+<h2 id="glossary">Glossary</h2>
+<dl>
+<dt>binding</dt>
+<dd><p>the introduction of a name for a value. For instance, <code>let hello = 5 in ...</code> is a binding.</p>
+</dd>
+<dt>binder</dt>
+<dd><p>the name of a binding. For instance, in <code>let hello = 5 in ...</code> <code>hello</code> is the binder</p>
+</dd>
+</dl>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>GHC’s Core language is known in the literature as <a href="SystemFC">System FC</a>, owing to the fact that it is closely related to <a href="https://en.wikipedia.org/wiki/System_F">System F</a>. In fact, the “C” in “FC” stands for “coercion”, indicative of the fact that System FC is simply System F with coercions.<a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
+        </section>
+      </div>
+
+      <footer id="footer">
+        <span>Generated by <a href="http://jaspervdj.be/hakyll/index.html">Hakyll</a>.</span>
+      </footer>
+    </div>
+  </body>
+</html>
+
