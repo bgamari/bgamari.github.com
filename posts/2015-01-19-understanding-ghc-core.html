@@ -30,8 +30,15 @@
         </div>
 
         <section id="main">
-        <h1 id="understanding-ghc-core">Understanding GHC Core</h1>
-<p>While there have been a variety of writings about GHC’s Core representation, the language is a living entity which changes quickly in ways that aren’t always documented in</p>
+        <article>
+    <h1>Understanding GHC Core</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2015-11-29" class="pubdate">2015-11-29</time> | tagged with <ul class="tags"><li>ghc</li><li>core</li></ul>
+        </div>
+    </header>
+
+    <p>While there have been a variety of writings about GHC’s Core representation, the language is a living entity which changes quickly in ways that aren’t always documented in</p>
 <h2 id="what-is-core">What is Core?</h2>
 <p>GHC Core is a close relative of the <a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/ext-f/fc-tldi.pdf">System FC</a> language and the first of a series of intermediate representations used by GHC to turn Haskell into machine code (the others being STG and C–).</p>
 <p>While on face value Core appears very similar to Haskell, there are a few</p>
@@ -52,11 +59,15 @@
 <p>Attached to identifiers GHC will often keep metadata known as <a href="https://git.haskell.org/ghc.git/blob/a6f0f5ab45b2643b561e0a0a54a4f14745ab2152:/compiler/basicTypes/IdInfo.hs#l144"><code>IdInfo</code></a> to inform various optimization passes. This information can be found within brackets in Core’s textual representation. In the event that you just want to merely see the “shape” of a program <code>IdInfo</code> annotations are often noise that can be safely suppressed with <code>-dsuppress-idinfo</code>.</p>
 <p>The information in <code>IdInfo</code> can be useful when examining the optimization with respect to specific passes. In this case it can be useful hto have a rough understanding of what these annotations mean. A brief summary of the IdInfo annotations used by GHC 7.10 is included below although these will likely change with future compiler versions.</p>
 <table>
+<colgroup>
+<col width="22%" />
+<col width="27%" />
+<col width="50%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="left">annotation</th>
 <th align="left">example</th>
-<th align="left">definition</th>
 <th align="left">meaning</th>
 </tr>
 </thead>
@@ -64,49 +75,41 @@
 <tr class="odd">
 <td align="left"><code>Caf</code></td>
 <td align="left"><code>Caf=NoCafRefs</code></td>
-<td align="left"><code>basicTypes/IdInfo.hs(CafInfo)</code></td>
-<td align="left">The value is a a function or static constructor that refers to no CAFs</td>
+<td align="left">The value is a a function or static constructor that refers to no CAFs <em>defined in</em> <code>basicTypes/IdInfo.hs(CafInfo)</code>.</td>
 </tr>
 <tr class="even">
 <td align="left"><code>Arity</code></td>
 <td align="left"><code>Arity=1</code></td>
-<td align="left"><code>basicTypes/IdInfo.hs(ArityInfo)</code></td>
-<td align="left">An <code>ArityInfo</code> of <span class="math inline">\(n\)</span> tells us that partial application of the value to up to <span class="math inline">\(n-1\)</span> value arguments does essentially no work.</td>
+<td align="left">An <code>ArityInfo</code> of <span class="math inline">\(n\)</span> tells us that partial application of the value to up to <span class="math inline">\(n-1\)</span> value arguments does essentially no work. <em>defined in</em> <code>basicTypes/IdInfo.hs(ArityInfo)</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>GlbId</code></td>
 <td align="left"><code>GblId[[RecSel]]</code></td>
 <td align="left">TODO</td>
-<td align="left">TODO</td>
 </tr>
 <tr class="even">
 <td align="left"><code>Unf</code></td>
 <td align="left"><code>Unf=Unf{...}</code></td>
-<td align="left"></td>
 <td align="left">The value has an associated unfolding template.</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>SpecInfo</code></td>
 <td align="left">TODO</td>
-<td align="left"><code>basicTypes/IdInfo.hs(SpecInfo)</code></td>
-<td align="left">Records the available specializations of the identifier</td>
+<td align="left">Records the available specializations of the identifier <em>defined in</em> <code>basicTypes/IdInfo.hs(SpecInfo)</code>.</td>
 </tr>
 <tr class="even">
 <td align="left"><code>OS</code></td>
 <td align="left"><code>OS=OneShot</code></td>
-<td align="left"></td>
 <td align="left">Records that the identifier will be used precisely once TODO</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>Str</code></td>
 <td align="left"><code>Str=DmdType &lt;S(L...)</code></td>
-<td align="left"><code>basicTypes/Demand.hs(DmdType)</code></td>
-<td align="left">The result of demand analysis</td>
+<td align="left">The result of demand analysis. <em>defined in</em> <code>basicTypes/Demand.hs(DmdType)</code>.</td>
 </tr>
 <tr class="even">
 <td align="left"><code>Occ</code></td>
 <td align="left"><code>Occ=Dead</code></td>
-<td align="left">TODO</td>
 <td align="left">The result of occurrence analysis</td>
 </tr>
 </tbody>
@@ -176,7 +179,7 @@ foldl' <span class="fu">=</span> <span class="fu">...</span></code></pre></div>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><em>strictness</em></td>
+<td align="left"><strong>strictness</strong></td>
 <td align="left"></td>
 </tr>
 <tr class="even">
@@ -192,12 +195,12 @@ foldl' <span class="fu">=</span> <span class="fu">...</span></code></pre></div>
 <td align="left"><em>structured demand</em>. The argument will itself be evaluated to at least head-normal form and the values within it (e.g. its fields) will be evaluated to at least the given strictness.</td>
 </tr>
 <tr class="odd">
-<td align="left"><em>usage</em></td>
+<td align="left"><strong>absence</strong></td>
 <td align="left"></td>
 </tr>
 <tr class="even">
 <td align="left"><code>U</code></td>
-<td align="left"><em>used</em>: the</td>
+<td align="left"><em>used</em>. the</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>1*</code></td>
@@ -216,7 +219,7 @@ foldl' <span class="fu">=</span> <span class="fu">...</span></code></pre></div>
 <td align="left"><em>call</em>. Applied to functio</td>
 </tr>
 <tr class="odd">
-<td align="left"><em>suffixes</em></td>
+<td align="left"><strong>suffixes</strong></td>
 <td align="left"></td>
 </tr>
 <tr class="even">
@@ -287,6 +290,8 @@ instance Outputable ClsInst -- Defined in ‘InstEnv’</code></pre>
 <li id="fn1"><p>GHC’s Core language is known in the literature as <a href="SystemFC">System FC</a>, owing to the fact that it is closely related to <a href="https://en.wikipedia.org/wiki/System_F">System F</a>. In fact, the “C” in “FC” stands for “coercion”, indicative of the fact that System FC is simply System F with coercions.<a href="#fnref1">↩</a></p></li>
 </ol>
 </div>
+</article>
+
         </section>
       </div>
 

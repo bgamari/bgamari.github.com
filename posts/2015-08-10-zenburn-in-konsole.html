@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>bgamari.github.com - Cross-compiling a kernel for the Odroid XU4 on Debian</title>
+    <title>bgamari.github.com - Installing ZenBurn</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
     <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
@@ -31,20 +31,15 @@
 
         <section id="main">
         <article>
-    <h1>Cross-compiling a kernel for the Odroid XU4 on Debian</h1>
+    <h1>Installing ZenBurn</h1>
     <header>
         <div class="meta">
-            <time datetime="2015-11-30" class="pubdate">2015-11-30</time> | tagged with <ul class="tags"><li>kernel</li><li>arm</li><li>debian</li><li>notes</li><li>work-in-progress</li></ul>
+            <time datetime="2015-08-10" class="pubdate">2015-08-10</time> | tagged with <ul class="tags"><li>konsole</li></ul>
         </div>
     </header>
 
-    <p>mkimage -A arm -O linux -T ramdisk -C none -a 0 -e 0 -n uInitrd -d initrd.img-<span class="math inline">\(ver uInitrd-\)</span>ver</p>
-<pre><code>sudo apt-get install build-essential kernel-package u-boot-tools</code></pre>
-<pre><code>export ARCH=arm
-export DEB_HOST_ARCH=armhf
-export CONCURRENCY_LEVEL=6
-fakeroot make-kpkg --arch=arm --cross-compile arm-linux-gnueabihf- --initrd kernel_image kernel_headers
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- zImage</code></pre>
+    <p>Recently I got stuck for quite a while trying to use the Zenburn colorscheme in <code>konsole</code>. While there are a <a href="https://github.com/brson/zenburn-konsole">number</a> of <a href="http://usrlocalbin.blogspot.de/2008/04/zenburn-for-konsole-redux.html">sources</a> for konsole <code>.colorscheme</code> files for [Zenburn][] and <a href="https://github.com/hayalci/kde-colors-solarized">other</a> themes, it isn’t entirely clear where these files belong. Some sources claim <code>~/.kde/share/apps/konsole</code>, others claim <code>~/.kde4/share/apps/konsole</code>. Naturally neither of these options worked for me on Debian <code>testing</code>.</p>
+<p>It seems that Konsole now looks in <code>~/.local/share/konsole</code> for its themes.</p>
 </article>
 
         </section>
