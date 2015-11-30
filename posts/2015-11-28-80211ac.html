@@ -46,7 +46,9 @@
 <li>Throughput was not worth the complexity that 802.11ac wrought</li>
 </ol>
 <p>This was with a Compex WLE600V5-27 adapter supported by the <a href="https://wireless.wiki.kernel.org/en/users/Drivers/ath10k">ath10k</a>.</p>
-<h2 id="regulatory">Regulatory</h2>
+<h2 id="regulatory-things">Regulatory things</h2>
+<p>Wireless regulation enforcement is necessarily <a href="https://wireless.wiki.kernel.org/en/developers/Regulatory/processing_rules">complex</a>. Unfortunately my card, like many others, was shipped from the factory with its EEPROM set for use in the United States. This is problematic since I live in Germany, which uses different radar detection scheme (ETSI) than that used in the US (which, as it turns out, doesn’t even appear to be supported by <code>ath10k</code>).</p>
+<p><a href="http://pisarenko.net/blog/2015/05/05/updates-to-the-802-dot-11ac-guide/">Working around this</a> essentially amounts to replacing the regulatory database entry describing the US region with that of Germany.</p>
 <pre><code>$ git clone git://git.kernel.org/pub/scm/linux/kernel/git/linville/wireless-regdb.git
 $ cd wireless-regdb
 $ openssl req -x509  -nodes -days 365 -sha256 -newkey rsa:2048 -keyout ben.pem -out ben.pem
@@ -60,6 +62,11 @@ $ PUBKEY_DIR=/lib/crda/pubkeys RUNTIME_PUBKEY_DIR=$PUBKEY_DIR make
 $ sudo PREFIX= make install
 $ ln -s debian-example debian</code></pre>
 <p>Add <code>CFLAGS := -fpic</code> to <code>debian/rules</code>.</p>
+<h2 id="other-things-i-learned">Other things I learned</h2>
+<p>Regarding the meaning of <code>vht_oper_centr_freq_seg0_idx</code> (see <a href="http://lists.infradead.org/pipermail/ath10k/2014-May/002190.html">here</a>):</p>
+<blockquote>
+<p>VHT requires a generic center frequency (or rather channel number in hostapd) to be provided. Since you have channel=36 then the center frequency for 80MHz bandwidth is 36+6 = 42.</p>
+</blockquote>
 </article>
 
         </section>
