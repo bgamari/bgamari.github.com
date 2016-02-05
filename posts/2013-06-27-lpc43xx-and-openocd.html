@@ -30,7 +30,15 @@
         </div>
 
         <section id="main">
-        <h1 id="notes-concerning-lpc43xx-and-openocd">Notes concerning LPC43xx and OpenOCD</h1>
+        <article>
+    <h1>Notes concerning LPC43xx and OpenOCD</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2013-06-27" class="pubdate">2013-06-27</time> | tagged with <ul class="tags"></ul>
+        </div>
+    </header>
+
+    <h1 id="notes-concerning-lpc43xx-and-openocd">Notes concerning LPC43xx and OpenOCD</h1>
 <p>The LPC43xx seems to be pretty finicky when it comes to its JTAG. interface. Here are a few things that I found helped in getting the LPC and OpenOCD to talk,</p>
 <ul>
 <li><p>I use a BusBlaster. The new <code>interfaces/ftdi/dp_busblaster.cfg</code> configuration uses OpenOCD’s new FTDI driver which seems to be much more reliable than the old <code>interfaces/busblaster.cfg</code> configuration.</p></li>
@@ -54,6 +62,8 @@
 <ul>
 <li>the first use of GDB’s <code>load</code> command will jump into ROM</li>
 </ul>
+</article>
+
         </section>
       </div>
 

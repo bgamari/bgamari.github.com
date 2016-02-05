@@ -30,7 +30,15 @@
         </div>
 
         <section id="main">
-        <h1 id="semihosting-with-arm-gcc-and-openocd">Semihosting with ARM, GCC, and OpenOCD</h1>
+        <article>
+    <h1>Semihosting on ARM with GCC and OpenOCD</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2014-10-31" class="pubdate">2014-10-31</time> | tagged with <ul class="tags"><li>openocd</li><li>gdb</li><li>gcc</li><li>arm</li></ul>
+        </div>
+    </header>
+
+    <h1 id="semihosting-with-arm-gcc-and-openocd">Semihosting with ARM, GCC, and OpenOCD</h1>
 <p>One of the many nice features of the ARM Cortex microcontrollers is the ability to use the JTAG debug interface as a sink for <code>printf</code> messages. This capability is known as <em>semihosting</em>. It’s actually quite straightforward to configure with open source tooling (the <a href="https://www.sourceware.org/newlib/"><code>newlib</code></a> C standard library and <a href="http://openocd.org/">OpenOCD</a> JTAG implementation).</p>
 <p>You’ll need to add the following to <code>LDFLAGS</code>,</p>
 <pre><code>LDFLAGS += --specs=rdimon.specs -lc -lrdimon</code></pre>
@@ -54,6 +62,8 @@
 <li><code>libopencm3</code> example: https://github.com/libopencm3/libopencm3-examples/tree/master/examples/stm32/l1/stm32l-discovery/usart-semihosting</li>
 <li>OpenOCD manual section (search for “semihosting”): http://openocd.sourceforge.net/doc/html/Architecture-and-Core-Commands.html#Architecture-and-Core-Commands</li>
 </ul>
+</article>
+
         </section>
       </div>
 

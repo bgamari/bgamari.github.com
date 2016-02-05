@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>bgamari.github.com - Compressor comparison for GHC binary distributions</title>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="content">
+        <div id="sidebar">
+          <nav>
+            <h1>Navigation</h1>
+            <ul>
+              <li><a href="../index.html">Home</a></li>
+              <li><a href="../posts.html">Blog</a></li>
+              <li><a href="../research-agenda.html">Research agenda</a></li>
+              <li><a href="../publications.html">Publications</a></li>
+              <li><a href="../past-research.html">Past research</a></li>
+              <li><a href="../media/cv.pdf">Curriculum Vitæ</a></li>
+            </ul>
+            <h1>Related Links</h1>
+            <ul>
+              <li><a href="http://goldnerlab.physics.umass.edu/wiki/">Research group</a></li>
+              <li><a href="http://www.github.com/bgamari">Github</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <section id="main">
+        <article>
+    <h1>Compressor comparison for GHC binary distributions</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2016-02-04" class="pubdate">2016-02-04</time> | tagged with <ul class="tags"><li>data compression</li></ul>
+        </div>
+    </header>
+
+    <p>Recently I noticed that <a href="http://haskell.org/ghc">GHC’s</a> validation script spends a significant portion of its runtime preparing a compressed binary distribution with <code>xz</code>. This perhaps shouldn’t be surprising as the build system uses the extremely aggressive <code>-9e</code> flag set.</p>
+<p>The obvious next question is what all of this <del>carbon emission</del>CPU time buys us. To quantify this I took an uncompressed GHC binary distribution tarball (around 1.1 gigabytes of tar’d binaries and some text) and compressed it with various configurations of <code>gzip</code>, <code>bzip2</code>, and <code>xz</code>, recording the user-space runtime, final size, and maximum resident set size of each,</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">(for</span> <span class="kw">i</span> in <span class="ot">$(</span><span class="kw">seq</span> 1 9<span class="ot">)</span><span class="kw">;</span> <span class="kw">do</span>
+    <span class="kw">cat</span> ghc-8.0.0.20160111-i386-centos67-linux.tar
+        <span class="kw">|</span> <span class="kw">/usr/bin/time</span> -f <span class="st">&quot;%U %M&quot;</span> -o time.log gzip -<span class="ot">$i</span>
+        <span class="kw">|</span> <span class="kw">wc</span> -c <span class="kw">&gt;|</span> <span class="kw">size.log;</span>
+    <span class="kw">echo</span> <span class="st">&quot;</span><span class="ot">$i</span><span class="st"> </span><span class="ot">$(</span><span class="kw">cat</span> time.log<span class="ot">)</span><span class="st"> </span><span class="ot">$(</span><span class="kw">cat</span> size.log<span class="ot">)</span><span class="st">&quot;</span><span class="kw">;</span>
+<span class="kw">done)</span> <span class="kw">|</span> <span class="kw">tee</span> results.log</code></pre></div>
+<p>After cleaning up the results I arrived at the following,</p>
+<div class="figure">
+<img src="../media/compression-comparison/runtime-comparison.svg" alt="a comparison of compression ratio and compressor runtime of gzip, bzip2, and xz on a GHC binary distribution." />
+<p class="caption">a comparison of compression ratio and compressor runtime of gzip, bzip2, and xz on a GHC binary distribution.</p>
+</div>
+<p>There aren’t many surprises here (with the usual caveats: this is an unscientific study of a particular workload, etc.),</p>
+<ul>
+<li><code>gzip</code> compresses better than <code>bzip2</code>, which compresses better than <code>xz</code></li>
+<li>Investing more time in compression helps all compressors, although to varying degrees</li>
+<li>Additional compression comes at a significant cost in the case of <code>xz</code></li>
+<li>Perhaps most surprising, <code>xz -e</code> hardly makes a difference, despite being <em>significantly</em> more expensive</li>
+<li>Unsurprisingly, <code>xz</code>’s improved compression does come at a significant cost in memory consumption; while all other compressors have a roughly constant memory consumption of a few megabytes, <code>xz</code> continues to balloon as the compression level is raised, reaching nearly 700 megabytes at <code>-9</code>.</li>
+</ul>
+<h1 id="code-and-data.">Code and data.</h1>
+<p>The raw data of this study is available <a href="../media/compression-comparison/comparison.csv">here</a>. Results were plotted thusly.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> pl
+
+d <span class="op">=</span> np.genfromtxt(<span class="st">'comparison.csv'</span>, names<span class="op">=</span><span class="va">True</span>, dtype<span class="op">=</span><span class="va">None</span>)
+uncomp_size <span class="op">=</span> d[<span class="dv">0</span>][<span class="st">'output_size_bytes'</span>]
+d <span class="op">=</span> d[<span class="dv">1</span>:]
+comp_ratio <span class="op">=</span> <span class="dv">1</span>. <span class="op">*</span> d[<span class="st">'output_size_bytes'</span>] <span class="op">/</span> uncomp_size
+
+compressors <span class="op">=</span> np.unique(d[<span class="st">'compressor'</span>])
+<span class="bu">print</span> compressors
+<span class="cf">for</span> color, compressor <span class="op">in</span> <span class="bu">zip</span>(<span class="st">'rgbc'</span>, compressors):
+    ds <span class="op">=</span> d[<span class="st">'compressor'</span>] <span class="op">==</span> compressor
+    pl.scatter(d[ds][<span class="st">'user_time_sec'</span>], comp_ratio[ds], color<span class="op">=</span>color, label<span class="op">=</span>compressor)
+
+pl.xlabel(<span class="st">'user time (seconds)'</span>)
+pl.ylabel(<span class="st">'compression ratio'</span>)
+pl.legend()
+pl.xlim(<span class="dv">0</span>, <span class="va">None</span>)
+pl.show()</code></pre></div>
+</article>
+
+        </section>
+      </div>
+
+      <footer id="footer">
+        <span>Generated by <a href="http://jaspervdj.be/hakyll/index.html">Hakyll</a>.</span>
+      </footer>
+    </div>
+  </body>
+</html>
+

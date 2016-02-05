@@ -30,8 +30,18 @@
         </div>
 
         <section id="main">
-        <p>I’ve forgotten this enough times that I’m finally going to write it down. Say you want to copy files with extension <code>.ext</code> in <code>./dir</code> to <code>host</code>. <code>rsync</code> can do this with,</p>
+        <article>
+    <h1>rsyncing files with a given extension</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2015-06-17" class="pubdate">2015-06-17</time> | tagged with <ul class="tags"><li>rsync notes</li></ul>
+        </div>
+    </header>
+
+    <p>I’ve forgotten this enough times that I’m finally going to write it down. Say you want to copy files with extension <code>.ext</code> in <code>./dir</code> to <code>host</code>. <code>rsync</code> can do this with,</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">rsync</span> -vza --include=<span class="st">'*.xcorr-0-1'</span> --include=<span class="st">'*/'</span> --exclude=<span class="st">'*'</span> dir host:dir</code></pre></div>
+</article>
+
         </section>
       </div>
 

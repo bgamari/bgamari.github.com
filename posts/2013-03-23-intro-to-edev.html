@@ -30,7 +30,15 @@
         </div>
 
         <section id="main">
-        <h1 id="a-brief-introduction-to-embedded-development">A brief introduction to embedded development</h1>
+        <article>
+    <h1>A brief introduction to embedded development</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2013-03-23" class="pubdate">2013-03-23</time> | tagged with <ul class="tags"><li>arm</li><li>embedded</li><li>development</li></ul>
+        </div>
+    </header>
+
+    <h1 id="a-brief-introduction-to-embedded-development">A brief introduction to embedded development</h1>
 <h2 id="prelude">Prelude</h2>
 <p>This was the product of an email conversation to a friend. Embedded development can be tough to sink one’s teeth into; I wrote this an an attempt introduce him to the various considerations regarding tool-choice, design, and implementation on an embedded platform.</p>
 <p>Be aware that my experience is only as a hobbyist.</p>
@@ -62,6 +70,8 @@
 </ol>
 <p>As always, use version control religiously. Make changes in as piece-wise a manner as possible. While you have a debugger, it won’t always help you; having small, easily verified commits is extremely important. Once you have an appreciable amount of code it becomes extremely difficult to track down certain classes of bugs. On an embedded device you are running on bare metal; there are no guards, no memory protection, there is <a href="http://en.wikipedia.org/wiki/Direct_memory_access">action at a distance</a> happening all the time. Every once in a while the only feasible debugging strategy is either staring down the bug or <a href="http://git-scm.com/book/en/Git-Tools-Debugging-with-Git">bisecting</a>.</p>
 <p>Anyways, that’s all for now.</p>
+</article>
+
         </section>
       </div>
 

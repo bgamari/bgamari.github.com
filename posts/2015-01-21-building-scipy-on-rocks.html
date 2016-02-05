@@ -30,7 +30,15 @@
         </div>
 
         <section id="main">
-        <p>ROCKS is one of many Redhat-based distributions often found on large-ish compute clusters. Unfortunately, ROCKS and its breatheren all share a distinctive flavor of brokenness and apparent contempt of the user that is truly remarkable, even among operating systems. This is most often encountered on the evening of a large deadline. In this scenario, you copy your compute task to the cluster, eager to see the machine churn away at your handiwork. Your enthusiasm is quickly quenched, however, when you realize that <code>scipy</code> is not available (or more likely, from a package build at some point during middle of the Carter administration).</p>
+        <article>
+    <h1>Building Scipy on the ROCKS</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2015-01-21" class="pubdate">2015-01-21</time> | tagged with <ul class="tags"><li>scipy</li><li>redhat</li><li>rocks</li><li>atlas</li><li>lapack</li></ul>
+        </div>
+    </header>
+
+    <p>ROCKS is one of many Redhat-based distributions often found on large-ish compute clusters. Unfortunately, ROCKS and its breatheren all share a distinctive flavor of brokenness and apparent contempt of the user that is truly remarkable, even among operating systems. This is most often encountered on the evening of a large deadline. In this scenario, you copy your compute task to the cluster, eager to see the machine churn away at your handiwork. Your enthusiasm is quickly quenched, however, when you realize that <code>scipy</code> is not available (or more likely, from a package build at some point during middle of the Carter administration).</p>
 <p>In this case, it’s typically easiest to just build your own environment. When it comes to Python applications, it’s best to do this within <code>virtualenv</code>,</p>
 <pre><code>$ curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-X.X.tar.gz
 $ tar -xfz virtualenv-X.X.tar.gz
@@ -49,6 +57,8 @@ $ cd scipy
 $ ATLAS=atlas-lib ./setup.py install</code></pre>
 <p>That’s all!</p>
 <p>Now for some sleep.</p>
+</article>
+
         </section>
       </div>
 

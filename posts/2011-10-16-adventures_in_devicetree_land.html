@@ -30,7 +30,15 @@
         </div>
 
         <section id="main">
-        <h1 id="adventures-in-devicetree-land">Adventures in devicetree land</h1>
+        <article>
+    <h1>Adventures in devicetree land</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2011-10-16" class="pubdate">2011-10-16</time> | tagged with <ul class="tags"><li>devicetree</li><li>kernel</li><li>beagleboard</li><li>linaro</li></ul>
+        </div>
+    </header>
+
+    <h1 id="adventures-in-devicetree-land">Adventures in devicetree land</h1>
 <p>Building kernel with following script,</p>
 <pre><code>#!/bin/bash
 
@@ -160,6 +168,8 @@ Please check your kernel config and/or bootloader.</code></pre>
 <p>Hmm, now what does that mean?</p>
 <p>It seems that the <code>machine_desc</code> (defined in the board file) should provide a <code>dt_compat</code> list which defines the devicetree compatibility tags which that board file can boot. This isn’t defined in v3.0’s <code>board-omap3beagle.c</code>. Looking at the Linaro tree it appears these were added in 9d51c816. Cherry-picked.</p>
 <p>It Works!</p>
+</article>
+
         </section>
       </div>
 

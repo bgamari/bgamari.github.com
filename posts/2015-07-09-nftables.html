@@ -30,7 +30,15 @@
         </div>
 
         <section id="main">
-        <h1 id="a-simple-nftables-firewall-with-nat">A simple nftables firewall with NAT</h1>
+        <article>
+    <h1>A simple nftables firewall</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2015-07-09" class="pubdate">2015-07-09</time> | tagged with <ul class="tags"><li>firewall</li><li>linux</li></ul>
+        </div>
+    </header>
+
+    <h1 id="a-simple-nftables-firewall-with-nat">A simple nftables firewall with NAT</h1>
 <p><code>nftables</code> is the successor to <code>iptables</code> as the Linux firewall. It carries with it a number of advantages, not the least of which being a very nice syntax which essentially eliminates the need for code generation (in contrast to iptables, where code generation was generally quite necessary).</p>
 <p>Unfortunately, nftables is still quite new and as such documentation is a bit lacking. A few weeks ago I spent a couple of hours porting my simple iptables chains to nftables. Here is the result,</p>
 <pre><code>#!/usr/bin/local/nft -f 
@@ -83,6 +91,8 @@ table ip nat {
   }
 }</code></pre>
 <p>Note that this requires a recent kernel and userspace tools. If things don’t work right off the bat, be sure to double-check your kernel configuration. I spent a great deal of time chasing down vague errors due to missing modules.</p>
+</article>
+
         </section>
       </div>
 

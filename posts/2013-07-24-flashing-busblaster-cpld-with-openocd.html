@@ -30,7 +30,15 @@
         </div>
 
         <section id="main">
-        <h1 id="flashing-the-bus-blaster-jtag-adapters-cpld-buffer-with-openocd">Flashing the Bus Blaster JTAG adapter’s CPLD buffer with OpenOCD</h1>
+        <article>
+    <h1>Flashing the Bus Blaster's CPLD buffer with OpenOCD</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2013-07-24" class="pubdate">2013-07-24</time> | tagged with <ul class="tags"><li>openocd</li><li>busblaster</li><li>jtag</li><li>cpld</li></ul>
+        </div>
+    </header>
+
+    <h1 id="flashing-the-bus-blaster-jtag-adapters-cpld-buffer-with-openocd">Flashing the Bus Blaster JTAG adapter’s CPLD buffer with OpenOCD</h1>
 <p>Recently an unfortunate incident involving 20V and a slipped probe resulted in a small plume of smoke rising from my Bus Blaster, followed by the smell of burnt electronics. After examining the wreckage, it seemed likely that the CPLD took most, if not all, of the damage. Not wanting to wait another month for Seeed to send a whole new device, I ordered some XC2C32A CPLD’s and replaced the burnt part. This, however, requires that the new part if FLASHed with the appropriate buffer logic. Below I describe how this can be accomplished using OpenOCD.</p>
 <h2 id="new-approach">New Approach</h2>
 <p>With sufficiently recent OpenOCD releases (<code>ae806d8f4</code>, included in the 0.8.0 release), this process is much simpler than it used to be as the package now ships with a board file for the Bus Blaster<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. Simply <a href="https://code.google.com/p/dangerous-prototypes-open-hardware/source/browse/trunk/Bus_Blaster/buffer_logic/">download</a> the desired SVF and run,</p>
@@ -79,6 +87,8 @@ svf file programmed successfully for 579 commands</code></pre>
 <p>In fact, if we examine the board file, we’ll notice that it simply <code>source</code>’s the interface file, sets the <code>ftdi_channel</code> and defines the TAP parameters for the buffer CPLD.<a href="#fnref1">↩</a></p></li>
 </ol>
 </div>
+</article>
+
         </section>
       </div>
 

@@ -30,7 +30,15 @@
         </div>
 
         <section id="main">
-        <h1 id="ghc-and-llvm-a-status-update">GHC and LLVM: A status update</h1>
+        <article>
+    <h1>GHC and LLVM: A status update</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2014-11-28" class="pubdate">2014-11-28</time> | tagged with <ul class="tags"><li>ghc</li><li>llvm</li><li>arm</li></ul>
+        </div>
+    </header>
+
+    <h1 id="ghc-and-llvm-a-status-update">GHC and LLVM: A status update</h1>
 <p>GHC and LLVM have had a long and somewhat tumultuous relationship. At this point David Terei’s lovely LLVM code generation backend has been with us now for almost five years and nine LLVM releases. GHC has benefited significantly from its use of LLVM; LLVM has enabled us to support new platforms, given us access to a state-of-the-art low-level optimizer, and enabled support for SIMD instructions all with very little man-power.</p>
 <h2 id="but-its-not-all-rosy">But it’s not all rosy…</h2>
 <p>As always there are also challenges; LLVM is a rather tricky project to target, offering very little in the way of compatibility guarantees between versions. While this allows the project to adapt quickly, it does mean that simultaneously supporting more than a couple of versions quickly becomes painful.</p>
@@ -126,6 +134,8 @@
 <p>This above mess is largely due to the fact that we try to make use of whatever LLVM release the user can give us. Given the lack of backwards-compatibility offered by LLVM and the lack of GHC developer-hours, this isn’t terribly sustainable. Austin Seipp recently introduced a <a href="https://ghc.haskell.org/trac/ghc/wiki/ImprovedLLVMBackend">proposal</a> to address this. Probably starting with GHC 7.12, GHC will have an officially sanctioned LLVM release. Moreover, LLVM builds for common platforms will be offered for download alongside GHC binaries. We will work with distributions currently offering GHC packages to ensure that they can offer an officially supported LLVM.</p>
 <p>Not only will this step reduce our support surface and hopefully improve the reliability of the LLVM backend, it also enables GHC to make better use of the services that LLVM provides. If we can focus on a single release, it will be possible for us to request only those optimization passes that GHC will actually benefit from. Moreover, we can introduce optimization passes to address the areas where GHC’s code has traditionally been weak. I’ve started a <a href="https://github.com/bgamari/ghc-llvm-analyses">repository</a> to collect LLVM analyses for GHC, starting with Max Bolingbroke’s <a href="http://blog.omega-prime.co.uk/?p=135">work</a> on alias analysis.</p>
 <p>If you feel like this is an effort that you would like to contribute to, drop by <code>#ghc</code> on Freenode or <code>ghc-devs</code>. We need all of the help we can get.</p>
+</article>
+
         </section>
       </div>
 

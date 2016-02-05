@@ -43,7 +43,7 @@
 <h2 id="what-is-core">What is Core?</h2>
 <p>GHC Core is a close relative of the <a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/ext-f/fc-tldi.pdf">System FC</a> language and the first of a series of intermediate representations used by GHC to turn Haskell into machine code (the others being STG and C–).</p>
 <p>While on face value Core appears very similar to Haskell, there are a few</p>
-<p>Type application</p>
+<p>Type application <a href="http://research.microsoft.com/apps/pubs/default.aspx?id=67064">A transformation-based optimiser for Haskell</a></p>
 <h2 id="coercions">Coercions</h2>
 <p>Core preserves <code>newtypes</code> as types unique from their representation (e.g. the type that they wrap). Wrapping and unwrapping of <code>newtype</code> values are represented by applications of the <code>cast</code> function. This essentially has the type,</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Coercion</span> a b
@@ -51,7 +51,7 @@
 <span class="ot">cast ::</span> a <span class="ot">-&gt;</span> <span class="dt">Coercion</span> a b <span class="ot">-&gt;</span> b</code></pre></div>
 <p><code>Coercion</code>s are GHC’s internal representation for type equalities<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. On account of various</p>
 <p>TODO <code>~R#</code></p>
-<p>TODO: What is <code>@~</code>?</p>
+<p><code>@~</code>: type application of a coercion. For instance <code>myFunction @~ (&lt;a&gt;_N :: a GHC.Prim.~# a)</code> means that <code>myFunction</code> is being given a coercion argument <code>&lt;a&gt;_N</code>, a nominal coercion between <code>a</code> and <code>a</code>.</p>
 <p><code>cast</code></p>
 <p><code>Sym</code></p>
 <p><code>Sub</code></p>
@@ -132,8 +132,8 @@
 <h3 id="how-are-values-used">How are values used?</h3>
 <p>GHC uses a variety of local <a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/demand-anal/demand.ps">analyses</a> to determine various ways function arguments are used (or unused). These analyses include,</p>
 <ul>
-<li>demand (or strictness) analysis: Is an argument definitely forced (partially or completely) by a function?</li>
-<li>absence analysis: Is an argument entirely unused in the body?</li>
+<li>strictness (or sometimes called demand) analysis: Is an argument forced (partially or completely) by a function?</li>
+<li>absence analysis: Is an argument entirely unused by the function?</li>
 <li>occurrence analysis:</li>
 </ul>
 <p>When optimization is enabled GHC runs these analyses on all top-level bindings and records the results in the binding’s <code>IdInfo</code>. These results are then examined by later stages of compilation to help guide further optimizations (notably the worker-wrapper transformation).</p>
@@ -252,6 +252,13 @@ f x y <span class="fu">=</span> x <span class="fu">+</span> <span class="dv">1</
 <span class="ot">foldl' ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> [b] <span class="ot">-&gt;</span> a
 foldl' f x0</code></pre></div>
 <h4 id="absence-analysis">Absence analysis</h4>
+<p>Consider the function,</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">f ::</span> (<span class="dt">Int</span>, <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span>
+f (a,_) <span class="fu">=</span> a <span class="fu">+</span> <span class="dv">42</span></code></pre></div>
+<p>The strictness analysis discussed above allows us to determine that the first element of the tuple argument is demanded strictly. This observation allows to perform the [worker-wrapper transformation][worker-wrapper] on <code>f</code>, resulting in,</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">f_workerer</code></pre></div>
+<p>However, what of the second element?</p>
+<p>It is quite obvious that the second element is not called for at all</p>
 <h2 id="trick-locating-outputable-instances">Trick: Locating <code>Outputable</code> instances</h2>
 <p>As GHC Core is an internal representation there is a tendency for documentation to fall behind what GHC actually emits. For this reason, it can be useful to quickly find the <code>Outputable</code> instance defintion from which a given piece of output originated. <code>ghci</code> is quite handy for this purpose,</p>
 <pre><code>$ ghci

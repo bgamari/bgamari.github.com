@@ -30,7 +30,15 @@
         </div>
 
         <section id="main">
-        <h1 id="self-built-kernels-on-linaro">Self-built kernels on Linaro</h1>
+        <article>
+    <h1>Self-built kernels on Linaro</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2012-03-01" class="pubdate">2012-03-01</time> | tagged with <ul class="tags"><li>linaro</li><li>kernel</li><li>arm</li></ul>
+        </div>
+    </header>
+
+    <h1 id="self-built-kernels-on-linaro">Self-built kernels on Linaro</h1>
 <p>Tried compiling kernel with <code>.config</code> from (http://elinux.org/Panda_How_to_kernel_3_3_rcx).</p>
 <pre><code> $ make CROSS_COMPILE=arm-linux-gnueabi- ARCH=arm uImage
  $ make CROSS_COMPILE=arm-linux-gnueabi- ARCH=arm tarbz2-pkg</code></pre>
@@ -154,6 +162,8 @@
 <p>Disabling <code>Generic OMAP4</code> in <code>.config</code> causes the kernel to complain that it doesn’t support the devicetree. Pulling board file changes from <a href="http://dev.omapzoom.org/?p=integration/kernel-ubuntu.git;a=blobdiff;f=arch/arm/mach-omap2/board-omap4panda.c;h=1c583c7d9752e207ecc9bc9bd7c1383699567e61;hp=9aaa96057666936378e8270e689436f23dabe5fa;hb=a4c3505dc2a89aeea397b2ace08da0fc38dade1b;hpb=c3b92c8787367a8bb53d57d9789b558f1295cc96">this patch</a> also doesn’t help. Adding the remaining compatibility flags to the board’s compatbility list gets things booting again.</p>
 <p>Still can’t mount root however. It seems some ext4 flags aren’t supported by this kernel. Enable Ext4 and extended attributes in Kconfig.</p>
 <p>Finally, we have full boot.</p>
+</article>
+
         </section>
       </div>
 

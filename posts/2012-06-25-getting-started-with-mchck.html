@@ -30,7 +30,15 @@
         </div>
 
         <section id="main">
-        <h1 id="getting-started-with-mchck">Getting started with mchck</h1>
+        <article>
+    <h1>Getting started with mchck</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2012-06-25" class="pubdate">2012-06-25</time> | tagged with <ul class="tags"><li>mchck</li><li>arm</li></ul>
+        </div>
+    </header>
+
+    <h1 id="getting-started-with-mchck">Getting started with mchck</h1>
 <h2 id="note">Note</h2>
 <p>This describes my work with an older revision (r2) of the MC HCK design. Many things have changed in the last year; the current revision (r5) is built upon a different MCU, the pinout has changed, and the software environment has greatly matured. I’ll try to write about my experiences with this new revision soon. Until then, many of the ideas below still hold true.</p>
 <h2 id="section"></h2>
@@ -265,6 +273,8 @@ $ make</code></pre>
 <p>If the script dies of a protocol error, don’t worry, there are many possible issues, few of which are serious. First double-check the wiring and ensure that the device has power. If this is the correct, next look at the three bits listed in the script’s error message. These are the acknowledgement bits of the frame during which it lost synchronization with the device.</p>
 <p>If the acknowledgement bits aren’t all the same value, then you probably have noise on your clock line. This can be tested by placing your finger on the mchck’s SWD header pins. If the bus becomes more stable, this is evidence that your connection configuration is picking up RF noise from your surroundings, leading to false cycles. When using my Bus Pirate’s grabber cable, I found it necessary to place a capacitor between CLK and GND to provide better noise rejection. Without this the bus was extremely unstable.</p>
 <p>Finally, if the acknowledgement bits are all either 0 or 1, things aren’t good; it seems the chip isn’t making any attempt at communicating. Double check your soldering, the orientation of the chip, and if all else fails try replacing it.</p>
+</article>
+
         </section>
       </div>
 

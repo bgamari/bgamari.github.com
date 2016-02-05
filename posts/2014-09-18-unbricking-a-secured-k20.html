@@ -30,7 +30,15 @@
         </div>
 
         <section id="main">
-        <p>Due to the… interesting behavior of OpenOCD’s K20 FLASH writing algorithm, you can sometimes end up in a situation where you inadvertently end up with a secured chip. In particular, if your image doesn’t explicitly write to the FLASH configuration block (which starts at 0x400) but writes anywhere in the sector that contains it, OpenOCD will erase the sector without zeroing the configuration fields. Bam… secured chip.</p>
+        <article>
+    <h1>Unbricking a secured Freescale K20</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2014-09-18" class="pubdate">2014-09-18</time> | tagged with <ul class="tags"><li>jtag</li><li>openocd</li><li>k20</li></ul>
+        </div>
+    </header>
+
+    <p>Due to the… interesting behavior of OpenOCD’s K20 FLASH writing algorithm, you can sometimes end up in a situation where you inadvertently end up with a secured chip. In particular, if your image doesn’t explicitly write to the FLASH configuration block (which starts at 0x400) but writes anywhere in the sector that contains it, OpenOCD will erase the sector without zeroing the configuration fields. Bam… secured chip.</p>
 <p>Thankfully recovering from this is quite simple:</p>
 <p>Simply hold SRST low and run <code>kinetis mdm mass_erase</code> from the OpenOCD console (e.g. <code>nc localhost 4444</code>). You’ll see something like this,</p>
 <pre><code>&gt; kinetis mdm mass_erase
@@ -42,6 +50,8 @@ target halted due to debug-request, current mode: Thread
 xPSR: 0x01000000 pc: 0xfffffffe msp: 0xfffffffc
 &gt; </code></pre>
 <p>Yay! Unbricked chip!</p>
+</article>
+
         </section>
       </div>
 

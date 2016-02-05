@@ -30,7 +30,15 @@
         </div>
 
         <section id="main">
-        <h1 id="bayes-theorem-bayesian-probability-and-inference">Bayes theorem, Bayesian probability, and inference</h1>
+        <article>
+    <h1>Bayes theorem, Bayesian probability, and inference</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2014-11-21" class="pubdate">2014-11-21</time> | tagged with <ul class="tags"><li>bayes</li><li>probability</li><li>statistics</li></ul>
+        </div>
+    </header>
+
+    <h1 id="bayes-theorem-bayesian-probability-and-inference">Bayes theorem, Bayesian probability, and inference</h1>
 <p>A colleague recently wrote asking the following,</p>
 <blockquote>
 <p>Most of the sources I have came across explain the use of Bayes’ Theorem and how it can be applied to real world situations, but nothing that can contrast the two interpretations. Could you provide any insight into this?</p>
@@ -111,6 +119,8 @@ P(\alpha {\,\vert\,}\mathrm{tails}) = \frac{P(\mathrm{tails} {\,\vert\,}\alpha) 
 <p>As you see, in the limit of large number of observations, the maximum likelihood inference, and the Bayesian inference, with and without informative prior, come to the same answer. The difference matters most in the face of small quantities of data as whatever prior you give the Bayesian inference will contribute strongly to the posterior. As you accumulate more observations the role of the prior diminishes and the Bayesian inference converges to the ML inference.</p>
 <p>Which method you choose depends largely upon your needs. That being said, the flexibility and consistency enabled by the Bayesian approach makes many problems much easier to reason about. Being able to speak about all of the variables in your problem, both known and latent, in the same language is incredibly powerful. Especially coupled with formalisms such as <a href="https://en.wikipedia.org/wiki/Graphical_model">graphical models</a> and generalized inference methods such as <a href="https://en.wikipedia.org/wiki/Variational_Bayesian_methods">variational inference</a> and <a href="https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo">Markov Chain Monte Carlo</a>, the Bayesian framework offers the ability to construct rich models while retaining the ability to perform meaningful inference. For this reason, much of modern machine learning is built on the Bayesian interpretation.</p>
 <p>The Python sources to generate the figures in this post are available as an <a href="../media/bayes/bayes.ipynb">IPython Notebook</a>.</p>
+</article>
+
         </section>
       </div>
 
