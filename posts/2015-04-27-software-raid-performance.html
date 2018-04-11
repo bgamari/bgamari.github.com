@@ -70,85 +70,85 @@ xor: automatically using best checksumming function:
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash -e</span>
 
 <span class="co"># Where to put the images</span>
-<span class="ot">root=</span><span class="st">&quot;/tmp&quot;</span>
-<span class="ot">processes=</span><span class="st">&quot;md md127_raid6&quot;</span>
+<span class="va">root=</span><span class="st">&quot;/tmp&quot;</span>
+<span class="va">processes=</span><span class="st">&quot;md md127_raid6&quot;</span>
 
 <span class="co"># damn you bash</span>
-<span class="ot">time=</span><span class="st">&quot;/usr/bin/time&quot;</span>
+<span class="va">time=</span><span class="st">&quot;/usr/bin/time&quot;</span>
 
 <span class="co"># Setup RAID &quot;devices&quot;</span>
 <span class="kw">function</span><span class="fu"> setup()</span> <span class="kw">{</span>
-    <span class="ot">loopbacks=</span>
-    <span class="kw">for</span> <span class="kw">i</span> in 1 2 3 4<span class="kw">;</span> <span class="kw">do</span>
-        <span class="kw">touch</span> <span class="ot">$root</span>/test<span class="ot">$i</span>
-        <span class="kw">fallocate</span> -l <span class="ot">$(</span><span class="kw">echo</span> 8*1024*1024*1024 <span class="kw">|</span> <span class="kw">bc</span><span class="ot">)</span> -z <span class="ot">$root</span>/test<span class="ot">$i</span>
-        <span class="ot">loopbacks=</span><span class="st">&quot;</span><span class="ot">$loopbacks</span><span class="st"> </span><span class="ot">$(</span><span class="kw">sudo</span> losetup --find --show <span class="ot">$root</span>/test<span class="ot">$i)</span><span class="st">&quot;</span>
+    <span class="va">loopbacks=</span>
+    <span class="kw">for</span> <span class="ex">i</span> in 1 2 3 4<span class="kw">;</span> <span class="kw">do</span>
+        <span class="fu">touch</span> <span class="va">$root</span>/test<span class="va">$i</span>
+        <span class="ex">fallocate</span> -l <span class="va">$(</span><span class="bu">echo</span> 8*1024*1024*1024 <span class="kw">|</span> <span class="fu">bc</span><span class="va">)</span> -z <span class="va">$root</span>/test<span class="va">$i</span>
+        <span class="va">loopbacks=</span><span class="st">&quot;</span><span class="va">$loopbacks</span><span class="st"> </span><span class="va">$(</span><span class="fu">sudo</span> losetup --find --show <span class="va">$root</span>/test<span class="va">$i)</span><span class="st">&quot;</span>
     <span class="kw">done</span>
-    <span class="kw">sudo</span> mdadm --create --level=6 --raid-devices=4 /dev/md/bench <span class="ot">$loopbacks</span>
-    <span class="kw">sudo</span> mkfs.ext4 /dev/md/bench
-    <span class="kw">sudo</span> mkdir /mnt/bench
-    <span class="kw">sudo</span> mount /dev/md/bench /mnt/bench
+    <span class="fu">sudo</span> mdadm --create --level=6 --raid-devices=4 /dev/md/bench <span class="va">$loopbacks</span>
+    <span class="fu">sudo</span> mkfs.ext4 /dev/md/bench
+    <span class="fu">sudo</span> mkdir /mnt/bench
+    <span class="fu">sudo</span> mount /dev/md/bench /mnt/bench
 <span class="kw">}</span>
 
 <span class="co"># Measure it!</span>
-<span class="ot">tick=</span><span class="st">&quot;</span><span class="ot">$(</span><span class="kw">getconf</span> CLK_TCK<span class="ot">)</span><span class="st">&quot;</span>
+<span class="va">tick=</span><span class="st">&quot;</span><span class="va">$(</span><span class="ex">getconf</span> CLK_TCK<span class="va">)</span><span class="st">&quot;</span>
 <span class="kw">function</span><span class="fu"> show_processes()</span> <span class="kw">{</span>
-    <span class="kw">for</span> <span class="kw">p</span> in <span class="ot">$@</span><span class="kw">;</span> <span class="kw">do</span>
-        <span class="ot">pid=</span><span class="st">&quot;</span><span class="ot">$(</span><span class="kw">pidof</span> <span class="ot">$p)</span><span class="st">&quot;</span>
+    <span class="kw">for</span> <span class="ex">p</span> in <span class="va">$@</span><span class="kw">;</span> <span class="kw">do</span>
+        <span class="va">pid=</span><span class="st">&quot;</span><span class="va">$(</span><span class="fu">pidof</span> <span class="va">$p)</span><span class="st">&quot;</span>
         <span class="co"># pid, comm, user, system</span>
-        <span class="kw">cat</span> /proc/<span class="ot">$pid</span>/stat <span class="kw">|</span> <span class="kw">awk</span> <span class="st">&quot;{print </span><span class="dt">\$</span><span class="st">1,</span><span class="dt">\$</span><span class="st">2,</span><span class="dt">\$</span><span class="st">14 / </span><span class="ot">$tick</span><span class="st">,</span><span class="dt">\$</span><span class="st">15 / </span><span class="ot">$tick</span><span class="st">}&quot;</span>
+        <span class="fu">cat</span> /proc/<span class="va">$pid</span>/stat <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&quot;{print </span><span class="dt">\$</span><span class="st">1,</span><span class="dt">\$</span><span class="st">2,</span><span class="dt">\$</span><span class="st">14 / </span><span class="va">$tick</span><span class="st">,</span><span class="dt">\$</span><span class="st">15 / </span><span class="va">$tick</span><span class="st">}&quot;</span>
     <span class="kw">done</span>
 <span class="kw">}</span>
 
 <span class="kw">function</span><span class="fu"> write_test()</span> <span class="kw">{</span>
-    <span class="kw">echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">n================================&quot;</span> <span class="kw">&gt;&gt;</span> times.log
-    <span class="kw">echo</span> -e <span class="st">&quot;Write test&quot;</span> <span class="kw">&gt;&gt;</span> times.log
-    <span class="kw">(echo</span> <span class="st">&quot;Before&quot;</span><span class="kw">;</span> <span class="kw">show_processes</span> <span class="ot">$processes</span><span class="kw">)</span> <span class="kw">&gt;&gt;</span> <span class="kw">times.log</span>
-    <span class="ot">$time</span> <span class="kw">-a</span> -o times.log sudo fio --bs=64k --ioengine=libaio \
+    <span class="bu">echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">n================================&quot;</span> <span class="op">&gt;&gt;</span> times.log
+    <span class="bu">echo</span> -e <span class="st">&quot;Write test&quot;</span> <span class="op">&gt;&gt;</span> times.log
+    <span class="kw">(</span><span class="bu">echo</span> <span class="st">&quot;Before&quot;</span><span class="kw">;</span> <span class="ex">show_processes</span> <span class="va">$processes</span><span class="kw">)</span> <span class="op">&gt;&gt;</span> <span class="ex">times.log</span>
+    <span class="va">$time</span> <span class="ex">-a</span> -o times.log sudo fio --bs=64k --ioengine=libaio \
         --iodepth=4 --size=7g --direct=1 --runtime=60 \
         --directory=/mnt/bench --filename=test --name=seq-write \
         --rw=write
-    <span class="kw">(echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">nAfter&quot;</span><span class="kw">;</span> <span class="kw">show_processes</span> <span class="ot">$processes</span><span class="kw">)</span> <span class="kw">&gt;&gt;</span> <span class="kw">times.log</span>
+    <span class="kw">(</span><span class="bu">echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">nAfter&quot;</span><span class="kw">;</span> <span class="ex">show_processes</span> <span class="va">$processes</span><span class="kw">)</span> <span class="op">&gt;&gt;</span> <span class="ex">times.log</span>
 <span class="kw">}</span>
 
 <span class="kw">function</span><span class="fu"> read_test()</span> <span class="kw">{</span>
-    <span class="kw">echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">n================================&quot;</span> <span class="kw">&gt;&gt;</span> times.log
-    <span class="kw">echo</span> -e <span class="st">&quot;Read test&quot;</span> <span class="kw">&gt;&gt;</span> times.log
-    <span class="kw">(echo</span> <span class="st">&quot;Before&quot;</span><span class="kw">;</span> <span class="kw">show_processes</span> <span class="ot">$processes</span><span class="kw">)</span> <span class="kw">&gt;&gt;</span> <span class="kw">times.log</span>
-    <span class="ot">$time</span> <span class="kw">-a</span> -o times.log sudo fio --bs=64k --ioengine=libaio \
+    <span class="bu">echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">n================================&quot;</span> <span class="op">&gt;&gt;</span> times.log
+    <span class="bu">echo</span> -e <span class="st">&quot;Read test&quot;</span> <span class="op">&gt;&gt;</span> times.log
+    <span class="kw">(</span><span class="bu">echo</span> <span class="st">&quot;Before&quot;</span><span class="kw">;</span> <span class="ex">show_processes</span> <span class="va">$processes</span><span class="kw">)</span> <span class="op">&gt;&gt;</span> <span class="ex">times.log</span>
+    <span class="va">$time</span> <span class="ex">-a</span> -o times.log sudo fio --bs=64k --ioengine=libaio \
         --iodepth=4 --size=7g --direct=1 --runtime=60 \
         --directory=/mnt/bench --filename=test --name=seq-read \
         --rw=read
-    <span class="kw">(echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">nAfter&quot;</span><span class="kw">;</span> <span class="kw">show_processes</span> <span class="ot">$processes</span><span class="kw">)</span> <span class="kw">&gt;&gt;</span> <span class="kw">times.log</span>
+    <span class="kw">(</span><span class="bu">echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">nAfter&quot;</span><span class="kw">;</span> <span class="ex">show_processes</span> <span class="va">$processes</span><span class="kw">)</span> <span class="op">&gt;&gt;</span> <span class="ex">times.log</span>
 <span class="kw">}</span>
 
 <span class="kw">function</span><span class="fu"> rebuild_test()</span> <span class="kw">{</span>
-    <span class="kw">echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">n================================&quot;</span> <span class="kw">&gt;&gt;</span> times.log
-    <span class="kw">echo</span> <span class="st">&quot;Rebuild test&quot;</span> <span class="kw">&gt;&gt;</span> times.log
-    <span class="kw">(echo</span> <span class="st">&quot;Before&quot;</span><span class="kw">;</span> <span class="kw">show_processes</span> <span class="ot">$processes</span><span class="kw">)</span> <span class="kw">&gt;&gt;</span> <span class="kw">times.log</span>
-    <span class="kw">echo</span> check <span class="kw">|</span> <span class="kw">sudo</span> tee /sys/block/md127/md/sync_action
-    <span class="kw">sudo</span> mdadm --monitor <span class="kw">|</span> <span class="kw">grep</span> RebuildFinished <span class="kw">|</span> <span class="kw">head</span> -n1
-    <span class="kw">(echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">nAfter&quot;</span><span class="kw">;</span> <span class="kw">show_processes</span> <span class="ot">$processes</span><span class="kw">)</span> <span class="kw">&gt;&gt;</span> <span class="kw">times.log</span>
+    <span class="bu">echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">n================================&quot;</span> <span class="op">&gt;&gt;</span> times.log
+    <span class="bu">echo</span> <span class="st">&quot;Rebuild test&quot;</span> <span class="op">&gt;&gt;</span> times.log
+    <span class="kw">(</span><span class="bu">echo</span> <span class="st">&quot;Before&quot;</span><span class="kw">;</span> <span class="ex">show_processes</span> <span class="va">$processes</span><span class="kw">)</span> <span class="op">&gt;&gt;</span> <span class="ex">times.log</span>
+    <span class="bu">echo</span> check <span class="kw">|</span> <span class="fu">sudo</span> tee /sys/block/md127/md/sync_action
+    <span class="fu">sudo</span> mdadm --monitor <span class="kw">|</span> <span class="fu">grep</span> RebuildFinished <span class="kw">|</span> <span class="fu">head</span> -n1
+    <span class="kw">(</span><span class="bu">echo</span> -e <span class="st">&quot;</span><span class="dt">\\</span><span class="st">nAfter&quot;</span><span class="kw">;</span> <span class="ex">show_processes</span> <span class="va">$processes</span><span class="kw">)</span> <span class="op">&gt;&gt;</span> <span class="ex">times.log</span>
 <span class="kw">}</span>
 
 <span class="co"># Clean up</span>
 <span class="kw">function</span><span class="fu"> cleanup()</span> <span class="kw">{</span>
-    <span class="kw">sudo</span> umount /mnt/bench
-    <span class="kw">sudo</span> mdadm -S /dev/md/bench
-    <span class="kw">echo</span> <span class="ot">$loopbacks</span> <span class="kw">|</span> <span class="kw">sudo</span> xargs -n1 -- losetup --detach
-    <span class="kw">sudo</span> rm -R /mnt/bench
-    <span class="kw">rm</span> <span class="ot">$root</span>/test[1234]
+    <span class="fu">sudo</span> umount /mnt/bench
+    <span class="fu">sudo</span> mdadm -S /dev/md/bench
+    <span class="bu">echo</span> <span class="va">$loopbacks</span> <span class="kw">|</span> <span class="fu">sudo</span> xargs -n1 -- losetup --detach
+    <span class="fu">sudo</span> rm -R /mnt/bench
+    <span class="fu">rm</span> <span class="va">$root</span>/test[1234]
 <span class="kw">}</span>
 
 <span class="kw">function</span><span class="fu"> run_all()</span> <span class="kw">{</span>
-    <span class="kw">echo</span> <span class="kw">&gt;</span> times.log
-    <span class="kw">setup</span>
-    <span class="kw">write_test</span>
-    <span class="kw">read_test</span>
-    <span class="kw">umount</span> /mnt/bench
-    <span class="kw">rebuild_test</span>
-    <span class="kw">cleanup</span>
-    <span class="kw">cat</span> times.log
+    <span class="bu">echo</span> <span class="op">&gt;</span> times.log
+    <span class="ex">setup</span>
+    <span class="ex">write_test</span>
+    <span class="ex">read_test</span>
+    <span class="fu">umount</span> /mnt/bench
+    <span class="ex">rebuild_test</span>
+    <span class="ex">cleanup</span>
+    <span class="fu">cat</span> times.log
 <span class="kw">}</span></code></pre></div>
 </article>
 

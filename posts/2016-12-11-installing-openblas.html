@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>bgamari.github.com - rsyncing files with a given extension</title>
+    <title>bgamari.github.com - Building OpenBLAS on Debian 8</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
     <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
@@ -31,15 +31,24 @@
 
         <section id="main">
         <article>
-    <h1>rsyncing files with a given extension</h1>
+    <h1>Building OpenBLAS on Debian 8</h1>
     <header>
         <div class="meta">
-            <time datetime="2015-06-17" class="pubdate">2015-06-17</time> | tagged with <ul class="tags"><li>rsync notes</li></ul>
+            <time datetime="2016-12-11" class="pubdate">2016-12-11</time> | tagged with <ul class="tags"></ul>
         </div>
     </header>
 
-    <p>I’ve forgotten this enough times that I’m finally going to write it down. Say you want to copy files with extension <code>.ext</code> in <code>./dir</code> to <code>host</code>. <code>rsync</code> can do this with,</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">rsync</span> -vza --include=<span class="st">'*.xcorr-0-1'</span> --include=<span class="st">'*/'</span> --exclude=<span class="st">'*'</span> dir host:dir</code></pre></div>
+    <h1 id="building-openblas-on-debian-8">Building OpenBLAS on Debian 8</h1>
+<pre><code>$ wget http://github.com/xianyi/OpenBLAS/archive/v0.2.19.tar.gz
+$ tar -xf v0.2.19.tar.gz
+$ cd OpenBLAS-0.2.19
+$ make
+$ sudo cp libopenblas* /usr/local/lib
+$ sudo update-alternatives --install /usr/lib/liblapack.so liblapack.so /usr/local/lib/libopenblas.so.0.2 50
+$ sudo update-alternatives --install /usr/lib/liblapack.so.3 liblapack.so.3 /usr/local/lib/libopenblas.so.0.2 50
+$ sudo update-alternatives --install /usr/lib/libblas.so libblas.so /usr/local/lib/libopenblas.so.0.2 50
+$ sudo update-alternatives --install /usr/lib/libblas.so.3 libblas.so.3 /usr/local/lib/libopenblas.so.0.2 50</code></pre>
+<p>`</p>
 </article>
 
         </section>

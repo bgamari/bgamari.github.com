@@ -62,15 +62,15 @@ P(A {\,\vert\,}B) = \frac{P(B {\,\vert\,}A) P(A)}{P(B)}
 <p>Note that throughout this we made no assumptions on how we interpret these probabilities (beyond the chain rule which holds in both interpretations). Mathematically this statement is true in any setting. Intuitively it gives us a tool for inverting conditionality.</p>
 <h2 id="a-frequentists-use-of-bayes-theorem">A frequentist’s use of Bayes’ theorem</h2>
 While Bayes’ theorem holds in both Bayesian and frequentist settings, the two interpretations will differ in how they use this relationship. Let’s look at an example (inspired by <a href="https://en.wikipedia.org/wiki/Bayes%27_theorem#Frequentist_example">Wikipedia</a>): Say that we collect stamps, which we classify by their color (red or blue) and the texture (smooth or rough). When we count our stamps, we find that 10% of them are red, with the remaining 90% being blue,
-\begin{align*}
+<span class="math display">\[\begin{align*}
 P(\mathrm{Color} = \mathrm{red}) &amp;= 0.1 \\
 P(\mathrm{Color} = \mathrm{blue}) &amp;= 0.9 \\
-\end{align*}
+\end{align*}\]</span>
 Moreover, we find that 70% of our red stamps are smooth,
-\begin{align*}
+<span class="math display">\[\begin{align*}
 P(\mathrm{Texture} = \mathrm{smooth} \cond \mathrm{Color} = \mathrm{red}) &amp;= 0.7 \\
 P(\mathrm{Texture} = \mathrm{rough} \cond \mathrm{Color} = \mathrm{red}) &amp;= 0.3 \\
-\end{align*}
+\end{align*}\]</span>
 <p>We can now ask the inverse question “given that a stamp is smooth, what is the probability that it is red?” Here we are looking for <span class="math inline">\(P(\mathrm{Color} = \mathrm{red} {\,\vert\,}\mathrm{Texture} = \mathrm{smooth})\)</span>. The frequentist has no problem invoking Bayes theorem here as all of the probabilities involve are strictly outcome fractions from some sample (our body of stamps), <span class="math display">\[
 P(\mathrm{red} {\,\vert\,}\mathrm{smooth}) = 
   \frac{P(\mathrm{smooth} {\,\vert\,}\mathrm{red})
@@ -82,10 +82,10 @@ P(\mathrm{smooth}) = \sum_{c \in \{\mathrm{red}, \mathrm{blue}\}} P(\mathrm{smoo
 <p>The Bayesian would happily agree with the above frequentist reasoning. In addition, their more accommodating interpretation of probability allows the Bayesian to invoke probabilistic arguments in contexts where the frequentist would claim they are not appropriate.</p>
 <p>Say you are given a coin by a friend who expresses fear that it may be weighted. “I flipped it one hundred times and I only saw twenty-two tails! I think it’s rigged!” he exclaims as he hands you the coin. Being an inquisitive person and good friend, you feel your should help alleviate (or confirm) your friend’s concern and begin thinking about how you might test his hypothesis.</p>
 You recall that the outcome of a coin flip is described by the Bernoulli distribution,
-\begin{align*}
+<span class="math display">\[\begin{align*}
 P(\mathrm{Heads}) &amp; = \alpha \\
 P(\mathrm{Tails}) &amp; = 1 - \alpha \\
-\end{align*}
+\end{align*}\]</span>
 <p>where the Bernoulli parameter <span class="math inline">\(\alpha = 0.5\)</span> is to be expected in the case of a fair specimen. To answer your friend’s query you want to determine <span class="math inline">\(\alpha\)</span>. This statistical task is known as <em>parameter estimation</em>.</p>
 <p>With this knowledge in mind you hatch a plan: you will flip the coin one hundred times and see what fraction of the flips turn up heads, for this will give you an estimate of the unknown <span class="math inline">\(\alpha\)</span>. As you perform the first flip, you ponder your friend’s words, watching the coin tumble to the floor. It lands showing tails. You flip again; another tails. “Interesting,” you think, “must be a fluke,” surely your friend knows how to properly flip a coin.</p>
 <p>At this point that you have revealed your inner Bayesian. You have used your friend’s experience to form your own prior belief on the outcome of the flip and let this prior affect your interpretation of the data. The frequentist would claim that in doing so you have committed a probabilistic sin for probabilities are not beliefs, they are event counts. The Bayesian, on the other hand, would counter that this is a natural and quite useful extension of probability to cases where large quantities of observation aren’t available.</p>

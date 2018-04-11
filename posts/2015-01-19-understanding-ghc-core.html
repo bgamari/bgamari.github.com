@@ -40,11 +40,11 @@
 
     <p><strong>This document is a work-in-progress.</strong> If there is something that you would like to see discussed feel free to let me know.</p>
 <p>While there have been a variety of writings about GHC’s Core representation, the language is a living entity which changes quickly in ways that aren’t always well documented. This</p>
-<h2 id="what-is-core">What is Core?</h2>
+<p>## What is Core?</p>
 <p>GHC Core is a close relative of the <a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/ext-f/fc-tldi.pdf">System FC</a> language and the first of a series of intermediate representations used by GHC to turn Haskell into machine code (the others being STG and C–).</p>
 <p>While on face value Core appears very similar to Haskell, there are a few</p>
 <p>Type application <a href="http://research.microsoft.com/apps/pubs/default.aspx?id=67064">A transformation-based optimiser for Haskell</a></p>
-<h2 id="coercions">Coercions</h2>
+<p>## Coercions</p>
 <p>Core preserves <code>newtypes</code> as types unique from their representation (e.g. the type that they wrap). Wrapping and unwrapping of <code>newtype</code> values are represented by applications of the <code>cast</code> function. This essentially has the type,</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Coercion</span> a b
 
@@ -56,7 +56,7 @@
 <p><code>Sym</code></p>
 <p><code>Sub</code></p>
 <p><code>&lt;ty&gt;_R</code> is a type parameter with representational role. Roughly speaking this means that given a type constructor <code>T</code> and types <code>A</code> and <code>B</code>, <code>T &lt;A&gt;_R</code> and <code>T &lt;B&gt;_R</code> are representationally distinct. <code>@~</code></p>
-<h2 id="idinfo">IdInfo</h2>
+<p>## IdInfo</p>
 <p>Attached to identifiers GHC will often keep metadata known as <a href="https://git.haskell.org/ghc.git/blob/a6f0f5ab45b2643b561e0a0a54a4f14745ab2152:/compiler/basicTypes/IdInfo.hs#l144"><code>IdInfo</code></a> to inform various optimization passes. This information can be found within brackets in Core’s textual representation. In the event that you just want to merely see the “shape” of a program <code>IdInfo</code> annotations are often noise that can be safely suppressed with <code>-dsuppress-idinfo</code>.</p>
 <p>The information in <code>IdInfo</code> can be useful when examining the optimization with respect to specific passes. In this case it can be useful hto have a rough understanding of what these annotations mean. A brief summary of the IdInfo annotations used by GHC 7.10 is included below although these will likely change with future compiler versions.</p>
 <table>
@@ -115,7 +115,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="unfolding-templates">Unfolding templates</h3>
+<p>### Unfolding templates</p>
 <p>Unfolding (sometimes known as inlining) is one of the central optimizations performed by GHC’s Core optimizer. In this optimization, identifier occurrences are substituted by the right-hand side of their respective definition.</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">Unf</span><span class="fu">=</span><span class="dt">Unf</span>{<span class="dt">Src</span><span class="fu">=</span><span class="dt">InlineStable</span>, <span class="dt">TopLvl</span><span class="fu">=</span><span class="dt">True</span>, <span class="dt">Value</span><span class="fu">=</span><span class="dt">True</span>, <span class="dt">ConLike</span><span class="fu">=</span><span class="dt">True</span>,
         <span class="dt">WorkFree</span><span class="fu">=</span><span class="dt">True</span>, <span class="dt">Expandable</span><span class="fu">=</span><span class="dt">True</span>,
@@ -129,7 +129,7 @@
                 ds2_daj7
                 }}]</code></pre></div>
 <p><code>Src</code></p>
-<h3 id="how-are-values-used">How are values used?</h3>
+<p>### How are values used?</p>
 <p>GHC uses a variety of local <a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/demand-anal/demand.ps">analyses</a> to determine various ways function arguments are used (or unused). These analyses include,</p>
 <ul>
 <li>strictness (or sometimes called demand) analysis: Is an argument forced (partially or completely) by a function?</li>
@@ -165,8 +165,17 @@ foldl' <span class="fu">=</span> <span class="fu">...</span></code></pre></div>
 </tbody>
 </table>
 <p>We will discuss the meaning of these annotations in the following sections.</p>
-<h4 id="demand-analysis">Demand analysis</h4>
-<p><a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/demand-anal/demand.ps">Demand analysis</a> (or strictness analysis) is an analysis which attempts to determine how the arguments of a function are used by its definition. The result of the analysis is a <em>demand signature</em></p>
+<p>#### Demand analysis</p>
+<p><a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/demand-anal/demand.ps">Demand analysis</a> (or strictness analysis) is an analysis which attempts to determine how the arguments of a function or binders of a let-block are used by its right-hand side. The result of the analysis is a <em>demand signature</em>. Note that demand signatures are computed for both let-bound and lambda-bound (argument) binders; however, for the sake of simplicity we will talk only about arguments below. Most everything applies equally to let-bound binders as well.</p>
+<p>Note that demand analysis is necessarily conservative; GHC can not conclude that a value is forced unless all possible code-paths force it. Afterall, we may otherwise perform unnecessary work or, even worse, force a bottoming expression.</p>
+<p>Demand signatures consist of two parts:</p>
+<ul>
+<li><p>a <strong>strictness</strong> signature denoting how much of the value is forced</p></li>
+<li><p>an <strong>absence</strong> (or usage) signature denoting how many times the value might be used</p></li>
+</ul>
+<p>In GHC Core syntax demand signatures are rendered inside angle brackets (e.g. <code>&lt;...&gt;</code>) and separated by a comma, e.g.,</p>
+<pre><code>&lt;strictness1, usage1&gt; &lt;strictness2, usage2&gt; ... &lt;strictnessN, usageN&gt; suffixes</code></pre>
+<p>where there is one signature pair per argument. The strictness and absence signatures themselves are rendered in abbreviated form,</p>
 <table style="width:99%;">
 <colgroup>
 <col width="18%" />
@@ -193,65 +202,99 @@ foldl' <span class="fu">=</span> <span class="fu">...</span></code></pre></div>
 </tr>
 <tr class="even">
 <td align="left"><code>S(...)</code></td>
-<td align="left"><em>structured demand</em>. The argument will itself be evaluated to at least head-normal form and the values within it (e.g. its fields) will be evaluated to at least the given strictness.</td>
+<td align="left"><em>strict product demand</em>. The argument (which must be a product) will itself be evaluated to at least head-normal form and each of its fields will be evaluated to at least the strictnesses given in parentheses.</td>
 </tr>
 <tr class="odd">
+<td align="left"><code>C</code></td>
+<td align="left"><em>strict call</em>. The binder (which must be a function) is applied to arguments and the result is forced.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>B</code></td>
+<td align="left"><em>hyper-strict</em>. All codepaths which force the argument will eventually diverge.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>x...</code></td>
+<td align="left"><em>handles exceptions</em>. This isn’t a demand itself, but rather <em>modifies</em> a strict demand, denoting that while the argument is forced, its divergence does not imply that the function will diverge (e.g. the function may catch exceptions thrown during evaluation of the argument).</td>
+</tr>
+<tr class="even">
 <td align="left"><strong>absence</strong></td>
 <td align="left"></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>U</code></td>
 <td align="left"><em>used</em>. The binder is used</td>
 </tr>
+<tr class="even">
+<td align="left"><code>C</code></td>
+<td align="left"><em>used as function</em>. The argument is</td>
+</tr>
 <tr class="odd">
-<td align="left"><code>1*</code></td>
-<td align="left"><em>used once</em>. The argument is used precisely once.</td>
+<td align="left"><code>S(...)</code></td>
+<td align="left"><em>product usage</em>. The argument (which must be a product) and some portion of its fields are used.</td>
 </tr>
 <tr class="even">
 <td align="left"><code>A</code></td>
 <td align="left"><em>absent == definitely unused</em>. Indicates that the binder is certainly not used.</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>B</code></td>
-<td align="left"><em>hyper-strict</em>.</td>
-</tr>
-<tr class="even">
-<td align="left"><code>C</code></td>
-<td align="left"><em>call</em>. Applied to functio</td>
-</tr>
-<tr class="odd">
-<td align="left"><strong>suffixes</strong></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left"><code>m</code></td>
-<td align="left"><em>returns a constructed product result</em>.</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>b</code></td>
-<td align="left"><em>bottoming</em>. The function is known to diverge.</td>
+<td align="left"><code>1*...</code></td>
+<td align="left"><em>used once</em>. Not a usage but rather modifies a “used” demand denoting that the argument is used precisely once.</td>
 </tr>
 </tbody>
 </table>
-<p>Let’s consider a few examples (stolen from <a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/demand-anal/demand.ps">the paper</a>),</p>
+<p>In addition, following the argument signatures there may also be a variety of miscellaneous flags that describe the result of the functionm,</p>
+<table style="width:99%;">
+<colgroup>
+<col width="18%" />
+<col width="80%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">signature</th>
+<th align="left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>m</code></td>
+<td align="left"><em>returns a constructed product result</em>.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>b</code></td>
+<td align="left"><em>bottoming</em>. The result of the function (when saturated) is known to be bottom.</td>
+</tr>
+</tbody>
+</table>
+<p>Let’s consider a few examples (including several stolen from <a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/demand-anal/demand.ps">the paper</a>),</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Demand signature: &lt;S,1*U&gt;</span>
 null<span class="ot"> ::</span> [a] <span class="ot">-&gt;</span> <span class="dt">Bool</span>
 null v <span class="fu">=</span> <span class="kw">case</span> v <span class="kw">of</span> []   <span class="ot">-&gt;</span> <span class="dt">True</span>
                    x<span class="fu">:</span>xs <span class="ot">-&gt;</span> <span class="dt">False</span></code></pre></div>
-<p>The <code>S</code> here arises from the case-analysis, which implies that if we evaluate <code>null v</code> then <code>v</code> must be evaluated to at least WHNF.</p>
+<p>The <code>S</code> (strict) strictness here arises from the case-analysis, which implies that if we evaluate <code>null v</code> then <code>v</code> must be evaluated to at least WHNF. The <code>1*U</code> usage signature means that the binder occurs in exactly one context (namely as the scrutinee of the case).</p>
+<p>Now let’s look at a slightly tricker example,</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Demand signature: &lt;S(SL),1*U(1*U,A)&gt;</span>
 fst<span class="ot"> ::</span> (a,b) <span class="ot">-&gt;</span> a
 fst p <span class="fu">=</span> <span class="kw">case</span> p <span class="kw">of</span> (x,_) <span class="ot">-&gt;</span> x</code></pre></div>
+<p>Here we see that the strictness signature of <code>p</code> is <code>S(SL)</code>, meaning that the <code>(,)</code> constructor will be forced to WHNF, as will its first field. The usage signature suggests that, as one would expect, <code>p</code> and its first field are used precisely once. The second field of <code>p</code> has a lazy (<code>L</code>) strictness and absent (<code>A</code>) usage, as it is nowhere mentioned in <code>fst</code>’s right-hand side.</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Demand signature: &lt;S,1*U(U,U)&gt;m</span>
 <span class="ot">swap ::</span> (a,b) <span class="ot">-&gt;</span> (b,a)
 swap p <span class="fu">=</span> <span class="kw">case</span> p <span class="kw">of</span> (x,y) <span class="ot">-&gt;</span> (y,x)</code></pre></div>
+<p>Here we see that <code>p</code> is evaluated to WHNF, however neither of the fields will be further forced despite the fact that they are both mentioned. Additionally, we see that swap returns a [constructed product result]<span class="citation">(<span class="citeproc-not-found" data-reference-id="cpr"><strong>???</strong></span>)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Demand signature: &lt;S,1*U(U)&gt;&lt;L,A&gt;m</span>
 <span class="ot">f ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>
-f x y <span class="fu">=</span> x <span class="fu">+</span> <span class="dv">1</span></code></pre></div>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Demand signature: &lt;L,C(C1(U))&gt;&lt;S,1*U&gt;&lt;S,1*U&gt;</span>
+f x y <span class="fu">=</span> <span class="kw">case</span> x <span class="kw">of</span> 
+          <span class="dt">I</span><span class="fu">#</span> x<span class="fu">#</span> <span class="ot">-&gt;</span> <span class="dt">I</span><span class="fu">#</span> (x<span class="fu">#</span> <span class="fu">+#</span> <span class="dv">1</span><span class="fu">#</span>)</code></pre></div>
+<p>This is another simple case: the first argument, <code>x</code>, has a demand of <code>&lt;S,1*U(U)&gt;</code>, owing to the fact that it is scrutinized by the case.</p>
+<p>Now let’s look at a combinator involving a higher-order function,</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Demand signature: &lt;L,C(C1(U))&gt;&lt;L,U&gt;&lt;S,1*U&gt;</span>
 <span class="ot">foldl' ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> [b] <span class="ot">-&gt;</span> a
-foldl' f x0</code></pre></div>
-<h4 id="absence-analysis">Absence analysis</h4>
+foldl' f y xs <span class="fu">=</span>
+    <span class="kw">case</span> xs <span class="kw">of</span>
+      []    <span class="ot">-&gt;</span> y
+      x<span class="fu">:</span>xs' <span class="ot">-&gt;</span> foldl' f (f y x) xs'</code></pre></div>
+<p>The first thing to notice here is the lazy strictness on <code>f</code>; this is due to the conservative nature of strictness analysis. Afterall, evaluating <code>foldl' f</code> to an empty list will never force <code>f</code>. However, we nevertheless see that <code>f</code>’s usage signature reflects that it is called with two arguments: .</p>
+<p>Exceptions tend to make</p>
+<p>#### Absence analysis</p>
 <p>Consider the function,</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">f ::</span> (<span class="dt">Int</span>, <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span>
 f (a,_) <span class="fu">=</span> a <span class="fu">+</span> <span class="dv">42</span></code></pre></div>
@@ -259,8 +302,7 @@ f (a,_) <span class="fu">=</span> a <span class="fu">+</span> <span class="dv">4
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">f_workerer</code></pre></div>
 <p>However, what of the second element?</p>
 <p>It is quite obvious that the second element is not called for at all</p>
-<h2 id="trick-locating-outputable-instances">Trick: Locating <code>Outputable</code> instances</h2>
-<p>As GHC Core is an internal representation there is a tendency for documentation to fall behind what GHC actually emits. For this reason, it can be useful to quickly find the <code>Outputable</code> instance defintion from which a given piece of output originated. <code>ghci</code> is quite handy for this purpose,</p>
+<p>## Trick: Locating <code>Outputable</code> instances As GHC Core is an internal representation there is a tendency for documentation to fall behind what GHC actually emits. For this reason, it can be useful to quickly find the <code>Outputable</code> instance defintion from which a given piece of output originated. <code>ghci</code> is quite handy for this purpose,</p>
 <pre><code>$ ghci
 GHCi, version 7.10.2.20151118: http://www.haskell.org/ghc/  :? for help
 λ&gt; :set -package ghc
@@ -277,19 +319,23 @@ instance Outputable Type -- Defined in ‘TypeRep’
 instance Outputable TyThing -- Defined in ‘TypeRep’
 instance Outputable TyCon -- Defined in ‘TyCon’
 instance Outputable ClsInst -- Defined in ‘InstEnv’</code></pre>
-<h2 id="optimizations">Optimizations</h2>
-<h3 id="float-out">Float-out</h3>
-<h3 id="float-in">Float-in</h3>
-<h3 id="float-">Float-</h3>
+<p>## Optimizations ### Float-out ### Float-in ### Float-</p>
 <p>In brackets: <a href="https://git.haskell.org/ghc.git/blob/a6f0f5ab45b2643b561e0a0a54a4f14745ab2152:/compiler/basicTypes/IdInfo.hs#l144">IdInfo</a></p>
 <p>Role annotations</p>
-<h2 id="glossary">Glossary</h2>
+<p># A language deeper: STG</p>
+<p>STG is a Haskell-like language which Core is lowered to. While it doesn’t technically fit in this article, I’ve plopped it here regardless.</p>
+<p>let-no-escape closure update flags * <code>\r</code>: re-entrant: may be entered multiple times and therefore shouldn’t be updated or black-hole’d * <code>\s</code>: single-entry: will be entered at most once and therefore needn’t be updated * <code>\u</code>: updatable: should be updated after evaluation (and may be blackhole’d during evaluation) <code>sat-only</code>: Marks a closure that will only be used in fully-saturated applications.</p>
+<p>## Glossary</p>
 <dl>
 <dt>binding</dt>
 <dd><p>the introduction of a name for a value. For instance, <code>let hello = 5 in ...</code> is a binding.</p>
 </dd>
 <dt>binder</dt>
 <dd><p>the name of a binding. For instance, in <code>let hello = 5 in ...</code> <code>hello</code> is the binder</p>
+</dd>
+<dt>MFE (Maximal Free Expression)</dt>
+<dd><p>A maximal free expression (or MFE) of a lambda abstraction is an expression which contains no occurrences of the variable bound by the abstraction, and is not a sub-expression of a larger expression with this property.</p>
+<p>For instance, of the expression, <code>\x -&gt; (4 * 3) + x</code>, <code>(4 * 3)</code> is an MFE as it contains no references to <code>x</code>.</p>
 </dd>
 </dl>
 <div class="footnotes">

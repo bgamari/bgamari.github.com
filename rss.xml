@@ -257,14 +257,6 @@
     <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
-    <title>Using perf probe for fun and profit</title>
-    <link>http://bgamari.github.com//posts/2015-01-06-using-perf-probe.html</link>
-    <description><![CDATA[Using perf probe to debug gtk performance degradation]]></description>
-    <pubDate>Tue, 06 Jan 2015 00:00:00 UT</pubDate>
-    <guid>http://bgamari.github.com//posts/2015-01-06-using-perf-probe.html</guid>
-    <dc:creator>Ben Gamari</dc:creator>
-</item>
-<item>
     <title>Understanding GHC Core</title>
     <link>http://bgamari.github.com//posts/2015-01-19-understanding-ghc-core.html</link>
     <description><![CDATA[Everything you really need to know to understand GHC's Core]]></description>
@@ -337,11 +329,67 @@
     <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
+    <title>Using perf probe for fun and profit</title>
+    <link>http://bgamari.github.com//posts/2016-01-06-using-perf-probe.html</link>
+    <description><![CDATA[Using perf probe to debug gtk performance degradation]]></description>
+    <pubDate>Wed, 06 Jan 2016 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2016-01-06-using-perf-probe.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
+<item>
     <title>Compressor comparison for GHC binary distributions</title>
     <link>http://bgamari.github.com//posts/2016-02-04-compression-comparison.html</link>
     <description><![CDATA[Some notes from an unscientific comparison of gzip, bzip2, and xz]]></description>
     <pubDate>Thu, 04 Feb 2016 00:00:00 UT</pubDate>
     <guid>http://bgamari.github.com//posts/2016-02-04-compression-comparison.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
+<item>
+    <title>The many arrays of GHC</title>
+    <link>http://bgamari.github.com//posts/2016-03-30-what-is-this-array.html</link>
+    <description><![CDATA[A brief summary of the many array types you'll find in a Haskell heap profile]]></description>
+    <pubDate>Wed, 30 Mar 2016 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2016-03-30-what-is-this-array.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
+<item>
+    <title>Securely copying with escalated privileges with rsync</title>
+    <link>http://bgamari.github.com//posts/2016-09-08-secure-root-rsync.html</link>
+    <description><![CDATA[Securely protected files with rsync and minimal privileges]]></description>
+    <pubDate>Thu, 08 Sep 2016 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2016-09-08-secure-root-rsync.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
+<item>
+    <title>Nix notes</title>
+    <link>http://bgamari.github.com//posts/2016-10-29-nix-notes.html</link>
+    <description><![CDATA[Some notes-to-myself on Nix]]></description>
+    <pubDate>Sat, 29 Oct 2016 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2016-10-29-nix-notes.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
+<item>
+    <title>Building OpenBLAS on Debian 8</title>
+    <link>http://bgamari.github.com//posts/2016-12-11-installing-openblas.html</link>
+    <description><![CDATA[Installing OpenBLAS on Debian 8]]></description>
+    <pubDate>Sun, 11 Dec 2016 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2016-12-11-installing-openblas.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
+<item>
+    <title>A simple IPsec tunnel with StrongSwan</title>
+    <link>http://bgamari.github.com//posts/2017-04-08-ipsec.html</link>
+    <description><![CDATA[Setting up a simple IPsec tunnel]]></description>
+    <pubDate>Sat, 08 Apr 2017 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2017-04-08-ipsec.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
+<item>
+    <title>In the trenches: Debugging GHC evaluation</title>
+    <link>http://bgamari.github.com//posts/2017-06-06-debugging-T13615.html</link>
+    <description><![CDATA[A pseudo-tutorial walking through the debugging process of GHC]]></description>
+    <pubDate>Tue, 06 Jun 2017 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2017-06-06-debugging-T13615.html</guid>
     <dc:creator>Ben Gamari</dc:creator>
 </item>
 

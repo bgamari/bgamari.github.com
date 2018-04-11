@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>bgamari.github.com - In the trenches: Debugging GHC evaluation</title>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="content">
+        <div id="sidebar">
+          <nav>
+            <h1>Navigation</h1>
+            <ul>
+              <li><a href="../index.html">Home</a></li>
+              <li><a href="../posts.html">Blog</a></li>
+              <li><a href="../research-agenda.html">Research agenda</a></li>
+              <li><a href="../publications.html">Publications</a></li>
+              <li><a href="../past-research.html">Past research</a></li>
+              <li><a href="../media/cv.pdf">Curriculum Vitæ</a></li>
+            </ul>
+            <h1>Related Links</h1>
+            <ul>
+              <li><a href="http://goldnerlab.physics.umass.edu/wiki/">Research group</a></li>
+              <li><a href="http://www.github.com/bgamari">Github</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <section id="main">
+        <article>
+    <h1>In the trenches: Debugging GHC evaluation</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2017-06-06" class="pubdate">2017-06-06</time> | tagged with <ul class="tags"></ul>
+        </div>
+    </header>
+
+    <p>This will be a collection of notes from my efforts debugging GHC bug <a href="https://ghc.haskell.org/trac/ghc/ticket/13615">#13615</a>, a nasty concurrency issue leading to non-deterministic incorrect evaluation in some parallel programs.</p>
+<p>This post will not be an introduction to <code>gdb</code>, although will rely on it. Moreover, we will assume some knowledge of GHC internals, in particular a working understanding of STG machine. See <span class="citation">(<span class="citeproc-not-found" data-reference-id="stg"><strong>???</strong></span>)</span> for details.</p>
+<p>A fairly nice reproducer can be found <a href="https://github.com/bgamari/cuddly-bassoon/blob/master/unordered-containers-0.2.8.0/Data/HashMap/Strict.hs#L90">here</a>. In short what we have here is a program which builds a strict <code>HashMap</code> (from <code>unordered-containers</code>) from a list of elements evaluated in parallel (using <code>parallel</code>’s strategies),</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">Probably</span> a <span class="fu">=</span> [(a, <span class="dt">Rational</span>)]
+
+<span class="ot">regroup ::</span> (<span class="fu">...</span>) <span class="ot">=&gt;</span> <span class="dt">Probably</span> a <span class="ot">-&gt;</span> <span class="dt">Probably</span> a
+regroup xs <span class="fu">=</span>
+    <span class="kw">let</span> xs <span class="fu">=</span> HM.toList <span class="fu">$</span> HM.fromListWith (<span class="fu">+</span>) xs
+    <span class="kw">in</span> <span class="fu">...</span>
+
+<span class="ot">winStates ::</span> (<span class="fu">...</span>) <span class="ot">=&gt;</span> <span class="dt">Solution</span> state description <span class="ot">-&gt;</span> <span class="dt">Probably</span> state
+winStates <span class="fu">=</span>
+    <span class="kw">case</span> s <span class="kw">of</span>
+      <span class="fu">...</span>
+      <span class="dt">Node</span> _ _ _ ps <span class="ot">-&gt;</span> regroup <span class="fu">$</span> concat <span class="fu">$</span> parMap rdeepseq someFunction ps</code></pre></div>
+<p>It turns out that when run with <code>+RTS -N2</code>, <code>winStates</code> will return an incorrect result. Specifically, it appears that some elements of the input list to <code>regroup</code> are not folded into the <code>HashMap</code>.</p>
+<p>Looking at <code>Data.HashMap.Strict.fromListWith</code> it becomes quite clear that there is some subtlety here as it uses internal mutation while building the <code>HashMap</code>. At this point it will likely be helpful to look at the representation of <code>HashMap</code>,</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Leaf</span> k v <span class="fu">=</span> <span class="dt">L</span> <span class="fu">!</span>k v
+    <span class="kw">deriving</span> (<span class="dt">Eq</span>)
+
+<span class="kw">data</span> <span class="dt">HashMap</span> k v
+    <span class="fu">=</span> <span class="dt">Empty</span>
+    <span class="fu">|</span> <span class="dt">BitmapIndexed</span> <span class="fu">!</span><span class="dt">Bitmap</span> <span class="fu">!</span>(<span class="dt">A.Array</span> (<span class="dt">HashMap</span> k v))
+    <span class="fu">|</span> <span class="dt">Leaf</span> <span class="fu">!</span><span class="dt">Hash</span> <span class="fu">!</span>(<span class="dt">Leaf</span> k v)
+    <span class="fu">|</span> <span class="dt">Full</span> <span class="fu">!</span>(<span class="dt">A.Array</span> (<span class="dt">HashMap</span> k v))
+    <span class="fu">|</span> <span class="dt">Collision</span> <span class="fu">!</span><span class="dt">Hash</span> <span class="fu">!</span>(<span class="dt">A.Array</span> (<span class="dt">Leaf</span> k v))</code></pre></div>
+<p><code>fromListWith</code> is implemented in terms of <code>unsafeInsertWith</code>, which, given a key and value to insert, traverses this tree, finds the appropriate node to insert into, and if possible performs an in-place insertion. This is the codepath which</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">unsafeInsertWith ::</span> (<span class="dt">Eq</span> k, <span class="dt">Hashable</span> k, <span class="dt">NFData</span> k, <span class="dt">NFData</span> v, <span class="dt">Show</span> k)
+                 <span class="ot">=&gt;</span> (v <span class="ot">-&gt;</span> v <span class="ot">-&gt;</span> v) <span class="ot">-&gt;</span> k <span class="ot">-&gt;</span> v <span class="ot">-&gt;</span> <span class="dt">HashMap</span> k v <span class="ot">-&gt;</span> <span class="dt">ST</span> s (<span class="dt">HashMap</span> k v)
+unsafeInsertWith f k0 v0 m0 <span class="fu">=</span> go h0 k0 v0 <span class="dv">0</span> m0
+  <span class="kw">where</span>
+    h0 <span class="fu">=</span> hash k0
+    go <span class="fu">!</span>h <span class="fu">!</span>k x <span class="fu">!</span>_ <span class="dt">Empty</span> <span class="fu">=</span> return <span class="fu">$!</span> leaf h k x
+    go h k x s (<span class="dt">Leaf</span> hy l<span class="fu">@</span>(<span class="dt">L</span> ky y))
+        <span class="fu">|</span> hy <span class="fu">==</span> h <span class="fu">=</span> <span class="kw">if</span> ky <span class="fu">==</span> k
+                    <span class="kw">then</span> return <span class="fu">$!</span> leaf h k (f x y)
+                    <span class="kw">else</span> return <span class="fu">$!</span> collision h l (<span class="dt">L</span> k x)
+        <span class="fu">|</span> otherwise <span class="fu">=</span> two s h k x hy ky y
+    go h k x s t<span class="fu">@</span>(<span class="dt">BitmapIndexed</span> b ary)
+        <span class="fu">|</span> b <span class="fu">.&amp;.</span> m <span class="fu">==</span> <span class="dv">0</span> <span class="fu">=</span> <span class="kw">do</span>
+            <span class="kw">let</span> ary' <span class="fu">=</span> A.insert ary i <span class="fu">$!</span> leaf h k x
+            return <span class="fu">$!</span> bitmapIndexedOrFull (b <span class="fu">.|.</span> m) ary'
+        <span class="fu">|</span> otherwise <span class="fu">=</span> <span class="kw">do</span>
+            st <span class="ot">&lt;-</span> A.indexM ary i
+            st' <span class="ot">&lt;-</span> rnf x <span class="ot">`seq`</span> go h k x (s<span class="fu">+</span>bitsPerSubkey) st
+            A.unsafeUpdateM ary i st'             <span class="co">-- in-place mutation</span>
+            return t
+      <span class="kw">where</span> m <span class="fu">=</span> mask h s
+            i <span class="fu">=</span> sparseIndex b m
+    go h k x s t<span class="fu">@</span>(<span class="dt">Full</span> ary) <span class="fu">=</span> <span class="kw">do</span>
+        st <span class="ot">&lt;-</span> A.indexM ary i
+        st' <span class="ot">&lt;-</span> go h k x (s<span class="fu">+</span>bitsPerSubkey) st
+        A.unsafeUpdateM ary i st'                 <span class="co">-- in-place mutation</span>
+        return t
+      <span class="kw">where</span> i <span class="fu">=</span> index h s
+    go h k x s t<span class="fu">@</span>(<span class="dt">Collision</span> hy v)
+        <span class="fu">|</span> h <span class="fu">==</span> hy   <span class="fu">=</span> return <span class="fu">$!</span> <span class="dt">Collision</span> h (updateOrSnocWith f k x v)
+        <span class="fu">|</span> otherwise <span class="fu">=</span> go h k x s <span class="fu">$</span> <span class="dt">BitmapIndexed</span> (mask hy s) (A.singleton t)</code></pre></div>
+<p>We can show that in-place mutation is responsible by changing both the references to <code>A.unsafeUpdateM</code> to safe copy-and-modify updates. Doing this indeed appears to hide the issue.</p>
+<p>So, the question then becomes why this in-place modification results in non-deterministic behavior. Given that parallelism is involved, one concern is that we have multiple threads performing mutable updates on the same array concurrently. There are a few ways we can test this,</p>
+<ul>
+<li><p>Compile <code>Data.HashMap.Strict</code> with <code>-feager-blackholing</code> to ensure that multiple threads aren’t evaluating some thunk whole code mutates, resulting in multiple racing mutable updates</p></li>
+<li><p>Wrap <code>unsafeInsertWith</code> with a <code>noDuplicate</code>, essentially forcing a more localized blackholing check</p></li>
+</ul>
+<p>Indeed both of these options seem to fix the issue. This is somewhat surprising; afterall, no <code>unsafeInsertWith</code> thunks should be leaking out of <code>fromListWith</code>, which is essentially a strict fold over the input list producing a result in normal form. Given this, it’s hard to imagine how we are entering such a thunk more than once.</p>
+<p>## Catching the program in the act</p>
+<p>To determine how we end up with multiple entry we’ll want to catch when it occurs. We can then pause the program and poke at its state in <code>gdb</code>. To catch this, we’ll write some sanity checking logic to wrap <code>unsafeInsertWith</code> with ensuring that only one thread is in our critical section at once,</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Status</span> <span class="fu">=</span> <span class="dt">AllOut</span>   <span class="co">-- ^ no one is in the critical section</span>
+            <span class="fu">|</span> <span class="dt">OneIn</span>    <span class="co">-- ^ one thread is currently in the critical section</span>
+            <span class="fu">|</span> <span class="dt">TwoIn</span>    <span class="co">-- ^ a second thread tried to enter</span>
+            <span class="kw">deriving</span> (<span class="dt">Eq</span>)
+
+<span class="ot">failOnDuplicate ::</span> <span class="dt">IORef</span> <span class="dt">Status</span> <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> <span class="dt">ST</span> s a <span class="ot">-&gt;</span> <span class="dt">ST</span> s a
+failOnDuplicate ref obj action <span class="fu">=</span> <span class="kw">do</span>
+    a <span class="ot">&lt;-</span> unsafeIOToST <span class="fu">$</span> atomicModifyIORef' ref <span class="fu">$</span> \x <span class="ot">-&gt;</span> (<span class="dt">OneIn</span>, x)
+    <span class="co">-- Is someone already in our critical section?</span>
+    when (a <span class="fu">==</span> <span class="dt">OneIn</span>) <span class="fu">$</span> unsafeIOToST <span class="fu">$</span> <span class="kw">do</span>
+        writeIORef ref <span class="dt">TwoIn</span>
+        <span class="co">-- if so log some details and hang</span>
+        logWord <span class="bn">0x22</span>
+        logThreadId
+        logWord <span class="bn">0x22</span>
+        logPointer obj
+        forever <span class="fu">$</span> return ()
+
+    <span class="fu">!</span>r <span class="ot">&lt;-</span> action
+
+    a' <span class="ot">&lt;-</span> unsafeIOToST <span class="fu">$</span> atomicModifyIORef' ref <span class="fu">$</span> \x <span class="ot">-&gt;</span> (<span class="dt">AllOut</span>, x)
+    <span class="co">-- did a second thread try to enter the </span>
+    when (a' <span class="fu">==</span> <span class="dt">TwoIn</span>) <span class="fu">$</span> unsafeIOToST <span class="fu">$</span> <span class="kw">do</span>
+        logWord <span class="bn">0x44</span>
+        logThreadId
+        logWord <span class="bn">0x44</span>
+        logPointer obj
+        breakpoint
+    return r
+
+<span class="ot">unsafeInsertWith ::</span> (<span class="dt">Eq</span> k, <span class="dt">Hashable</span> k, <span class="dt">NFData</span> k, <span class="dt">NFData</span> v, <span class="dt">Show</span> k)
+                 <span class="ot">=&gt;</span> <span class="dt">IORef</span> <span class="dt">Status</span> <span class="ot">-&gt;</span> (v <span class="ot">-&gt;</span> v <span class="ot">-&gt;</span> v) <span class="ot">-&gt;</span> k <span class="ot">-&gt;</span> v <span class="ot">-&gt;</span> <span class="dt">HashMap</span> k v <span class="ot">-&gt;</span> <span class="dt">ST</span> s (<span class="dt">HashMap</span> k v)
+unsafeInsertWith ref f k0 v0 m0 <span class="fu">=</span> failOnDuplicate ref m0 <span class="fu">$</span> go h0 k0 v0 <span class="dv">0</span> m0
+  <span class="kw">where</span>
+    <span class="fu">...</span></code></pre></div>
+<p>Where the <code>log*</code> and <code>breakpoint</code> functions come from a utility module that I carry around from times like these. Respectively they call to C to log machine words to a ring-buffer, and fire an <code>int $3</code> to break into GDB.</p>
+<p>Compiling and running the program within <code>gdb</code> indeed breaks, again confirming our multi-entry hypothesis.</p>
+<pre><code>Thread 13 &quot;ghc_worker&quot; received signal SIGTRAP, Trace/breakpoint trap.
+[Switching to Thread 0x7fffd17fa700 (LWP 10758)]
+0x00000000004569f1 in c_breakpoint () at cbits/breakpoint.c:19
+19	  __asm__(&quot;int $3&quot;);
+
+(gdb) info threads
+  Id   Target Id         Frame 
+...
+  15   Thread 0x7fffd1ffb700 (LWP 10803) &quot;ghc_worker&quot; rxSQ_info () at ./Data/HashMap/Strict.hs:100
+...
+* 17   Thread 0x7fffd17fa700 (LWP 10805) &quot;ghc_worker&quot; 0x00000000004569f1 in c_breakpoint () at cbits/breakpoint.c:19
+...</code></pre>
+<p>Here we clearly see the two threads in play: thread 15 is looping at the <code>forever $ return ()</code> whereas thread 17 fired the breakpoint. Looking at the log ringbuffer sheds a bit more light,</p>
+<pre><code>(gdb) x/-8xg word_log + log_idx
+0x7de2e0 &lt;word_log&gt;:	0x0000000000000022	0x00007fffd0ff9700
+0x7de2f0 &lt;word_log+16&gt;:	0x0000000000000022	0x0000004200cc09c2
+0x7de300 &lt;word_log+32&gt;:	0x0000000000000044	0x00007fffd27fc700
+0x7de310 &lt;word_log+48&gt;:	0x0000000000000044	0x0000004200cc09c2</code></pre>
+<p>Here we see that we have a <code>44</code> type message, indicating that a thread (namely thread 15) tried to insert into the map which was already being inserted into. We also have a <code>44</code> message, from the thread who was inserting, thread 17. Most importantly we see that both of these calls are acting upon the same <code>HashMap</code> object, located at <code>0x0000004200cc09c2</code> (note that this isn’t always the case; often we seem to get two calls entering the critical section acting on two different <code>HashMap</code>s. However, we’ll focus on the case where both calls are acting on the same object as I suspect this will be a bit easier to reason about).</p>
+<p>Let’s take a moment to examine the <code>HashMap</code> object.</p>
+<p>## Examining heap objects in GDB</p>
+<p>From the <code>HashMap</code> pointer we can immediately tell from the tag (contained in the pointer’s bottom three bits, e.g. 2) that it is a <code>BitmapIndexed</code> constructor. Clearing the tag, we can view the heap object itself,</p>
+<pre><code>(gdb) x/3a 0x0000004200cc09c0
+0x4200cc09c0:	0x456928 &lt;unorderedzmcontainerszm0zi2zi8zi0zminplace_DataziHashMapziBase_BitmapIndexed_con_info&gt;	0x4200cc0998
+0x4200cc09d0:	0x800</code></pre>
+<p>Here we see the <code>Bitmap</code> field (having a value of <code>0x800</code>), and a pointer to the node’s <code>Array</code>. Note how the field order is inverted here: this is due to GHC’s convention of placing pointer fields first, then non-pointers. Next let’s examine the node’s <code>Array</code> (which follows the layout described by <code>struct StgMutArrPtrs</code> in <code>includes/rts/storage/Closures.h</code>),</p>
+<pre><code>(gdb) x/4a 0x4200cc0998
+0x4200cc0998:	0x55f2b8 &lt;stg_MUT_ARR_PTRS_FROZEN0_info&gt;	0x1
+0x4200cc09a8:	0x2	0x4200cc0982</code></pre>
+<p>Here we can tell from the info pointer that the array is of the <code>FROZEN0</code> variety, with length 1 (the 0x2 is the length including the size of the card table, which directly follows the pointer content). The first (and only) element of the array is found at <code>0x4200cc0982</code>,</p>
+<pre><code>(gdb) x/4a 0x4200cc0980
+0x4200cc0980:	0x456928 &lt;unorderedzmcontainerszm0zi2zi8zi0zminplace_DataziHashMapziBase_BitmapIndexed_con_info&gt;	0x4200cc0958</code></pre>
+<p>If we link against the debug RTS (with GHC’s <code>-debug</code> option) we can also use the RTS’s <code>printClosure</code> function, which makes interpretation much easier,</p>
+<pre><code>(gdb) print printClosure(0x4200cc0980)
+unordered-containers-0.2.8.0-inplace:Data.HashMap.Base.BitmapIndexed(0x4200cc0998, 0x800#)</code></pre>
+<p>## Examining the stack</p>
+<p>The head of the STG evaluation stack is located at the address held in the <code>$rbp</code> register on amd64,</p>
+<pre><code>(gdb) x/16a $rbp
+0x42002f0678:	0x5477e8 &lt;stg_ap_v_info&gt;	0x45e390 &lt;base_GHCziBase_zdfApplicativeIO2_info+64&gt;
+0x42002f0688:	0x4200144e00	0x4a8f30 &lt;r1rC_info+64&gt;
+0x42002f0698:	0x42001449e8	0x4a8c08 &lt;r1rB_info+64&gt;
+0x42002f06a8:	0x42001437b1	0x4a8fd8 &lt;base_GHCziST_runST_info+56&gt;
+0x42002f06b8:	0x4124e0 &lt;srlH_info+184&gt;	0x4200142288
+0x42002f06c8:	0x7b0708	0x4200142220
+0x42002f06d8:	0x4200142240	0x4200142250
+0x42002f06e8:	0x42001421e0	0x540da0 &lt;stg_upd_frame_info&gt;</code></pre>
+<p>However, this is one area where a little <a href="http://github.com/bgamari/ghc-utils/tree/master/ghc-gdb.py">help from the debugger</a> helps immensely,</p>
+<pre><code>(gdb) ghc-backtrace -n25 
+0: RET_SMALL
+  return=0x5477e8 &lt;stg_ap_v_info&gt; (rts/dist/build/AutoApply.cmm:8)
+1: RET_SMALL
+  return=0x45e390 &lt;base_GHCziBase_zdfApplicativeIO2_info+64&gt; (libraries/base/GHC/Base.hs:1195)
+  field 0: Ptr  0x4200144e00  : BLACKHOLE
+2: RET_SMALL
+  return=0x4a8f30 &lt;r1rC_info+64&gt; (libraries/base/GHC/ST.hs:66)
+  field 0: Ptr  0x42001449e8  : THUNK
+3: RET_SMALL
+  return=0x4a8c08 &lt;r1rB_info+64&gt; (libraries/base/GHC/ST.hs:74)
+  field 0: Ptr  0x42001437b1  : FUN_2_0
+4: RET_SMALL
+  return=0x4a8fd8 &lt;base_GHCziST_runST_info+56&gt; (libraries/base/GHC/ST.hs:136)
+5: RET_SMALL
+  return=0x4124e0 &lt;srlH_info+184&gt; (src/Solver.hs:96)
+  field 0: Ptr  0x4200142288  : THUNK_1_0
+  field 1: Ptr  0x7b0708      : off-heap(0x7b0708)
+  field 2: Ptr  0x4200142220  : THUNK_2_0
+  field 3: Ptr  0x4200142240  : THUNK
+  field 4: Ptr  0x4200142250  : THUNK
+  field 5: Ptr  0x42001421e0  : BLACKHOLE
+6: UPDATE_FRAME(0x4200141a98: THUNK_2_0) 
+7: RET_SMALL
+  return=0x45f528 &lt;s5BF_info+168&gt; (libraries/base/GHC/Base.hs:860)
+  field 0: Ptr  0x4200141348  : THUNK_2_0
+8: UPDATE_FRAME(0x4200140d60: THUNK_2_0) 
+9: RET_SMALL
+  return=0x411ca0 &lt;srkh_info+96&gt; (src/Solver.hs:87)
+  field 0: Ptr  0x4200140e20  : THUNK
+  field 1: Ptr  0x4200140ef1  : CONSTR_1_0
+  field 2: Ptr  0x4200140fb9  : CONSTR_1_0
+  field 3: Ptr  0x4200140fc9  : FUN
+...</code></pre>
+</article>
+
+        </section>
+      </div>
+
+      <footer id="footer">
+        <span>Generated by <a href="http://jaspervdj.be/hakyll/index.html">Hakyll</a>.</span>
+      </footer>
+    </div>
+  </body>
+</html>
+

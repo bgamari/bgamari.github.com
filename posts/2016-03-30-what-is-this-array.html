@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>bgamari.github.com - The many arrays of GHC</title>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="content">
+        <div id="sidebar">
+          <nav>
+            <h1>Navigation</h1>
+            <ul>
+              <li><a href="../index.html">Home</a></li>
+              <li><a href="../posts.html">Blog</a></li>
+              <li><a href="../research-agenda.html">Research agenda</a></li>
+              <li><a href="../publications.html">Publications</a></li>
+              <li><a href="../past-research.html">Past research</a></li>
+              <li><a href="../media/cv.pdf">Curriculum Vitæ</a></li>
+            </ul>
+            <h1>Related Links</h1>
+            <ul>
+              <li><a href="http://goldnerlab.physics.umass.edu/wiki/">Research group</a></li>
+              <li><a href="http://www.github.com/bgamari">Github</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <section id="main">
+        <article>
+    <h1>The many arrays of GHC</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2016-03-30" class="pubdate">2016-03-30</time> | tagged with <ul class="tags"><li>ghc</li><li>haskell</li><li>array</li></ul>
+        </div>
+    </header>
+
+    <h1 id="what-is-this-arr_words">What is this <code>ARR_WORDS</code>?</h1>
+<p>Sometimes when profiling Haskell code you will find yourself wondering how some large array will manifest itself in the cost-center profiler (namely in the “closure description” heap profile variety, <code>+RTS -hd</code>). Here is a brief summary.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Type</th>
+<th align="left">What appears in <code>-hd</code> profile?</th>
+<th align="left">Size</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><em>Primitive arrays</em></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><code>GHC.Prim.ArrayArray#</code></td>
+<td align="left"><code>ARR_PTRS</code></td>
+<td align="left"><span class="math inline">\(n\)</span> words</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>GHC.Prim.MutableArrayArray#</code></td>
+<td align="left"><code>MUT_ARR_PTRS_*</code></td>
+<td align="left"><span class="math inline">\(n\)</span> words</td>
+</tr>
+<tr class="even">
+<td align="left"><code>GHC.Prim.SmallArray#</code></td>
+<td align="left"><code>SMALL_ARR_PTRS_*</code></td>
+<td align="left"><span class="math inline">\(n\)</span> words</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>GHC.Prim.SmallMutableArray#</code></td>
+<td align="left"><code>SMALL_MUT_ARR_PTRS_*</code></td>
+<td align="left"><span class="math inline">\(n\)</span> words</td>
+</tr>
+<tr class="even">
+<td align="left"><code>GHC.Prim.ByteArray#</code></td>
+<td align="left"><code>ARR_WORDS</code></td>
+<td align="left"><span class="math inline">\(n\)</span> bytes</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>GHC.Prim.MutableByteArray#</code></td>
+<td align="left"><code>MUT_ARR_WORDS_*</code></td>
+<td align="left"><span class="math inline">\(n\)</span> bytes</td>
+</tr>
+<tr class="even">
+<td align="left"><code>GHC.Prim.Array#</code></td>
+<td align="left"><code>ARR_PTRS</code></td>
+<td align="left"><span class="math inline">\(n\)</span> words</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>GHC.Prim.MutableArray#</code></td>
+<td align="left"><code>MUT_ARR_PTRS_*</code></td>
+<td align="left"><span class="math inline">\(n\)</span> words</td>
+</tr>
+<tr class="even">
+<td align="left"><em><code>array</code> package</em></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>Data.Array</code></td>
+<td align="left"><code>ARR_WORDS</code></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">*<code>bytestring</code> package</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>Data.ByteString.ByteString</code></td>
+<td align="left"><code>ARR_WORDS</code></td>
+<td align="left"><span class="math inline">\(n\)</span> bytes</td>
+</tr>
+<tr class="even">
+<td align="left"><code>Data.ByteString.Short.ShortByteString</code></td>
+<td align="left"><code>ARR_WORDS</code></td>
+<td align="left"><span class="math inline">\(n\)</span> bytes</td>
+</tr>
+<tr class="odd">
+<td align="left"><em><code>vector</code> package</em></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><code>Data.Vector.Vector</code></td>
+<td align="left"><code>ARR_PTRS</code></td>
+<td align="left"><span class="math inline">\(s * n\)</span> bytes + <span class="math inline">\(n\)</span> words</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>Data.Vector.Vector.Mutable.MVector</code></td>
+<td align="left"><code>ARR_PTRS</code></td>
+<td align="left"><span class="math inline">\(s * n\)</span> bytes + <span class="math inline">\(n\)</span> words</td>
+</tr>
+<tr class="even">
+<td align="left"><code>Data.Vector.Storable.Vector</code></td>
+<td align="left"><code>ARR_WORDS</code></td>
+<td align="left"><span class="math inline">\(s * n\)</span> bytes</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>Data.Vector.Storable.Vector.Mutable.MVector</code></td>
+<td align="left"><code>ARR_WORDS</code></td>
+<td align="left"><span class="math inline">\(s * n\)</span> bytes</td>
+</tr>
+<tr class="even">
+<td align="left"><code>Data.Vector.Unboxed.Vector</code></td>
+<td align="left"><code>ARR_WORDS</code></td>
+<td align="left"><span class="math inline">\(s * n\)</span> bytes</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>Data.Vector.Unboxed.Vector.Mutable.MVector</code></td>
+<td align="left"><code>ARR_WORDS</code></td>
+<td align="left"><span class="math inline">\(s * n\)</span> bytes</td>
+</tr>
+<tr class="even">
+<td align="left"><em><code>text</code> package</em></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>Data.Text.Text</code></td>
+<td align="left"><code>ARR_WORDS</code></td>
+<td align="left"><span class="math inline">\(\approx 2*n\)</span> bytes</td>
+</tr>
+</tbody>
+</table>
+<p>In the above <span class="math inline">\(n\)</span> refers to the length of the array, <span class="math inline">\(s\)</span> refers to the element size in bytes (where appropriate).</p>
+<p>Of course, it would be great if the profiler could give us more helpful output. This issue has been tracked as <a href="https://ghc.haskell.org/trac/ghc/ticket/7275">GHC #7275</a> for several years now. Maybe you could be the one to fix it!</p>
+</article>
+
+        </section>
+      </div>
+
+      <footer id="footer">
+        <span>Generated by <a href="http://jaspervdj.be/hakyll/index.html">Hakyll</a>.</span>
+      </footer>
+    </div>
+  </body>
+</html>
+

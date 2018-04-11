@@ -152,11 +152,11 @@ JTAG tap: lpc1768.cpu tap/device found: 0x4ba00477 (mfg: 0x23b, part: 0xba00, ve
 <p>It works!</p>
 <h2 id="flashing-new-firmware">Flashing new firmware</h2>
 <p>First, build a <code>.bin</code> of the desired firmware. The LPC1769’s ROM bootloader verifies that the user code in FLASH is valid before booting by way of a checksum of the interrupt vector table. The checksum is of the first eight interrupt vectors and is stored in vector 7 (0x0000001c). The easiest way to ensure this is set correctly is to run the binary image through the following C,</p>
-<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="ot">#include &lt;stdio.h&gt;</span>
-<span class="ot">#include &lt;unistd.h&gt;</span>
-<span class="ot">#include &lt;sys/types.h&gt;</span>
-<span class="ot">#include &lt;sys/stat.h&gt;</span>
-<span class="ot">#include &lt;fcntl.h&gt;</span>
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span>
+<span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span>
+<span class="pp">#include </span><span class="im">&lt;sys/types.h&gt;</span>
+<span class="pp">#include </span><span class="im">&lt;sys/stat.h&gt;</span>
+<span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span>
 
 <span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">char</span> **argv) {
     <span class="dt">int</span> fw, count, crc;
@@ -167,7 +167,7 @@ JTAG tap: lpc1768.cpu tap/device found: 0x4ba00477 (mfg: 0x23b, part: 0xba00, ve
     read(fw, &amp;buf, <span class="dv">28</span>);
 
     <span class="co">// find 2's complement of entries 0 to 6</span>
-    <span class="kw">for</span> (count=<span class="dv">0</span>, crc=<span class="dv">0</span>; count &lt; <span class="dv">7</span>; count++) {
+    <span class="cf">for</span> (count=<span class="dv">0</span>, crc=<span class="dv">0</span>; count &lt; <span class="dv">7</span>; count++) {
             crc += *((<span class="dt">int</span>*)(buf+count*<span class="dv">4</span>));
     }
     crc = (~crc) + <span class="dv">1</span>;
@@ -177,7 +177,7 @@ JTAG tap: lpc1768.cpu tap/device found: 0x4ba00477 (mfg: 0x23b, part: 0xba00, ve
     write(fw, &amp;crc, <span class="dv">4</span>);
     close(fw);
 
-    <span class="kw">return</span> <span class="dv">0</span>;
+    <span class="cf">return</span> <span class="dv">0</span>;
 }</code></pre></div>
 <h2 id="debugging-on-arm">Debugging on ARM</h2>
 <p>While sometimes my system’s native gdb will somehow understand the ARM architecture after attaching to the remote target, I haven’t figured out how to do this reliably. For this reason, I build gdb for ARM.</p>
