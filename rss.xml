@@ -392,6 +392,14 @@
     <guid>http://bgamari.github.com//posts/2017-06-06-debugging-T13615.html</guid>
     <dc:creator>Ben Gamari</dc:creator>
 </item>
+<item>
+    <title>Talk: A low-latency garbage collector for GHC</title>
+    <link>http://bgamari.github.com//posts/2018-11-18-nonmoving-gc-for-ghc.html</link>
+    <description><![CDATA[A talk given at Munihac providing a high-level overview of my concurrent mark & sweep garbage collector design for the Glasgow Haskell Compiler.]]></description>
+    <pubDate>Sun, 18 Nov 2018 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2018-11-18-nonmoving-gc-for-ghc.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
 
     </channel>
 </rss>
