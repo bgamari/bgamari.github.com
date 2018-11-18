@@ -38,9 +38,15 @@
         </div>
     </header>
 
-    <h1 id="talk-a-low-latency-garbage-collector-for-ghc">Talk: A low-latency garbage collector for GHC</h1>
-<p><a href="../media/2018-11-18-nonmoving-gc-for-ghc.pdf">Slides</a></p>
-<p>Recorded talk to be announced</p>
+    <p>Abstract:</p>
+<blockquote>
+<p>As real-time and distributed systems become common-place, latencies associated with memory management begin to limit the usability of garbage collected languages. In particular, the Glasgow Haskell Compiler has long relied on a throughput-oriented copying garbage collector; while this collector provides good memory locality for user programs, minimal fragmentation, and efficient collection, it imposes large latencies when collecting large heaps.</p>
+<p>Recent language implementations (e.g. Go, Mono, various Java implementations) have moved away from have avoided the problem of garbage collection latency through use of concurrent collection on a non-moving heap. In this talk Ben will provide a high-level overview of a concurrent, non-moving garbage collector implemented for the Glasgow Haskell Compiler. This collector offers significantly improved pause times without the need for code recompilation and with minimal impact on program runtime. He will discuss the trade-offs implicit in the design, the challenges posed by collecting Haskell in particular, and present some preliminary performance measurements from a prototype implementation.</p>
+</blockquote>
+<ul>
+<li><a href="../media/2018-11-18-nonmoving-gc-for-ghc.pdf">Slides</a></li>
+<li>Recorded talk: to be announced</li>
+</ul>
 </article>
 
         </section>
