@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>bgamari.github.com - Nifty features of the ARM architecture</title>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="content">
+        <div id="sidebar">
+          <nav>
+            <h1>Navigation</h1>
+            <ul>
+              <li><a href="../index.html">Home</a></li>
+              <li><a href="../posts.html">Blog</a></li>
+              <li><a href="../research-agenda.html">Research agenda</a></li>
+              <li><a href="../publications.html">Publications</a></li>
+              <li><a href="../past-research.html">Past research</a></li>
+              <li><a href="../media/cv.pdf">Curriculum Vitæ</a></li>
+            </ul>
+            <h1>Related Links</h1>
+            <ul>
+              <li><a href="http://goldnerlab.physics.umass.edu/wiki/">Research group</a></li>
+              <li><a href="http://www.github.com/bgamari">Github</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <section id="main">
+        <article>
+    <h1>Nifty features of the ARM architecture</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2019-06-06" class="pubdate">2019-06-06</time> | tagged with <ul class="tags"><li>memory barriers</li><li>ARM</li><li>compilers</li></ul>
+        </div>
+    </header>
+
+    <p>While sorting out GHC’s support for architectures with weakly-ordered memory subsystems I peeked at GCC’s lowering of the <code>__sync_bool_compare_and_swap</code> operation [^1] on ARM. This reminded me of a few features of the architecture that I quite like and felt compelled to write about.</p>
+<p>My test involved looking at this program,</p>
+<pre><code>$ cat hi.c
+#include &lt;stdint.h&gt;
+int hello(uint32_t *x) {
+	return __sync_bool_compare_and_swap(x, 0, 1);
+}
+$ arm-linux-gnueabihf-gcc -c hi.c</code></pre>
+<p>This produced the following assembler:</p>
+<pre class="assembler"><code>Function prelude:
+   0:	b480      	push	{r7}
+   2:	b083      	sub	sp, #12
+   4:	af00      	add	r7, sp, #0
+   6:	6078      	str	r0, [r7, #4]
+   8:	687b      	ldr	r3, [r7, #4]
+   a:	2201      	movs	r2, #1
+Issue full barrier:
+   c:	f3bf 8f5b 	dmb	ish                  (1)
+Load value and claim exclusive access:
+  10:	e853 1f00 	ldrex	r1, [r3]           (2)
+Compare, loop if necessary:
+  14:	2900      	cmp	r1, #0
+  16:	d103      	bne.n	20 &lt;hello+0x20&gt;
+Store value and possibly cede exclusive access:
+  18:	e843 2000 	strex	r0, r2, [r3]       (2)
+Ensure that store succeeded, loop if necessary:
+  1c:	2800      	cmp	r0, #0
+  1e:	d1f7      	bne.n	10 &lt;hello+0x10&gt;
+Issue full barrier:
+  20:	f3bf 8f5b 	dmb	ish                  (1)
+Function epilogue:
+  24:	bf0c      	ite	eq                   (3)
+  26:	2301      	moveq	r3, #1
+  28:	2300      	movne	r3, #0
+  2a:	4618      	mov	r0, r3
+  2c:	370c      	adds	r7, #12
+  2e:	46bd      	mov	sp, r7
+  30:	f85d 7b04 	ldr.w	r7, [sp], #4
+  34:	4770      	bx	lr</code></pre>
+<p>There are a few things here that I found interesting, parenthesized above and discussed in detail below.</p>
+<h2 id="partitioned-memory-barriers">1. Partitioned memory barriers</h2>
+<p><code>dmb</code> is ARM’s <a href="http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0489c/CIHGHHIE.html">Data Memory Barrier</a> instruction. What is interesting is the options accepted by this instruction:</p>
+<ul>
+<li><code>SY</code>: Full system barrier</li>
+<li><code>ST</code>: Store barrier</li>
+<li><code>ISH</code>: Full barrier within <em>inner shareable domain</em></li>
+<li><code>ISHST</code>: Store barrier within <em>inner shareable domain</em></li>
+<li><code>NSH</code>: Full barrier out to <em>point of unification</em></li>
+<li><code>NSHST</code>: Store barrier out to <em>point of unification</em></li>
+<li><code>OSH</code>: Full barrier out to <em>outer shareable domain</em></li>
+<li><code>OSHST</code>: Store barrier out to <em>outer shareable domain</em></li>
+</ul>
+<p>The amount of granularity embodied by these options is quite forward-thinking, especially given how much freedom it leaves with the microarchitecture designer:</p>
+<ul>
+<li><p><em>inner/outer shareable domain</em>: This allows a large system to be broken into multiple independently-coherent domains. For instance, a large machine may have several paritions, each running its own supervisor (e.g. hypervisor or kernel). The <code>DMB ISH</code> instruction provides an efficient way for a supervisor to issue a barrier within the “system” on which it runs.</p></li>
+<li><p><em>point of unification</em>: This is <a href="https://developer.arm.com/docs/den0024/latest/caches/point-of-coherency-and-unification">defined</a> to be the point where the processor’s instruction and data caches are guaranteed to be coherent with its TLB walk logic. This depends upon the system design but is often the L2 cache.</p>
+<p>This is handy for implementing JIT compilers and other self-modifying code as it provides a flush mechanism which ensures that code modified by the local core can be executed.</p></li>
+</ul>
+<h2 id="exclusive-loadstore">2. Exclusive load/store</h2>
+<p>For someone used to IA-32’s rather boring atomic primitives, ARM is a breath of fresh air. IA-32 provides a handful of instructions implementing a selection of atomic operations (e.g. atomic add, subtract, AND, OR, etc.) via the <code>LOCK</code> prefix. By constrast, ARM provides a far more flexible mechanism consisting of two instructions:</p>
+<ul>
+<li><p><code>ldrex</code>: This is similar to the typical <code>ldr</code> instruction, loading an address (given in a register) from memory into a destination register. However, it also lays a claim of “exclusive” access to the loaded region (typically a cacheline, I believe).</p></li>
+<li><p><code>strex</code>: This is stores a value from a register to a memory location previously claimed with <code>ldrex</code>. If the value is has changed since the location was claimed then the store is aborted and a failure result is returned.</p></li>
+</ul>
+<p>These collectively provide the necessary pieces for a compare-and-swap operation, but allowing significantly more flexibility over a dedicated CAS instruction. For instance, one might do non-trivial computation on the loaded value before storing an updated value.</p>
+<h2 id="ifthenelse-instruction">3. If/then/else instruction</h2>
+<p>If/then/else flow control is incredibly common in typical programs. ARM has a nifty <code>it</code> <a href="http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0489c/Cjabicci.html">instruction</a> which predicates the execution of up to three instructions according to a given condition.</p>
+<p>For instance, consider the program:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb3-1" title="1"><span class="co">// Assume:</span></a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="co">//   uint64_t x, y, z;</span></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="co">//   uint64_t *p;</span></a>
+<a class="sourceLine" id="cb3-4" title="4"></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="cf">if</span> (x == <span class="dv">0</span>) {</a>
+<a class="sourceLine" id="cb3-6" title="6">  p[<span class="dv">0</span>] = x;</a>
+<a class="sourceLine" id="cb3-7" title="7">  p[<span class="dv">1</span>] = y;</a>
+<a class="sourceLine" id="cb3-8" title="8">} <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb3-9" title="9">  p[<span class="dv">0</span>] = z</a>
+<a class="sourceLine" id="cb3-10" title="10">}</a></code></pre></div>
+<p>this can be lowered as the following svelte instruction sequence:</p>
+<pre class="assembler"><code>cmp r0, #0         # x == 0?
+ittte eq
+str r0, [r7]       # p[0] = x;
+str r1, [r7, #8]   # p[1] = y;
+str r3, [r7]       # p[0] = z;
+...</code></pre>
+<p>Here the <code>it</code> instruction conditional on the <code>eq</code> condition code and is followed by three condition switches (<code>tte</code>; where <code>t</code> should be read as “then” (the condition holds) and <code>e</code> as “else” (the condition does not hold)). This is a remarkably efficient encoding for this common idiom.</p>
+<p>whether the operation implies a full memory barrier. Unfortunately it seems to be a pattern that memory ordering operations are woefully underdocumented despite their subtlety.</p>
+</article>
+
+        </section>
+      </div>
+
+      <footer id="footer">
+        <span>Generated by <a href="http://jaspervdj.be/hakyll/index.html">Hakyll</a>.</span>
+      </footer>
+    </div>
+  </body>
+</html>
+
