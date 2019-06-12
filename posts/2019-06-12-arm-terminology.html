@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>bgamari.github.com - An ARM Glossary</title>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="content">
+        <div id="sidebar">
+          <nav>
+            <h1>Navigation</h1>
+            <ul>
+              <li><a href="../index.html">Home</a></li>
+              <li><a href="../posts.html">Blog</a></li>
+              <li><a href="../research-agenda.html">Research agenda</a></li>
+              <li><a href="../publications.html">Publications</a></li>
+              <li><a href="../past-research.html">Past research</a></li>
+              <li><a href="../media/cv.pdf">Curriculum Vitæ</a></li>
+            </ul>
+            <h1>Related Links</h1>
+            <ul>
+              <li><a href="http://goldnerlab.physics.umass.edu/wiki/">Research group</a></li>
+              <li><a href="http://www.github.com/bgamari">Github</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <section id="main">
+        <article>
+    <h1>An ARM Glossary</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2019-06-12" class="pubdate">2019-06-12</time> | tagged with <ul class="tags"><li>ARM</li></ul>
+        </div>
+    </header>
+
+    <p>As someone who works on compilers, I am often faced with sorting through ARM’s endless collection of architectures, instruction sets, ABIs, and the like. This page is my attempt to bring some order to the madness.</p>
+<h2 id="architectures">Architectures</h2>
+<p>There are several ARM architecture currently found in the wild. Each defines a set of architectural state and one (or more) <a href="#instruction-sets">instruction sets</a>. We will overlook the ancient history that is everything prior to ARMv6.</p>
+<dl>
+<dt>ARMv6</dt>
+<dd><p>The 6th version of the ARM architecture. This is a 32-bit-only architecture and is <a href="https://en.wikipedia.org/wiki/ARM_Cortex-M#Instruction_sets">today only found</a> in Cortex M0, M0+, and M1 embedded devices.</p>
+</dd>
+<dt>ARMv7</dt>
+<dd><p>The 7th version of the ARM architecture. Like ARMv6, this is a 32-bit-only architecture and is generally what is found in most consumer devices made before 2016. Being a 32-bit architecture, these devices generally support up to 4GB of physical memory.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> Note that floating-point hardware (the ARM Vector Floating Point, VFP, unit) is optional for ARMv7 devices.</p>
+</dd>
+<dt>ARMv8 (<a href="https://en.wikichip.org/wiki/arm/armv8">wikichip</a>).</dt>
+<dd><p>The 8th version of the ARM architecture. This architecture defines two modes of execution: AArch64 (a 64-bit mode using the new A64 instruction set) and AArch32 (a 32-bit mode admitting the T32 and A32 instruction sets). Implementations may support AArch32, AArch64, or both (most implementations support exclusively AArch64 or both execution modes).</p>
+</dd>
+</dl>
+<p>In addition, ARMv8 defined a set of profiles:</p>
+<ul>
+<li><a href="https://developer.arm.com/architectures/cpu-architecture/a-profile">ARMv8-A</a> (Application)</li>
+<li><a href="https://developer.arm.com/architectures/cpu-architecture/r-profile">ARMv8-R</a> (Real-time)</li>
+<li><a href="https://developer.arm.com/architectures/cpu-architecture/m-profile">ARMv8-M</a> (Microcontroller)</li>
+</ul>
+<p>In typical consumer and server environments one most often finds ARMv8-A devices. Unlike ARMv7, the ARMv8-A profile unconditionally provides floating-point hardware (the ARMv8-R and ARMv8-M profiles makes floating-point optional).</p>
+<h2 id="instruction-sets">Instruction sets</h2>
+<p>The ARM architectures each can support several instruction sets.</p>
+<dl>
+<dt>ARM (abbreviated A32)</dt>
+<dd><p>This is the “native” fixed-width (32-bit opcode length) instruction set used by ARMv7 and earlier.</p>
+</dd>
+<dt><a href="https://en.wikipedia.org/wiki/ARM_architecture#Thumb">Thumb</a></dt>
+<dd><p>This is a compressed subset of the typical A32 instruction set introduced in the ARMv7 era. The encoding is still fixed-width, but 16-bits per opcode.</p>
+</dd>
+<dt><a href="https://en.wikipedia.org/wiki/ARM_architecture#Thumb-2">Thumb-2</a> (abbreviated T32)</dt>
+<dd><p>This extends the Thumb instruction set with additional 32-bit instructions.</p>
+</dd>
+<dt>A64</dt>
+<dd><p>This is the 64-bit instruction set used by AArch64 (<a href="https://en.wikichip.org/wiki/arm/a64">wikichip</a>). It has a fixed 32-bit encoding.</p>
+</dd>
+</dl>
+<h2 id="typical-arm-triples">Typical ARM triples</h2>
+<p>When working with ARM hardware you see a dizzying array of triples. This is an attempt to make sense of them.</p>
+<p>See <a href="https://collaborate.linaro.org/display/TCWGPUB/ARM+and+AArch64+Target+Triples">Linaro’s documentation</a>.</p>
+<p>The ABI used on ARMv7 is defined by the <a href="http://infocenter.arm.com/help/topic/com.arm.doc.ihi0036b/IHI0036B_bsabi.pdf">ARM EABI specification</a></p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Triple</th>
+<th>Architecture</th>
+<th>Endianness</th>
+<th>Floating point</th>
+<th style="text-align: left;">ABI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>ARMv8</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>aarch64-linux-gnu</code></td>
+<td>AArch64</td>
+<td>Little</td>
+<td>Hard</td>
+<td style="text-align: left;">Linux</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>armv8l-linux-gnu</code></td>
+<td>AArch32</td>
+<td>Little</td>
+<td>Hard</td>
+<td style="text-align: left;">Linux</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>ARMv7</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>armv7l-linux-gnueabi</code></td>
+<td>ARMv7</td>
+<td>Little</td>
+<td>Soft</td>
+<td style="text-align: left;">Linux</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>armv7l-linux-gnueabihf</code></td>
+<td>ARMv7</td>
+<td>Little</td>
+<td>Hard</td>
+<td style="text-align: left;">Linux</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>armv7a-linux-gnueabi</code></td>
+<td>ARMv7</td>
+<td>Little</td>
+<td>Soft</td>
+<td style="text-align: left;">Linux</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>armv7a-linux-gnueabihf</code></td>
+<td>ARMv7</td>
+<td>Little</td>
+<td>Hard</td>
+<td style="text-align: left;">Linux</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>armv7-linux-androideabi</code></td>
+<td>ARMv7</td>
+<td>Little</td>
+<td>Soft?</td>
+<td style="text-align: left;">Linux</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>ARMv6</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>arm-linux-gnueabi</code></td>
+<td>ARMv6</td>
+<td>Little</td>
+<td>Soft</td>
+<td style="text-align: left;">Linux</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>arm-linux-gnueabihf</code></td>
+<td>ARMv6</td>
+<td>Little</td>
+<td>Hard</td>
+<td style="text-align: left;">Linux</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>arm-none-eabi</code></td>
+<td>ARMv6</td>
+<td>Little</td>
+<td>Soft</td>
+<td style="text-align: left;">Embedded</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>arm-none-eabihf</code></td>
+<td>ARMv6</td>
+<td>Little</td>
+<td>Hard</td>
+<td style="text-align: left;">Embedded</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Debian ports</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Debian’s <code>armel</code> port</td>
+<td>ARMv7</td>
+<td>Little</td>
+<td>Soft</td>
+<td style="text-align: left;">Linux</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Debian’s <code>armhf</code> port</td>
+<td>ARMv7</td>
+<td>Little</td>
+<td>Hard</td>
+<td style="text-align: left;">Linux</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Debian’s <code>arm64</code> port</td>
+<td>AArch64</td>
+<td>Little</td>
+<td>Hard</td>
+<td style="text-align: left;">Linux</td>
+</tr>
+</tbody>
+</table>
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>While technically the Large Physical Address Extension (LPAE) extends ARMv7 to allow up to 48-bits of physical address space, I have never once seen a silicon implementation of this extension.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></p></li>
+</ol>
+</section>
+</article>
+
+        </section>
+      </div>
+
+      <footer id="footer">
+        <span>Generated by <a href="http://jaspervdj.be/hakyll/index.html">Hakyll</a>.</span>
+      </footer>
+    </div>
+  </body>
+</html>
+

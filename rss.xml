@@ -408,6 +408,14 @@
     <guid>http://bgamari.github.com//posts/2019-06-06-memory-barriers-on-arm.html</guid>
     <dc:creator>Ben Gamari</dc:creator>
 </item>
+<item>
+    <title>An ARM Glossary</title>
+    <link>http://bgamari.github.com//posts/2019-06-12-arm-terminology.html</link>
+    <description><![CDATA[Trying to make sense of the slew of ARM architecture and ABI variants.]]></description>
+    <pubDate>Wed, 12 Jun 2019 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2019-06-12-arm-terminology.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
 
     </channel>
 </rss>
