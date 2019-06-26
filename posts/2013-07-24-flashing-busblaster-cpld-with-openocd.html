@@ -41,7 +41,7 @@
     <h1 id="flashing-the-bus-blaster-jtag-adapters-cpld-buffer-with-openocd">Flashing the Bus Blaster JTAG adapter’s CPLD buffer with OpenOCD</h1>
 <p>Recently an unfortunate incident involving 20V and a slipped probe resulted in a small plume of smoke rising from my Bus Blaster, followed by the smell of burnt electronics. After examining the wreckage, it seemed likely that the CPLD took most, if not all, of the damage. Not wanting to wait another month for Seeed to send a whole new device, I ordered some XC2C32A CPLD’s and replaced the burnt part. This, however, requires that the new part if FLASHed with the appropriate buffer logic. Below I describe how this can be accomplished using OpenOCD.</p>
 <h2 id="new-approach">New Approach</h2>
-<p>With sufficiently recent OpenOCD releases (<code>ae806d8f4</code>, included in the 0.8.0 release), this process is much simpler than it used to be as the package now ships with a board file for the Bus Blaster<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. Simply <a href="https://code.google.com/p/dangerous-prototypes-open-hardware/source/browse/trunk/Bus_Blaster/buffer_logic/">download</a> the desired SVF and run,</p>
+<p>With sufficiently recent OpenOCD releases (<code>ae806d8f4</code>, included in the 0.8.0 release), this process is much simpler than it used to be as the package now ships with a board file for the Bus Blaster<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. Simply <a href="https://code.google.com/p/dangerous-prototypes-open-hardware/source/browse/trunk/Bus_Blaster/buffer_logic/">download</a> the desired SVF and run,</p>
 <pre><code>$ openocd -f board/dp_busblaster_v3.cfg -c &quot;adapter_khz 1000; init; svf &lt;path_to_svf&gt;; shutdown&quot;</code></pre>
 <p>This one-liner is due to <code>PaulFertser</code> of <code>#openocd</code> on Freenode (a lovely place to be if you have OpenOCD-related questions). Below the old procedure is reproduced for those not fortunate enough to have a recent OpenOCD installation.</p>
 <h2 id="old-openocd">Old OpenOCD</h2>
@@ -80,13 +80,13 @@ Open On-Chip Debugger
 Time used: 0m0s767ms 
 svf file programmed successfully for 579 commands</code></pre>
 <p>Well, that doesn’t look so bad and indeed attempting to debug a target works as expected. Yay!</p>
-<div class="footnotes">
+<section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p>At first glance, the filename <code>board/dp_busblaster_v3.cfg</code> is a bit confusing as there is nothing to directly suggest that this will flash the buffer instead of the target device. However, if we look more carefully we notice that this is a <em>board</em> file, not to be confused with <code>interface/ftdi/dp_busblaster.cfg</code>, the interface file describing the Bus Blaster.</p>
-<p>In fact, if we examine the board file, we’ll notice that it simply <code>source</code>’s the interface file, sets the <code>ftdi_channel</code> and defines the TAP parameters for the buffer CPLD.<a href="#fnref1">↩</a></p></li>
+<li id="fn1" role="doc-endnote"><p>At first glance, the filename <code>board/dp_busblaster_v3.cfg</code> is a bit confusing as there is nothing to directly suggest that this will flash the buffer instead of the target device. However, if we look more carefully we notice that this is a <em>board</em> file, not to be confused with <code>interface/ftdi/dp_busblaster.cfg</code>, the interface file describing the Bus Blaster.</p>
+<p>In fact, if we examine the board file, we’ll notice that it simply <code>source</code>’s the interface file, sets the <code>ftdi_channel</code> and defines the TAP parameters for the buffer CPLD.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></p></li>
 </ol>
-</div>
+</section>
 </article>
 
         </section>

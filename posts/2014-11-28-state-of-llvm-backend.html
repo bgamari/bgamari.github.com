@@ -54,62 +54,62 @@
 <table>
 <thead>
 <tr class="header">
-<th align="left">GHC release</th>
-<th align="left">LLVM 3.2</th>
-<th align="left">LLVM 3.3</th>
-<th align="left">LLVM 3.4</th>
-<th align="left">LLVM 3.5</th>
-<th align="left">LLVM 3.6</th>
+<th style="text-align: left;">GHC release</th>
+<th style="text-align: left;">LLVM 3.2</th>
+<th style="text-align: left;">LLVM 3.3</th>
+<th style="text-align: left;">LLVM 3.4</th>
+<th style="text-align: left;">LLVM 3.5</th>
+<th style="text-align: left;">LLVM 3.6</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">pre-GHC 7.8</td>
-<td align="left">ok?</td>
-<td align="left">ok?</td>
-<td align="left">ok?</td>
-<td align="left">bad, aliases</td>
-<td align="left">bad, syntax</td>
+<td style="text-align: left;">pre-GHC 7.8</td>
+<td style="text-align: left;">ok?</td>
+<td style="text-align: left;">ok?</td>
+<td style="text-align: left;">ok?</td>
+<td style="text-align: left;">bad, aliases</td>
+<td style="text-align: left;">bad, syntax</td>
 </tr>
 <tr class="even">
-<td align="left">GHC 7.8</td>
-<td align="left">ok</td>
-<td align="left">ok</td>
-<td align="left">ok</td>
-<td align="left">bad, aliases</td>
-<td align="left">bad, syntax</td>
+<td style="text-align: left;">GHC 7.8</td>
+<td style="text-align: left;">ok</td>
+<td style="text-align: left;">ok</td>
+<td style="text-align: left;">ok</td>
+<td style="text-align: left;">bad, aliases</td>
+<td style="text-align: left;">bad, syntax</td>
 </tr>
 <tr class="odd">
-<td align="left">GHC 7.8, alias rework, internal</td>
-<td align="left">ok, ARM bad?</td>
-<td align="left">ok, ARM bad?</td>
-<td align="left">bad, sections</td>
-<td align="left">ok, ARM bad</td>
-<td align="left">bad, syntax</td>
+<td style="text-align: left;">GHC 7.8, alias rework, internal</td>
+<td style="text-align: left;">ok, ARM bad?</td>
+<td style="text-align: left;">ok, ARM bad?</td>
+<td style="text-align: left;">bad, sections</td>
+<td style="text-align: left;">ok, ARM bad</td>
+<td style="text-align: left;">bad, syntax</td>
 </tr>
 <tr class="even">
-<td align="left">GHC 7.8, alias rework, external</td>
-<td align="left">ok, ARM bad</td>
-<td align="left">ok, ARM bad</td>
-<td align="left">ok, ARM bad</td>
-<td align="left">ok, ARM bad</td>
-<td align="left">bad, syntax</td>
+<td style="text-align: left;">GHC 7.8, alias rework, external</td>
+<td style="text-align: left;">ok, ARM bad</td>
+<td style="text-align: left;">ok, ARM bad</td>
+<td style="text-align: left;">ok, ARM bad</td>
+<td style="text-align: left;">ok, ARM bad</td>
+<td style="text-align: left;">bad, syntax</td>
 </tr>
 <tr class="odd">
-<td align="left">GHC 7.10</td>
-<td align="left">ok, ARM bad</td>
-<td align="left">ok, ARM bad</td>
-<td align="left">ok, ARM bad</td>
-<td align="left">ok</td>
-<td align="left">bad, syntax</td>
+<td style="text-align: left;">GHC 7.10</td>
+<td style="text-align: left;">ok, ARM bad</td>
+<td style="text-align: left;">ok, ARM bad</td>
+<td style="text-align: left;">ok, ARM bad</td>
+<td style="text-align: left;">ok</td>
+<td style="text-align: left;">bad, syntax</td>
 </tr>
 <tr class="even">
-<td align="left">GHC 7.11</td>
-<td align="left">bad, syntax</td>
-<td align="left">bad, syntax</td>
-<td align="left">bad, syntax</td>
-<td align="left">bad, syntax</td>
-<td align="left">ok!</td>
+<td style="text-align: left;">GHC 7.11</td>
+<td style="text-align: left;">bad, syntax</td>
+<td style="text-align: left;">bad, syntax</td>
+<td style="text-align: left;">bad, syntax</td>
+<td style="text-align: left;">bad, syntax</td>
+<td style="text-align: left;">ok!</td>
 </tr>
 </tbody>
 </table>
@@ -125,7 +125,7 @@
 <h2 id="the-plan-for-ghc-7.10">The plan for GHC 7.10</h2>
 <p>The above is clearly a bit of a mess. Moreover, this is only x86_64. It would be nice to say that by the time of the 7.10 release we have a nice clear path forward. LLVM 3.6 could almost be this path: it has no critical bugs on either ARM or x86-64. Moreover, I have a <a href="http://reviews.llvm.org/D6454">patch</a> adding a prefix data facility to the LLVM intermediate language which GHC could use to cleanly implement tables-next-to-code. In fact, a <a href="https://phabricator.haskell.org/D530">first cut</a> of this rework has already been completed.</p>
 <p>Unfortunately, the release schedules of GHC and LLVM unfortunately align quite closely and looming on the horizon. It’s not clear whether LLVM 3.6 will be released before or after GHC 7.10, much less whether the prefix data patch will be merged in time.</p>
-<ol style="list-style-type: lower-alpha">
+<ol type="a">
 <li><p>Release with only the alias rework: This will enable us to run against LLVM 3.2, 3.3, 3.4, and 3.5 on the x86-64. ARM support will suffer until the next LLVM 3.5 bugfix is released.</p></li>
 <li><p>Release with the llvm-3.6 rework: This would only enable us to run against 3.6 on both ARM and x86-64. There might be a gap between the time when the GHC 7.10 release is cut and when LLVM 3.6 is released.</p></li>
 </ol>

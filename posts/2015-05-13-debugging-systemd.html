@@ -83,7 +83,7 @@ Transient=no</code></pre>
 <p>Unfortunately these details show no indication of why the unit can’t be started.</p>
 <p><code>systemctl cat dev-mmcblk0p1.device</code> suggests that these <code>.device</code> units are no ordinary units. This is apparently now the time to brush up on the intricacies of systemd units so I run off to the <a href="http://www.freedesktop.org/software/systemd/man/systemd.unit.html"><code>systemd.unit</code></a> manpage which within a few paragraphs sends me to the <a href="http://www.freedesktop.org/software/systemd/man/systemd.device.html"><code>systemd.device</code></a> manpage. While short, the document seems quite effective in suggesting the next obvious step,</p>
 <blockquote>
-<p>systemd will dynamically create device units for all kernel devices that are marked with the “systemd” udev tag (by default all block and network devices, and a few others). This may be used to define dependencies between devices and other units. To tag a udev device, use “TAG+=”systemd“” in the udev rules file, see udev(7) for details.</p>
+<p>systemd will dynamically create device units for all kernel devices that are marked with the “systemd” udev tag (by default all block and network devices, and a few others). This may be used to define dependencies between devices and other units. To tag a udev device, use “TAG+=”systemd"" in the udev rules file, see udev(7) for details.</p>
 </blockquote>
 <p>Perhaps the <code>ttySAC2</code> device isn’t getting the proper udev tag. Sadly, udev disagrees,</p>
 <pre><code>$ udevadm info /dev/ttySAC2

@@ -41,61 +41,61 @@
     <p>This will be a collection of notes from my efforts debugging GHC bug <a href="https://ghc.haskell.org/trac/ghc/ticket/13615">#13615</a>, a nasty concurrency issue leading to non-deterministic incorrect evaluation in some parallel programs.</p>
 <p>This post will not be an introduction to <code>gdb</code>, although will rely on it. Moreover, we will assume some knowledge of GHC internals, in particular a working understanding of STG machine. See <span class="citation" data-cites="stg">(<span class="citeproc-not-found" data-reference-id="stg"><strong>???</strong></span>)</span> for details.</p>
 <p>A fairly nice reproducer can be found <a href="https://github.com/bgamari/cuddly-bassoon/blob/master/unordered-containers-0.2.8.0/Data/HashMap/Strict.hs#L90">here</a>. In short what we have here is a program which builds a strict <code>HashMap</code> (from <code>unordered-containers</code>) from a list of elements evaluated in parallel (using <code>parallel</code>’s strategies),</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">type</span> <span class="dt">Probably</span> a <span class="fu">=</span> [(a, <span class="dt">Rational</span>)]</a>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">type</span> <span class="dt">Probably</span> a <span class="ot">=</span> [(a, <span class="dt">Rational</span>)]</a>
 <a class="sourceLine" id="cb1-2" title="2"></a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="ot">regroup ::</span> (<span class="fu">...</span>) <span class="ot">=&gt;</span> <span class="dt">Probably</span> a <span class="ot">-&gt;</span> <span class="dt">Probably</span> a</a>
-<a class="sourceLine" id="cb1-4" title="4">regroup xs <span class="fu">=</span></a>
-<a class="sourceLine" id="cb1-5" title="5">    <span class="kw">let</span> xs <span class="fu">=</span> HM.toList <span class="fu">$</span> HM.fromListWith (<span class="fu">+</span>) xs</a>
-<a class="sourceLine" id="cb1-6" title="6">    <span class="kw">in</span> <span class="fu">...</span></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="ot">regroup ::</span> (<span class="op">...</span>) <span class="ot">=&gt;</span> <span class="dt">Probably</span> a <span class="ot">-&gt;</span> <span class="dt">Probably</span> a</a>
+<a class="sourceLine" id="cb1-4" title="4">regroup xs <span class="ot">=</span></a>
+<a class="sourceLine" id="cb1-5" title="5">    <span class="kw">let</span> xs <span class="ot">=</span> HM.toList <span class="op">$</span> HM.fromListWith (<span class="op">+</span>) xs</a>
+<a class="sourceLine" id="cb1-6" title="6">    <span class="kw">in</span> <span class="op">...</span></a>
 <a class="sourceLine" id="cb1-7" title="7"></a>
-<a class="sourceLine" id="cb1-8" title="8"><span class="ot">winStates ::</span> (<span class="fu">...</span>) <span class="ot">=&gt;</span> <span class="dt">Solution</span> state description <span class="ot">-&gt;</span> <span class="dt">Probably</span> state</a>
-<a class="sourceLine" id="cb1-9" title="9">winStates <span class="fu">=</span></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="ot">winStates ::</span> (<span class="op">...</span>) <span class="ot">=&gt;</span> <span class="dt">Solution</span> state description <span class="ot">-&gt;</span> <span class="dt">Probably</span> state</a>
+<a class="sourceLine" id="cb1-9" title="9">winStates <span class="ot">=</span></a>
 <a class="sourceLine" id="cb1-10" title="10">    <span class="kw">case</span> s <span class="kw">of</span></a>
-<a class="sourceLine" id="cb1-11" title="11">      <span class="fu">...</span></a>
-<a class="sourceLine" id="cb1-12" title="12">      <span class="dt">Node</span> _ _ _ ps <span class="ot">-&gt;</span> regroup <span class="fu">$</span> <span class="fu">concat</span> <span class="fu">$</span> parMap rdeepseq someFunction ps</a></code></pre></div>
+<a class="sourceLine" id="cb1-11" title="11">      <span class="op">...</span></a>
+<a class="sourceLine" id="cb1-12" title="12">      <span class="dt">Node</span> _ _ _ ps <span class="ot">-&gt;</span> regroup <span class="op">$</span> <span class="fu">concat</span> <span class="op">$</span> parMap rdeepseq someFunction ps</a></code></pre></div>
 <p>It turns out that when run with <code>+RTS -N2</code>, <code>winStates</code> will return an incorrect result. Specifically, it appears that some elements of the input list to <code>regroup</code> are not folded into the <code>HashMap</code>.</p>
 <p>Looking at <code>Data.HashMap.Strict.fromListWith</code> it becomes quite clear that there is some subtlety here as it uses internal mutation while building the <code>HashMap</code>. At this point it will likely be helpful to look at the representation of <code>HashMap</code>,</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">data</span> <span class="dt">Leaf</span> k v <span class="fu">=</span> <span class="dt">L</span> <span class="fu">!</span>k v</a>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">data</span> <span class="dt">Leaf</span> k v <span class="ot">=</span> <span class="dt">L</span> <span class="op">!</span>k v</a>
 <a class="sourceLine" id="cb2-2" title="2">    <span class="kw">deriving</span> (<span class="dt">Eq</span>)</a>
 <a class="sourceLine" id="cb2-3" title="3"></a>
 <a class="sourceLine" id="cb2-4" title="4"><span class="kw">data</span> <span class="dt">HashMap</span> k v</a>
-<a class="sourceLine" id="cb2-5" title="5">    <span class="fu">=</span> <span class="dt">Empty</span></a>
-<a class="sourceLine" id="cb2-6" title="6">    <span class="fu">|</span> <span class="dt">BitmapIndexed</span> <span class="fu">!</span><span class="dt">Bitmap</span> <span class="fu">!</span>(<span class="dt">A.Array</span> (<span class="dt">HashMap</span> k v))</a>
-<a class="sourceLine" id="cb2-7" title="7">    <span class="fu">|</span> <span class="dt">Leaf</span> <span class="fu">!</span><span class="dt">Hash</span> <span class="fu">!</span>(<span class="dt">Leaf</span> k v)</a>
-<a class="sourceLine" id="cb2-8" title="8">    <span class="fu">|</span> <span class="dt">Full</span> <span class="fu">!</span>(<span class="dt">A.Array</span> (<span class="dt">HashMap</span> k v))</a>
-<a class="sourceLine" id="cb2-9" title="9">    <span class="fu">|</span> <span class="dt">Collision</span> <span class="fu">!</span><span class="dt">Hash</span> <span class="fu">!</span>(<span class="dt">A.Array</span> (<span class="dt">Leaf</span> k v))</a></code></pre></div>
+<a class="sourceLine" id="cb2-5" title="5">    <span class="ot">=</span> <span class="dt">Empty</span></a>
+<a class="sourceLine" id="cb2-6" title="6">    <span class="op">|</span> <span class="dt">BitmapIndexed</span> <span class="op">!</span><span class="dt">Bitmap</span> <span class="op">!</span>(<span class="dt">A.Array</span> (<span class="dt">HashMap</span> k v))</a>
+<a class="sourceLine" id="cb2-7" title="7">    <span class="op">|</span> <span class="dt">Leaf</span> <span class="op">!</span><span class="dt">Hash</span> <span class="op">!</span>(<span class="dt">Leaf</span> k v)</a>
+<a class="sourceLine" id="cb2-8" title="8">    <span class="op">|</span> <span class="dt">Full</span> <span class="op">!</span>(<span class="dt">A.Array</span> (<span class="dt">HashMap</span> k v))</a>
+<a class="sourceLine" id="cb2-9" title="9">    <span class="op">|</span> <span class="dt">Collision</span> <span class="op">!</span><span class="dt">Hash</span> <span class="op">!</span>(<span class="dt">A.Array</span> (<span class="dt">Leaf</span> k v))</a></code></pre></div>
 <p><code>fromListWith</code> is implemented in terms of <code>unsafeInsertWith</code>, which, given a key and value to insert, traverses this tree, finds the appropriate node to insert into, and if possible performs an in-place insertion. This is the codepath which</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb3-1" title="1"><span class="ot">unsafeInsertWith ::</span> (<span class="dt">Eq</span> k, <span class="dt">Hashable</span> k, <span class="dt">NFData</span> k, <span class="dt">NFData</span> v, <span class="dt">Show</span> k)</a>
 <a class="sourceLine" id="cb3-2" title="2">                 <span class="ot">=&gt;</span> (v <span class="ot">-&gt;</span> v <span class="ot">-&gt;</span> v) <span class="ot">-&gt;</span> k <span class="ot">-&gt;</span> v <span class="ot">-&gt;</span> <span class="dt">HashMap</span> k v <span class="ot">-&gt;</span> <span class="dt">ST</span> s (<span class="dt">HashMap</span> k v)</a>
-<a class="sourceLine" id="cb3-3" title="3">unsafeInsertWith f k0 v0 m0 <span class="fu">=</span> go h0 k0 v0 <span class="dv">0</span> m0</a>
+<a class="sourceLine" id="cb3-3" title="3">unsafeInsertWith f k0 v0 m0 <span class="ot">=</span> go h0 k0 v0 <span class="dv">0</span> m0</a>
 <a class="sourceLine" id="cb3-4" title="4">  <span class="kw">where</span></a>
-<a class="sourceLine" id="cb3-5" title="5">    h0 <span class="fu">=</span> hash k0</a>
-<a class="sourceLine" id="cb3-6" title="6">    go <span class="fu">!</span>h <span class="fu">!</span>k x <span class="fu">!</span>_ <span class="dt">Empty</span> <span class="fu">=</span> <span class="fu">return</span> <span class="fu">$!</span> leaf h k x</a>
-<a class="sourceLine" id="cb3-7" title="7">    go h k x s (<span class="dt">Leaf</span> hy l<span class="fu">@</span>(<span class="dt">L</span> ky y))</a>
-<a class="sourceLine" id="cb3-8" title="8">        <span class="fu">|</span> hy <span class="fu">==</span> h <span class="fu">=</span> <span class="kw">if</span> ky <span class="fu">==</span> k</a>
-<a class="sourceLine" id="cb3-9" title="9">                    <span class="kw">then</span> <span class="fu">return</span> <span class="fu">$!</span> leaf h k (f x y)</a>
-<a class="sourceLine" id="cb3-10" title="10">                    <span class="kw">else</span> <span class="fu">return</span> <span class="fu">$!</span> collision h l (<span class="dt">L</span> k x)</a>
-<a class="sourceLine" id="cb3-11" title="11">        <span class="fu">|</span> <span class="fu">otherwise</span> <span class="fu">=</span> two s h k x hy ky y</a>
-<a class="sourceLine" id="cb3-12" title="12">    go h k x s t<span class="fu">@</span>(<span class="dt">BitmapIndexed</span> b ary)</a>
-<a class="sourceLine" id="cb3-13" title="13">        <span class="fu">|</span> b <span class="fu">.&amp;.</span> m <span class="fu">==</span> <span class="dv">0</span> <span class="fu">=</span> <span class="kw">do</span></a>
-<a class="sourceLine" id="cb3-14" title="14">            <span class="kw">let</span> ary' <span class="fu">=</span> A.insert ary i <span class="fu">$!</span> leaf h k x</a>
-<a class="sourceLine" id="cb3-15" title="15">            <span class="fu">return</span> <span class="fu">$!</span> bitmapIndexedOrFull (b <span class="fu">.|.</span> m) ary'</a>
-<a class="sourceLine" id="cb3-16" title="16">        <span class="fu">|</span> <span class="fu">otherwise</span> <span class="fu">=</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb3-5" title="5">    h0 <span class="ot">=</span> hash k0</a>
+<a class="sourceLine" id="cb3-6" title="6">    go <span class="op">!</span>h <span class="op">!</span>k x <span class="op">!</span>_ <span class="dt">Empty</span> <span class="ot">=</span> <span class="fu">return</span> <span class="op">$!</span> leaf h k x</a>
+<a class="sourceLine" id="cb3-7" title="7">    go h k x s (<span class="dt">Leaf</span> hy l<span class="op">@</span>(<span class="dt">L</span> ky y))</a>
+<a class="sourceLine" id="cb3-8" title="8">        <span class="op">|</span> hy <span class="op">==</span> h <span class="ot">=</span> <span class="kw">if</span> ky <span class="op">==</span> k</a>
+<a class="sourceLine" id="cb3-9" title="9">                    <span class="kw">then</span> <span class="fu">return</span> <span class="op">$!</span> leaf h k (f x y)</a>
+<a class="sourceLine" id="cb3-10" title="10">                    <span class="kw">else</span> <span class="fu">return</span> <span class="op">$!</span> collision h l (<span class="dt">L</span> k x)</a>
+<a class="sourceLine" id="cb3-11" title="11">        <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> two s h k x hy ky y</a>
+<a class="sourceLine" id="cb3-12" title="12">    go h k x s t<span class="op">@</span>(<span class="dt">BitmapIndexed</span> b ary)</a>
+<a class="sourceLine" id="cb3-13" title="13">        <span class="op">|</span> b <span class="op">.&amp;.</span> m <span class="op">==</span> <span class="dv">0</span> <span class="ot">=</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb3-14" title="14">            <span class="kw">let</span> ary' <span class="ot">=</span> A.insert ary i <span class="op">$!</span> leaf h k x</a>
+<a class="sourceLine" id="cb3-15" title="15">            <span class="fu">return</span> <span class="op">$!</span> bitmapIndexedOrFull (b <span class="op">.|.</span> m) ary'</a>
+<a class="sourceLine" id="cb3-16" title="16">        <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="kw">do</span></a>
 <a class="sourceLine" id="cb3-17" title="17">            st <span class="ot">&lt;-</span> A.indexM ary i</a>
-<a class="sourceLine" id="cb3-18" title="18">            st' <span class="ot">&lt;-</span> rnf x <span class="ot">`seq`</span> go h k x (s<span class="fu">+</span>bitsPerSubkey) st</a>
+<a class="sourceLine" id="cb3-18" title="18">            st' <span class="ot">&lt;-</span> rnf x <span class="ot">`seq`</span> go h k x (s<span class="op">+</span>bitsPerSubkey) st</a>
 <a class="sourceLine" id="cb3-19" title="19">            A.unsafeUpdateM ary i st'             <span class="co">-- in-place mutation</span></a>
 <a class="sourceLine" id="cb3-20" title="20">            <span class="fu">return</span> t</a>
-<a class="sourceLine" id="cb3-21" title="21">      <span class="kw">where</span> m <span class="fu">=</span> mask h s</a>
-<a class="sourceLine" id="cb3-22" title="22">            i <span class="fu">=</span> sparseIndex b m</a>
-<a class="sourceLine" id="cb3-23" title="23">    go h k x s t<span class="fu">@</span>(<span class="dt">Full</span> ary) <span class="fu">=</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb3-21" title="21">      <span class="kw">where</span> m <span class="ot">=</span> mask h s</a>
+<a class="sourceLine" id="cb3-22" title="22">            i <span class="ot">=</span> sparseIndex b m</a>
+<a class="sourceLine" id="cb3-23" title="23">    go h k x s t<span class="op">@</span>(<span class="dt">Full</span> ary) <span class="ot">=</span> <span class="kw">do</span></a>
 <a class="sourceLine" id="cb3-24" title="24">        st <span class="ot">&lt;-</span> A.indexM ary i</a>
-<a class="sourceLine" id="cb3-25" title="25">        st' <span class="ot">&lt;-</span> go h k x (s<span class="fu">+</span>bitsPerSubkey) st</a>
+<a class="sourceLine" id="cb3-25" title="25">        st' <span class="ot">&lt;-</span> go h k x (s<span class="op">+</span>bitsPerSubkey) st</a>
 <a class="sourceLine" id="cb3-26" title="26">        A.unsafeUpdateM ary i st'                 <span class="co">-- in-place mutation</span></a>
 <a class="sourceLine" id="cb3-27" title="27">        <span class="fu">return</span> t</a>
-<a class="sourceLine" id="cb3-28" title="28">      <span class="kw">where</span> i <span class="fu">=</span> <span class="fu">index</span> h s</a>
-<a class="sourceLine" id="cb3-29" title="29">    go h k x s t<span class="fu">@</span>(<span class="dt">Collision</span> hy v)</a>
-<a class="sourceLine" id="cb3-30" title="30">        <span class="fu">|</span> h <span class="fu">==</span> hy   <span class="fu">=</span> <span class="fu">return</span> <span class="fu">$!</span> <span class="dt">Collision</span> h (updateOrSnocWith f k x v)</a>
-<a class="sourceLine" id="cb3-31" title="31">        <span class="fu">|</span> <span class="fu">otherwise</span> <span class="fu">=</span> go h k x s <span class="fu">$</span> <span class="dt">BitmapIndexed</span> (mask hy s) (A.singleton t)</a></code></pre></div>
+<a class="sourceLine" id="cb3-28" title="28">      <span class="kw">where</span> i <span class="ot">=</span> <span class="fu">index</span> h s</a>
+<a class="sourceLine" id="cb3-29" title="29">    go h k x s t<span class="op">@</span>(<span class="dt">Collision</span> hy v)</a>
+<a class="sourceLine" id="cb3-30" title="30">        <span class="op">|</span> h <span class="op">==</span> hy   <span class="ot">=</span> <span class="fu">return</span> <span class="op">$!</span> <span class="dt">Collision</span> h (updateOrSnocWith f k x v)</a>
+<a class="sourceLine" id="cb3-31" title="31">        <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> go h k x s <span class="op">$</span> <span class="dt">BitmapIndexed</span> (mask hy s) (A.singleton t)</a></code></pre></div>
 <p>We can show that in-place mutation is responsible by changing both the references to <code>A.unsafeUpdateM</code> to safe copy-and-modify updates. Doing this indeed appears to hide the issue.</p>
 <p>So, the question then becomes why this in-place modification results in non-deterministic behavior. Given that parallelism is involved, one concern is that we have multiple threads performing mutable updates on the same array concurrently. There are a few ways we can test this,</p>
 <ul>
@@ -105,29 +105,29 @@
 <p>Indeed both of these options seem to fix the issue. This is somewhat surprising; afterall, no <code>unsafeInsertWith</code> thunks should be leaking out of <code>fromListWith</code>, which is essentially a strict fold over the input list producing a result in normal form. Given this, it’s hard to imagine how we are entering such a thunk more than once.</p>
 <h2 id="catching-the-program-in-the-act">Catching the program in the act</h2>
 <p>To determine how we end up with multiple entry we’ll want to catch when it occurs. We can then pause the program and poke at its state in <code>gdb</code>. To catch this, we’ll write some sanity checking logic to wrap <code>unsafeInsertWith</code> with ensuring that only one thread is in our critical section at once,</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">data</span> <span class="dt">Status</span> <span class="fu">=</span> <span class="dt">AllOut</span>   <span class="co">-- ^ no one is in the critical section</span></a>
-<a class="sourceLine" id="cb4-2" title="2">            <span class="fu">|</span> <span class="dt">OneIn</span>    <span class="co">-- ^ one thread is currently in the critical section</span></a>
-<a class="sourceLine" id="cb4-3" title="3">            <span class="fu">|</span> <span class="dt">TwoIn</span>    <span class="co">-- ^ a second thread tried to enter</span></a>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">data</span> <span class="dt">Status</span> <span class="ot">=</span> <span class="dt">AllOut</span>   <span class="co">-- ^ no one is in the critical section</span></a>
+<a class="sourceLine" id="cb4-2" title="2">            <span class="op">|</span> <span class="dt">OneIn</span>    <span class="co">-- ^ one thread is currently in the critical section</span></a>
+<a class="sourceLine" id="cb4-3" title="3">            <span class="op">|</span> <span class="dt">TwoIn</span>    <span class="co">-- ^ a second thread tried to enter</span></a>
 <a class="sourceLine" id="cb4-4" title="4">            <span class="kw">deriving</span> (<span class="dt">Eq</span>)</a>
 <a class="sourceLine" id="cb4-5" title="5"></a>
 <a class="sourceLine" id="cb4-6" title="6"><span class="ot">failOnDuplicate ::</span> <span class="dt">IORef</span> <span class="dt">Status</span> <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> <span class="dt">ST</span> s a <span class="ot">-&gt;</span> <span class="dt">ST</span> s a</a>
-<a class="sourceLine" id="cb4-7" title="7">failOnDuplicate ref obj action <span class="fu">=</span> <span class="kw">do</span></a>
-<a class="sourceLine" id="cb4-8" title="8">    a <span class="ot">&lt;-</span> unsafeIOToST <span class="fu">$</span> atomicModifyIORef' ref <span class="fu">$</span> \x <span class="ot">-&gt;</span> (<span class="dt">OneIn</span>, x)</a>
+<a class="sourceLine" id="cb4-7" title="7">failOnDuplicate ref obj action <span class="ot">=</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb4-8" title="8">    a <span class="ot">&lt;-</span> unsafeIOToST <span class="op">$</span> atomicModifyIORef' ref <span class="op">$</span> \x <span class="ot">-&gt;</span> (<span class="dt">OneIn</span>, x)</a>
 <a class="sourceLine" id="cb4-9" title="9">    <span class="co">-- Is someone already in our critical section?</span></a>
-<a class="sourceLine" id="cb4-10" title="10">    when (a <span class="fu">==</span> <span class="dt">OneIn</span>) <span class="fu">$</span> unsafeIOToST <span class="fu">$</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb4-10" title="10">    when (a <span class="op">==</span> <span class="dt">OneIn</span>) <span class="op">$</span> unsafeIOToST <span class="op">$</span> <span class="kw">do</span></a>
 <a class="sourceLine" id="cb4-11" title="11">        writeIORef ref <span class="dt">TwoIn</span></a>
 <a class="sourceLine" id="cb4-12" title="12">        <span class="co">-- if so log some details and hang</span></a>
 <a class="sourceLine" id="cb4-13" title="13">        logWord <span class="bn">0x22</span></a>
 <a class="sourceLine" id="cb4-14" title="14">        logThreadId</a>
 <a class="sourceLine" id="cb4-15" title="15">        logWord <span class="bn">0x22</span></a>
 <a class="sourceLine" id="cb4-16" title="16">        logPointer obj</a>
-<a class="sourceLine" id="cb4-17" title="17">        forever <span class="fu">$</span> <span class="fu">return</span> ()</a>
+<a class="sourceLine" id="cb4-17" title="17">        forever <span class="op">$</span> <span class="fu">return</span> ()</a>
 <a class="sourceLine" id="cb4-18" title="18"></a>
-<a class="sourceLine" id="cb4-19" title="19">    <span class="fu">!</span>r <span class="ot">&lt;-</span> action</a>
+<a class="sourceLine" id="cb4-19" title="19">    <span class="op">!</span>r <span class="ot">&lt;-</span> action</a>
 <a class="sourceLine" id="cb4-20" title="20"></a>
-<a class="sourceLine" id="cb4-21" title="21">    a' <span class="ot">&lt;-</span> unsafeIOToST <span class="fu">$</span> atomicModifyIORef' ref <span class="fu">$</span> \x <span class="ot">-&gt;</span> (<span class="dt">AllOut</span>, x)</a>
+<a class="sourceLine" id="cb4-21" title="21">    a' <span class="ot">&lt;-</span> unsafeIOToST <span class="op">$</span> atomicModifyIORef' ref <span class="op">$</span> \x <span class="ot">-&gt;</span> (<span class="dt">AllOut</span>, x)</a>
 <a class="sourceLine" id="cb4-22" title="22">    <span class="co">-- did a second thread try to enter the </span></a>
-<a class="sourceLine" id="cb4-23" title="23">    when (a' <span class="fu">==</span> <span class="dt">TwoIn</span>) <span class="fu">$</span> unsafeIOToST <span class="fu">$</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb4-23" title="23">    when (a' <span class="op">==</span> <span class="dt">TwoIn</span>) <span class="op">$</span> unsafeIOToST <span class="op">$</span> <span class="kw">do</span></a>
 <a class="sourceLine" id="cb4-24" title="24">        logWord <span class="bn">0x44</span></a>
 <a class="sourceLine" id="cb4-25" title="25">        logThreadId</a>
 <a class="sourceLine" id="cb4-26" title="26">        logWord <span class="bn">0x44</span></a>
@@ -137,9 +137,9 @@
 <a class="sourceLine" id="cb4-30" title="30"></a>
 <a class="sourceLine" id="cb4-31" title="31"><span class="ot">unsafeInsertWith ::</span> (<span class="dt">Eq</span> k, <span class="dt">Hashable</span> k, <span class="dt">NFData</span> k, <span class="dt">NFData</span> v, <span class="dt">Show</span> k)</a>
 <a class="sourceLine" id="cb4-32" title="32">                 <span class="ot">=&gt;</span> <span class="dt">IORef</span> <span class="dt">Status</span> <span class="ot">-&gt;</span> (v <span class="ot">-&gt;</span> v <span class="ot">-&gt;</span> v) <span class="ot">-&gt;</span> k <span class="ot">-&gt;</span> v <span class="ot">-&gt;</span> <span class="dt">HashMap</span> k v <span class="ot">-&gt;</span> <span class="dt">ST</span> s (<span class="dt">HashMap</span> k v)</a>
-<a class="sourceLine" id="cb4-33" title="33">unsafeInsertWith ref f k0 v0 m0 <span class="fu">=</span> failOnDuplicate ref m0 <span class="fu">$</span> go h0 k0 v0 <span class="dv">0</span> m0</a>
+<a class="sourceLine" id="cb4-33" title="33">unsafeInsertWith ref f k0 v0 m0 <span class="ot">=</span> failOnDuplicate ref m0 <span class="op">$</span> go h0 k0 v0 <span class="dv">0</span> m0</a>
 <a class="sourceLine" id="cb4-34" title="34">  <span class="kw">where</span></a>
-<a class="sourceLine" id="cb4-35" title="35">    <span class="fu">...</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-35" title="35">    <span class="op">...</span></a></code></pre></div>
 <p>Where the <code>log*</code> and <code>breakpoint</code> functions come from a utility module that I carry around from times like these. Respectively they call to C to log machine words to a ring-buffer, and fire an <code>int $3</code> to break into GDB.</p>
 <p>Compiling and running the program within <code>gdb</code> indeed breaks, again confirming our multi-entry hypothesis.</p>
 <pre><code>Thread 13 &quot;ghc_worker&quot; received signal SIGTRAP, Trace/breakpoint trap.

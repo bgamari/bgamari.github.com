@@ -44,14 +44,14 @@
 <pre><code>LDFLAGS += --specs=rdimon.specs -lc -lrdimon</code></pre>
 <p>Note that <code>librdimon</code> takes the place of <code>libnosys</code>.</p>
 <p>Ensure that <code>initialise_monitor_handles()</code> is called in <code>main</code> before calling <code>printf</code>,</p>
-<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="kw">extern</span> <span class="dt">void</span> initialise_monitor_handles(<span class="dt">void</span>);
-
-<span class="dt">int</span> main(<span class="dt">void</span>) {
-    initialise_monitor_handles();
-
-    printf(<span class="st">&quot;hello world!</span><span class="sc">\n</span><span class="st">&quot;</span>);
-    <span class="co">// do things</span>
-}</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">extern</span> <span class="dt">void</span> initialise_monitor_handles(<span class="dt">void</span>);</a>
+<a class="sourceLine" id="cb2-2" title="2"></a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="dt">int</span> main(<span class="dt">void</span>) {</a>
+<a class="sourceLine" id="cb2-4" title="4">    initialise_monitor_handles();</a>
+<a class="sourceLine" id="cb2-5" title="5"></a>
+<a class="sourceLine" id="cb2-6" title="6">    printf(<span class="st">&quot;hello world!</span><span class="sc">\n</span><span class="st">&quot;</span>);</a>
+<a class="sourceLine" id="cb2-7" title="7">    <span class="co">// do things</span></a>
+<a class="sourceLine" id="cb2-8" title="8">}</a></code></pre></div>
 <p>If you are using the toolchain’s <code>crt0</code> initialization function then <code>initialise_monitor_handles</code> has already been called for you.</p>
 <p>At runtime enable semihosting in OpenOCD with <code>arm semihosting enable</code> before <code>initialise_monitor_handles</code> is called. Failure to do this will result in a <code>HardFault</code> due to an unexpected debug event. Also be aware that semihosting is disabled on core reset. This effectively means that an image compiled with semihosting enabled will be unable to run in the absence of a debugger (unless you make the call to <code>initialise_monitor_handles</code> contingent on a runtime flag).</p>
 <p>You should now see your <code>printf</code> messages show up in the OpenOCD console. You can</p>

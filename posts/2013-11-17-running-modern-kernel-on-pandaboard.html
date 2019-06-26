@@ -73,10 +73,10 @@
  $ vim uEnv-new.txt</code></pre>
 <p>Edit the following,</p>
 <ul>
-<li>set <code>kernel_file</code> to <code>zImage-new</code></li>
-<li>set <code>initrd_file</code> to <code>zinitrd-new.img</code></li>
+<li><p>set <code>kernel_file</code> to <code>zImage-new</code></p></li>
+<li><p>set <code>initrd_file</code> to <code>zinitrd-new.img</code></p></li>
 <li><p>ensure that the “New Device Tree Boot” command is used. This looks something like,</p>
-<pre><code> uenvcmd=run boot_fdt; run device_args; bootz 0x80300000 0x81600000:${initrd_size} 0x815f0000</code></pre></li>
+<pre><code>uenvcmd=run boot_fdt; run device_args; bootz 0x80300000 0x81600000:${initrd_size} 0x815f0000</code></pre></li>
 </ul>
 <p>Now the moment of truth,</p>
 <pre><code> $ sudo reboot</code></pre>
@@ -286,7 +286,7 @@ Ramdisk image is corrupt or invalid
 <p>After this things seem quite useable, although there is the occassional warning of the form,</p>
 <pre><code> gic_timer_retrigger: lost localtimer interrupt</code></pre>
 <p>As Tony Lindgren <a href="http://marc.info/?l=linux-arm-kernel&amp;m=138497259220285&amp;w=2">points out</a> there are a few things that are known to be broken at the moment,</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>WLAN does not work after a soft reset or when brough down with <code>ifconfig down</code>.</li>
 <li>Suspend and resume does not wake-up from serial console and spews a bunch of warnings.</li>
 <li>cpufreq unfortunately won’t be <a href="https://plus.google.com/112464029509057661457/posts/gvyZQcNieoq">supported</a> for a <a href="http://marc.info/?l=linux-omap&amp;m=138488225103388&amp;w=2">while</a></li>

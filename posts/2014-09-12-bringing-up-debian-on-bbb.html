@@ -41,18 +41,18 @@
     <h1 id="bringing-up-debian-on-a-beaglebone-black">Bringing up Debian on a BeagleBone Black</h1>
 <p>BeagleBoard.org has recently been gradually playing with the idea of replacing the long-used <a href="http://www.angstrom-distribution.org/">Angstrom</a> distribution to <a href="http://www.debian.org/">Debian</a>. Thanks in large part to the incredibly productive <a href="https://rcn-ee.net/">Robert C. Nelson</a> the transition seems to be quite smooth. Below I document my attempt at bringing up a BeagleBone Black with one of Robert’s Debian images.</p>
 <h2 id="initial-setup">Initial setup</h2>
-<ol style="list-style-type: decimal">
-<li>Download image. I used a <a href="https://rcn-ee.net/deb/testing/2014-09-04/console/BBB-eMMC-flasher-debian-7.6-console-armhf-2014-09-04-2gb.img.xz">testing image</a> from the <a href="http://elinux.org/Beagleboard:BeagleBoneBlack_Debian">elinux wiki</a>.</li>
+<ol type="1">
+<li><p>Download image. I used a <a href="https://rcn-ee.net/deb/testing/2014-09-04/console/BBB-eMMC-flasher-debian-7.6-console-armhf-2014-09-04-2gb.img.xz">testing image</a> from the <a href="http://elinux.org/Beagleboard:BeagleBoneBlack_Debian">elinux wiki</a>.</p></li>
 <li><p>Write to SD card,</p>
 <pre><code>$ dd if=BBB-eMMC-flasher-debian-7.6-console-armhf-2014-09-04-2gb.img.xz of=/dev/mmcblk0</code></pre></li>
 <li><p>Boot BeagleBone from SD card; a great deal of flashing commences. When flashing stops unplug BBB, remove SD card.</p></li>
 </ol>
 <h2 id="making-things-hospitable">Making things hospitable</h2>
 <p>The default Debian image is quite spartan. In fact, it doesn’t even include <code>wpa_supplicant</code> or the firmware for my Ralink RT5370 wifi adapter. To download these I used wired ethernet,</p>
-<ol style="list-style-type: decimal">
-<li>Plug in Ethernet cable</li>
-<li>Apply power to BBB</li>
-<li>Monitor DHCP logs for BBB’s request</li>
+<ol type="1">
+<li><p>Plug in Ethernet cable</p></li>
+<li><p>Apply power to BBB</p></li>
+<li><p>Monitor DHCP logs for BBB’s request</p></li>
 <li><p>SSH to BBB (the default username is <code>debian</code>, password is <code>temppwd</code>). Then,</p>
 <pre><code>$ sudo adduser ben
 $ sudo adduser ben adm
@@ -63,7 +63,7 @@ $ sudo apt-get install wpasupplicant firmware-ralink vim iw usbutils lsb-release
 $ sudo apt-get install tmux git bash-completion</code></pre></li>
 <li><p>Unfortunately the <code>rt2800usb</code> drivers perform very poorly with power-saving enabled (the default). Thankfully Stack Overflow has the <a href="http://superuser.com/questions/629039/disabling-power-save-option-on-wifi-device">answer</a> to this,</p>
 <pre><code>$ echo 'ACTION==&quot;add&quot;, SUBSYSTEM==&quot;net&quot;, KERNEL==&quot;wlan*&quot; RUN+=&quot;/usr/bin/iw dev %k set power_save off&quot;' | sudo tee /etc/udev/rules.d/70-wifi-disable-powersave.rules</code></pre></li>
-<li>Configure <code>wlan0</code> in <code>/etc/network/interfaces</code>.</li>
+<li><p>Configure <code>wlan0</code> in <code>/etc/network/interfaces</code>.</p></li>
 <li><p>Reboot and ensure that <code>wlan0</code> comes up.</p></li>
 </ol>
 <h2 id="upgrading-the-kernel">Upgrading the kernel</h2>

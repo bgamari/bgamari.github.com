@@ -98,13 +98,9 @@ INLINE_HEADER rtsBool LOOKS_LIKE_INFO_PTR (StgWord p)
     return (p &amp;&amp; (IS_FORWARDING_PTR(p) || LOOKS_LIKE_INFO_PTR_NOT_NULL(p))) ? rtsTrue : rtsFalse;
 }</code></pre>
 <p>This is, a valid info table pointer can’t be <code>NULL</code> and must be either,</p>
-<ol style="list-style-type: lower-alpha">
+<ol type="a">
 <li>A forwarding pointer, having the low order bit set, or</li>
-<li>A valid info table pointer, therefore
-<ol style="list-style-type: decimal">
-<li>Is not of type <code>INVALID_OBJECT</code> (0), and</li>
-<li>Has a type in the valid range of closure types (defined in <code>includes/rts/storage/ClosureTypes.h</code>; in GHC 7.8 <code>N_CLOSURE_TYPES == 61</code>)</li>
-</ol></li>
+<li>A valid info table pointer, therefore 1. Is not of type <code>INVALID_OBJECT</code> (0), and 2. Has a type in the valid range of closure types (defined in <code>includes/rts/storage/ClosureTypes.h</code>; in GHC 7.8 <code>N_CLOSURE_TYPES == 61</code>)</li>
 </ol>
 <p>If we look at the definition of <code>INFO_PTR_TO_STRUCT</code> we will notice there is a slight subtly here, however,</p>
 <pre><code>#ifdef TABLES_NEXT_TO_CODE

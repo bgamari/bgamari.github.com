@@ -100,7 +100,7 @@ $ sudo journalctl -f -u strongswan.service</code></pre>
 <p>Finally, we’ll need to add firewall rules allowing traffic on IP protocol 50 (for encrypted traffic), and UDP ports 500 and 4500 (for negotiation and NAT traversal, respectively).</p>
 <p>Now we can turn our attention to the client.</p>
 <h2 id="client">Client</h2>
-<p>You’ll need to grab the CA certificate, client key, and client certificate files from the server (e.g. <code>swan/ca.cert.pem</code>, <code>swan/ben-laptop.smart-cactus.org.cert.pem</code>, and <code>swan/ben-laptop.smart-cactus.org.key.pem</code> above).</p>
+<p>You’ll need to grab the CA certificate, client key, and client certificate files from the server (e.g. <code>swan/ca.cert.pem</code>, <code>swan/ben-laptop.smart-cactus.org.cert.pem</code>, and <code>swan/ben-laptop.smart-cactus.org.key.pem</code> above).</p>
 <p><code>network-manager</code> has excellent support for the sort of IKEv2 tunnel we are configuring here via the <code>strongswan-nm</code> package,</p>
 <pre><code>$ sudo apt-get install strongswan-nm</code></pre>
 <p>Now create a new NetworkManager IKEv2 connection, specifying the appropriate CA cerfificate, selecting “Certificate/private-key” as the authentication mechanism, and the appropriate client key and certificate.</p>

@@ -43,36 +43,36 @@
 <table>
 <thead>
 <tr class="header">
-<th align="left">LPCXpresso</th>
-<th align="left">Signal</th>
-<th align="left">Bus Pirate</th>
+<th style="text-align: left;">LPCXpresso</th>
+<th style="text-align: left;">Signal</th>
+<th style="text-align: left;">Bus Pirate</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">2</td>
-<td align="left">TMS</td>
-<td align="left">CS</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">TMS</td>
+<td style="text-align: left;">CS</td>
 </tr>
 <tr class="even">
-<td align="left">3</td>
-<td align="left">TCLK</td>
-<td align="left">CLK</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">TCLK</td>
+<td style="text-align: left;">CLK</td>
 </tr>
 <tr class="odd">
-<td align="left">4</td>
-<td align="left">TDO</td>
-<td align="left">MISO</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">TDO</td>
+<td style="text-align: left;">MISO</td>
 </tr>
 <tr class="even">
-<td align="left">5</td>
-<td align="left">TDI</td>
-<td align="left">MOSI</td>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">TDI</td>
+<td style="text-align: left;">MOSI</td>
 </tr>
 <tr class="odd">
-<td align="left">8</td>
-<td align="left">GND</td>
-<td align="left">GND</td>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">GND</td>
+<td style="text-align: left;">GND</td>
 </tr>
 </tbody>
 </table>
@@ -152,33 +152,33 @@ JTAG tap: lpc1768.cpu tap/device found: 0x4ba00477 (mfg: 0x23b, part: 0xba00, ve
 <p>It works!</p>
 <h2 id="flashing-new-firmware">Flashing new firmware</h2>
 <p>First, build a <code>.bin</code> of the desired firmware. The LPC1769’s ROM bootloader verifies that the user code in FLASH is valid before booting by way of a checksum of the interrupt vector table. The checksum is of the first eight interrupt vectors and is stored in vector 7 (0x0000001c). The easiest way to ensure this is set correctly is to run the binary image through the following C,</p>
-<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span>
-<span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span>
-<span class="pp">#include </span><span class="im">&lt;sys/types.h&gt;</span>
-<span class="pp">#include </span><span class="im">&lt;sys/stat.h&gt;</span>
-<span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span>
-
-<span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">char</span> **argv) {
-    <span class="dt">int</span> fw, count, crc;
-    <span class="dt">char</span> buf[<span class="dv">28</span>];
-
-    fw = open(argv[<span class="dv">1</span>], O_RDWR);
-    <span class="co">// read fist 28 bytes</span>
-    read(fw, &amp;buf, <span class="dv">28</span>);
-
-    <span class="co">// find 2's complement of entries 0 to 6</span>
-    <span class="cf">for</span> (count=<span class="dv">0</span>, crc=<span class="dv">0</span>; count &lt; <span class="dv">7</span>; count++) {
-            crc += *((<span class="dt">int</span>*)(buf+count*<span class="dv">4</span>));
-    }
-    crc = (~crc) + <span class="dv">1</span>;
-
-    <span class="co">// write it at offset 0x0000001C </span>
-    lseek(fw, <span class="bn">0x0000001C</span>, SEEK_SET);
-    write(fw, &amp;crc, <span class="dv">4</span>);
-    close(fw);
-
-    <span class="cf">return</span> <span class="dv">0</span>;
-}</code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb10-1" title="1"><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="pp">#include </span><span class="im">&lt;sys/types.h&gt;</span></a>
+<a class="sourceLine" id="cb10-4" title="4"><span class="pp">#include </span><span class="im">&lt;sys/stat.h&gt;</span></a>
+<a class="sourceLine" id="cb10-5" title="5"><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></a>
+<a class="sourceLine" id="cb10-6" title="6"></a>
+<a class="sourceLine" id="cb10-7" title="7"><span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">char</span> **argv) {</a>
+<a class="sourceLine" id="cb10-8" title="8">    <span class="dt">int</span> fw, count, crc;</a>
+<a class="sourceLine" id="cb10-9" title="9">    <span class="dt">char</span> buf[<span class="dv">28</span>];</a>
+<a class="sourceLine" id="cb10-10" title="10"></a>
+<a class="sourceLine" id="cb10-11" title="11">    fw = open(argv[<span class="dv">1</span>], O_RDWR);</a>
+<a class="sourceLine" id="cb10-12" title="12">    <span class="co">// read fist 28 bytes</span></a>
+<a class="sourceLine" id="cb10-13" title="13">    read(fw, &amp;buf, <span class="dv">28</span>);</a>
+<a class="sourceLine" id="cb10-14" title="14"></a>
+<a class="sourceLine" id="cb10-15" title="15">    <span class="co">// find 2's complement of entries 0 to 6</span></a>
+<a class="sourceLine" id="cb10-16" title="16">    <span class="cf">for</span> (count=<span class="dv">0</span>, crc=<span class="dv">0</span>; count &lt; <span class="dv">7</span>; count++) {</a>
+<a class="sourceLine" id="cb10-17" title="17">            crc += *((<span class="dt">int</span>*)(buf+count*<span class="dv">4</span>));</a>
+<a class="sourceLine" id="cb10-18" title="18">    }</a>
+<a class="sourceLine" id="cb10-19" title="19">    crc = (~crc) + <span class="dv">1</span>;</a>
+<a class="sourceLine" id="cb10-20" title="20"></a>
+<a class="sourceLine" id="cb10-21" title="21">    <span class="co">// write it at offset 0x0000001C </span></a>
+<a class="sourceLine" id="cb10-22" title="22">    lseek(fw, <span class="bn">0x0000001C</span>, SEEK_SET);</a>
+<a class="sourceLine" id="cb10-23" title="23">    write(fw, &amp;crc, <span class="dv">4</span>);</a>
+<a class="sourceLine" id="cb10-24" title="24">    close(fw);</a>
+<a class="sourceLine" id="cb10-25" title="25"></a>
+<a class="sourceLine" id="cb10-26" title="26">    <span class="cf">return</span> <span class="dv">0</span>;</a>
+<a class="sourceLine" id="cb10-27" title="27">}</a></code></pre></div>
 <h2 id="debugging-on-arm">Debugging on ARM</h2>
 <p>While sometimes my system’s native gdb will somehow understand the ARM architecture after attaching to the remote target, I haven’t figured out how to do this reliably. For this reason, I build gdb for ARM.</p>
 <p>Start by grabbing a GDB source tarball; extract it, and then configure and build as follows,</p>
