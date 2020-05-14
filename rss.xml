@@ -417,11 +417,11 @@
     <dc:creator>Ben Gamari</dc:creator>
 </item>
 <item>
-    <title>Running Microsoft Windows in qemu</title>
-    <link>http://bgamari.github.com//posts/2020-01-21-windows-in-qemu.html</link>
-    <description><![CDATA[Making Windows bearable in qemu]]></description>
-    <pubDate>Tue, 21 Jan 2020 00:00:00 UT</pubDate>
-    <guid>http://bgamari.github.com//posts/2020-01-21-windows-in-qemu.html</guid>
+    <title>Paper: Alligator Collector: A Latency-Optimized Garbage Collector for Functional Programming Languages</title>
+    <link>http://bgamari.github.com//posts/2020-05-13-paper-ismm2020.html</link>
+    <description><![CDATA[I will be presenting our concurrent garbage collector at ISMM 2020.]]></description>
+    <pubDate>Wed, 13 May 2020 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2020-05-13-paper-ismm2020.html</guid>
     <dc:creator>Ben Gamari</dc:creator>
 </item>
 
