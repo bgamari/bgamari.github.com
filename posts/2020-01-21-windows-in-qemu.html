@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>bgamari.github.com - rsyncing files with a given extension</title>
+    <title>bgamari.github.com - Running Microsoft Windows in qemu</title>
     <link rel="stylesheet" type="text/css" href="../css/default.css" />
     <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
@@ -31,15 +31,21 @@
 
         <section id="main">
         <article>
-    <h1>rsyncing files with a given extension</h1>
+    <h1>Running Microsoft Windows in qemu</h1>
     <header>
         <div class="meta">
-            <time datetime="2015-06-17" class="pubdate">2015-06-17</time> | tagged with <ul class="tags"><li>rsync notes</li></ul>
+            <time datetime="2020-01-21" class="pubdate">2020-01-21</time> | tagged with <ul class="tags"><li>vm</li><li>windows</li><li>qemu</li></ul>
         </div>
     </header>
 
-    <p>I’ve forgotten this enough times that I’m finally going to write it down. Say you want to copy files with extension <code>.ext</code> in <code>./dir</code> to <code>host</code>. <code>rsync</code> can do this with,</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">rsync</span> -vza --include=<span class="st">'*.xcorr-0-1'</span> --include=<span class="st">'*/'</span> --exclude=<span class="st">'*'</span> dir host:dir</span></code></pre></div>
+    <p>This assumes use of <code>libvirt</code>.</p>
+<ol type="1">
+<li><a href="https://www.microsoft.com/en-us/software-download/windows10ISO">Download</a> a Windows disk image</li>
+<li>Create a new virtual machine with at least 80GB of storage</li>
+<li>TODO: virtio block device</li>
+<li>Install [spice-guest-tools][spice] for clipboard sharing</li>
+</ol>
+<p>[spice-guest-tools][spice]: https://www.spice-space.org/download.html</p>
 </article>
 
         </section>

@@ -416,6 +416,14 @@
     <guid>http://bgamari.github.com//posts/2019-06-12-arm-terminology.html</guid>
     <dc:creator>Ben Gamari</dc:creator>
 </item>
+<item>
+    <title>Running Microsoft Windows in qemu</title>
+    <link>http://bgamari.github.com//posts/2020-01-21-windows-in-qemu.html</link>
+    <description><![CDATA[Making Windows bearable in qemu]]></description>
+    <pubDate>Tue, 21 Jan 2020 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2020-01-21-windows-in-qemu.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
 
     </channel>
 </rss>

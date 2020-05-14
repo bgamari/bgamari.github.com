@@ -84,7 +84,7 @@ svf file programmed successfully for 579 commands</code></pre>
 <hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p>At first glance, the filename <code>board/dp_busblaster_v3.cfg</code> is a bit confusing as there is nothing to directly suggest that this will flash the buffer instead of the target device. However, if we look more carefully we notice that this is a <em>board</em> file, not to be confused with <code>interface/ftdi/dp_busblaster.cfg</code>, the interface file describing the Bus Blaster.</p>
-<p>In fact, if we examine the board file, we’ll notice that it simply <code>source</code>’s the interface file, sets the <code>ftdi_channel</code> and defines the TAP parameters for the buffer CPLD.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></p></li>
+<p>In fact, if we examine the board file, we’ll notice that it simply <code>source</code>’s the interface file, sets the <code>ftdi_channel</code> and defines the TAP parameters for the buffer CPLD.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 </article>

@@ -50,9 +50,9 @@
 <p>Type application <a href="http://research.microsoft.com/apps/pubs/default.aspx?id=67064">A transformation-based optimiser for Haskell</a></p>
 <h2 id="coercions">Coercions</h2>
 <p>Core preserves <code>newtypes</code> as types unique from their representation (e.g. the type that they wrap). Wrapping and unwrapping of <code>newtype</code> values are represented by applications of the <code>cast</code> function. This essentially has the type,</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">data</span> <span class="dt">Coercion</span> a b</a>
-<a class="sourceLine" id="cb1-2" title="2"></a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="ot">cast ::</span> a <span class="ot">-&gt;</span> <span class="dt">Coercion</span> a b <span class="ot">-&gt;</span> b</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">data</span> <span class="dt">Coercion</span> a b</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="ot">cast ::</span> a <span class="ot">-&gt;</span> <span class="dt">Coercion</span> a b <span class="ot">-&gt;</span> b</span></code></pre></div>
 <p><code>Coercion</code>s are GHC’s internal representation for type equalities<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. On account of various</p>
 <p>TODO <code>~R#</code></p>
 <p><code>@~</code>: type application of a coercion. For instance <code>myFunction @~ (&lt;a&gt;_N :: a GHC.Prim.~# a)</code> means that <code>myFunction</code> is being given a coercion argument <code>&lt;a&gt;_N</code>, a nominal coercion between <code>a</code> and <code>a</code>.</p>
@@ -121,17 +121,17 @@
 </table>
 <h3 id="unfolding-templates">Unfolding templates</h3>
 <p>Unfolding (sometimes known as inlining) is one of the central optimizations performed by GHC’s Core optimizer. In this optimization, identifier occurrences are substituted by the right-hand side of their respective definition.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb2-1" title="1"><span class="dt">Unf</span><span class="ot">=</span><span class="dt">Unf</span>{<span class="dt">Src</span><span class="ot">=</span><span class="dt">InlineStable</span>, <span class="dt">TopLvl</span><span class="ot">=</span><span class="dt">True</span>, <span class="dt">Value</span><span class="ot">=</span><span class="dt">True</span>, <span class="dt">ConLike</span><span class="ot">=</span><span class="dt">True</span>,</a>
-<a class="sourceLine" id="cb2-2" title="2">        <span class="dt">WorkFree</span><span class="ot">=</span><span class="dt">True</span>, <span class="dt">Expandable</span><span class="ot">=</span><span class="dt">True</span>,</a>
-<a class="sourceLine" id="cb2-3" title="3">        <span class="dt">Guidance</span><span class="ot">=</span><span class="dt">ALWAYS_IF</span>(arity<span class="ot">=</span><span class="dv">1</span>,unsat_ok<span class="ot">=</span><span class="dt">True</span>,boring_ok<span class="ot">=</span><span class="dt">False</span>)</a>
-<a class="sourceLine" id="cb2-4" title="4">        <span class="dt">Tmpl</span><span class="ot">=</span> \ (ds_daj5 [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Once</span><span class="op">!</span>]<span class="ot"> ::</span> <span class="dt">Memcpy2Dargs</span>) <span class="ot">-&gt;</span></a>
-<a class="sourceLine" id="cb2-5" title="5">                <span class="kw">case</span> ds_daj5</a>
-<a class="sourceLine" id="cb2-6" title="6">                <span class="kw">of</span> _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>]</a>
-<a class="sourceLine" id="cb2-7" title="7">                { <span class="dt">Memcpy2Dargs</span> _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>] ds2_daj7 [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Once</span>] _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>]</a>
-<a class="sourceLine" id="cb2-8" title="8">                               _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>]</a>
-<a class="sourceLine" id="cb2-9" title="9">                               _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>] <span class="ot">-&gt;</span></a>
-<a class="sourceLine" id="cb2-10" title="10">                ds2_daj7</a>
-<a class="sourceLine" id="cb2-11" title="11">                }}]</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1"></a><span class="dt">Unf</span><span class="ot">=</span><span class="dt">Unf</span>{<span class="dt">Src</span><span class="ot">=</span><span class="dt">InlineStable</span>, <span class="dt">TopLvl</span><span class="ot">=</span><span class="dt">True</span>, <span class="dt">Value</span><span class="ot">=</span><span class="dt">True</span>, <span class="dt">ConLike</span><span class="ot">=</span><span class="dt">True</span>,</span>
+<span id="cb2-2"><a href="#cb2-2"></a>        <span class="dt">WorkFree</span><span class="ot">=</span><span class="dt">True</span>, <span class="dt">Expandable</span><span class="ot">=</span><span class="dt">True</span>,</span>
+<span id="cb2-3"><a href="#cb2-3"></a>        <span class="dt">Guidance</span><span class="ot">=</span><span class="dt">ALWAYS_IF</span>(arity<span class="ot">=</span><span class="dv">1</span>,unsat_ok<span class="ot">=</span><span class="dt">True</span>,boring_ok<span class="ot">=</span><span class="dt">False</span>)</span>
+<span id="cb2-4"><a href="#cb2-4"></a>        <span class="dt">Tmpl</span><span class="ot">=</span> \ (ds_daj5 [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Once</span><span class="op">!</span>]<span class="ot"> ::</span> <span class="dt">Memcpy2Dargs</span>) <span class="ot">-&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>                <span class="kw">case</span> ds_daj5</span>
+<span id="cb2-6"><a href="#cb2-6"></a>                <span class="kw">of</span> _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>]</span>
+<span id="cb2-7"><a href="#cb2-7"></a>                { <span class="dt">Memcpy2Dargs</span> _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>] ds2_daj7 [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Once</span>] _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>]</span>
+<span id="cb2-8"><a href="#cb2-8"></a>                               _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>]</span>
+<span id="cb2-9"><a href="#cb2-9"></a>                               _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>] _ [<span class="dt">Occ</span><span class="ot">=</span><span class="dt">Dead</span>] <span class="ot">-&gt;</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>                ds2_daj7</span>
+<span id="cb2-11"><a href="#cb2-11"></a>                }}]</span></code></pre></div>
 <p><code>Src</code></p>
 <h3 id="how-are-values-used">How are values used?</h3>
 <p>GHC uses a variety of local <a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/demand-anal/demand.ps">analyses</a> to determine various ways function arguments are used (or unused). These analyses include,</p>
@@ -142,9 +142,9 @@
 </ul>
 <p>When optimization is enabled GHC runs these analyses on all top-level bindings and records the results in the binding’s <code>IdInfo</code>. These results are then examined by later stages of compilation to help guide further optimizations (notably the worker-wrapper transformation).</p>
 <p>In the external Core output, the results of demand analysis can be found in the <code>Str=</code> section of <code>IdInfo</code>,</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb3-1" title="1"><span class="ot">foldl' ::</span> <span class="kw">forall</span> a b<span class="op">.</span> (b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> b</a>
-<a class="sourceLine" id="cb3-2" title="2">[<span class="dt">Str</span><span class="ot">=</span><span class="dt">DmdType</span> <span class="op">&lt;</span><span class="dt">L</span>,<span class="dt">C</span>(<span class="dt">C1</span>(<span class="dt">U</span>))<span class="op">&gt;&lt;</span><span class="dt">S</span>,<span class="dv">1</span><span class="op">*</span><span class="dt">U</span><span class="op">&gt;&lt;</span><span class="dt">S</span>,<span class="dv">1</span><span class="op">*</span><span class="dt">U</span><span class="op">&gt;</span>]</a>
-<a class="sourceLine" id="cb3-3" title="3">foldl' <span class="ot">=</span> <span class="op">...</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1"></a><span class="ot">foldl' ::</span> <span class="kw">forall</span> a b<span class="op">.</span> (b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> b</span>
+<span id="cb3-2"><a href="#cb3-2"></a>[<span class="dt">Str</span><span class="ot">=</span><span class="dt">DmdType</span> <span class="op">&lt;</span><span class="dt">L</span>,<span class="dt">C</span>(<span class="dt">C1</span>(<span class="dt">U</span>))<span class="op">&gt;&lt;</span><span class="dt">S</span>,<span class="dv">1</span><span class="op">*</span><span class="dt">U</span><span class="op">&gt;&lt;</span><span class="dt">S</span>,<span class="dv">1</span><span class="op">*</span><span class="dt">U</span><span class="op">&gt;</span>]</span>
+<span id="cb3-3"><a href="#cb3-3"></a>foldl' <span class="ot">=</span> <span class="op">...</span></span></code></pre></div>
 <p>Here we see the <code>IdInfo</code> of the usual strict left fold on list. Here we see that GHC has associated with each argument a tuple enclosed in angle brackets. These tuples consist of the strictness and usage annotations of the argument. Let’s look at each,</p>
 <table>
 <thead>
@@ -270,40 +270,40 @@
 </tbody>
 </table>
 <p>Let’s consider a few examples (including several stolen from <a href="http://research.microsoft.com/en-us/um/people/simonpj/papers/demand-anal/demand.ps">the paper</a>),</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb5-1" title="1"><span class="co">-- Demand signature: &lt;S,1*U&gt;</span></a>
-<a class="sourceLine" id="cb5-2" title="2"><span class="fu">null</span><span class="ot"> ::</span> [a] <span class="ot">-&gt;</span> <span class="dt">Bool</span></a>
-<a class="sourceLine" id="cb5-3" title="3"><span class="fu">null</span> v <span class="ot">=</span> <span class="kw">case</span> v <span class="kw">of</span> []   <span class="ot">-&gt;</span> <span class="dt">True</span></a>
-<a class="sourceLine" id="cb5-4" title="4">                   x<span class="op">:</span>xs <span class="ot">-&gt;</span> <span class="dt">False</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1"></a><span class="co">-- Demand signature: &lt;S,1*U&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="fu">null</span><span class="ot"> ::</span> [a] <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="fu">null</span> v <span class="ot">=</span> <span class="kw">case</span> v <span class="kw">of</span> []   <span class="ot">-&gt;</span> <span class="dt">True</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>                   x<span class="op">:</span>xs <span class="ot">-&gt;</span> <span class="dt">False</span></span></code></pre></div>
 <p>The <code>S</code> (strict) strictness here arises from the case-analysis, which implies that if we evaluate <code>null v</code> then <code>v</code> must be evaluated to at least WHNF. The <code>1*U</code> usage signature means that the binder occurs in exactly one context (namely as the scrutinee of the case).</p>
 <p>Now let’s look at a slightly tricker example,</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb6-1" title="1"><span class="co">-- Demand signature: &lt;S(SL),1*U(1*U,A)&gt;</span></a>
-<a class="sourceLine" id="cb6-2" title="2"><span class="fu">fst</span><span class="ot"> ::</span> (a,b) <span class="ot">-&gt;</span> a</a>
-<a class="sourceLine" id="cb6-3" title="3"><span class="fu">fst</span> p <span class="ot">=</span> <span class="kw">case</span> p <span class="kw">of</span> (x,_) <span class="ot">-&gt;</span> x</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">-- Demand signature: &lt;S(SL),1*U(1*U,A)&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="fu">fst</span><span class="ot"> ::</span> (a,b) <span class="ot">-&gt;</span> a</span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="fu">fst</span> p <span class="ot">=</span> <span class="kw">case</span> p <span class="kw">of</span> (x,_) <span class="ot">-&gt;</span> x</span></code></pre></div>
 <p>Here we see that the strictness signature of <code>p</code> is <code>S(SL)</code>, meaning that the <code>(,)</code> constructor will be forced to WHNF, as will its first field. The usage signature suggests that, as one would expect, <code>p</code> and its first field are used precisely once. The second field of <code>p</code> has a lazy (<code>L</code>) strictness and absent (<code>A</code>) usage, as it is nowhere mentioned in <code>fst</code>’s right-hand side.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb7-1" title="1"><span class="co">-- Demand signature: &lt;S,1*U(U,U)&gt;m</span></a>
-<a class="sourceLine" id="cb7-2" title="2"><span class="ot">swap ::</span> (a,b) <span class="ot">-&gt;</span> (b,a)</a>
-<a class="sourceLine" id="cb7-3" title="3">swap p <span class="ot">=</span> <span class="kw">case</span> p <span class="kw">of</span> (x,y) <span class="ot">-&gt;</span> (y,x)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">-- Demand signature: &lt;S,1*U(U,U)&gt;m</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="ot">swap ::</span> (a,b) <span class="ot">-&gt;</span> (b,a)</span>
+<span id="cb7-3"><a href="#cb7-3"></a>swap p <span class="ot">=</span> <span class="kw">case</span> p <span class="kw">of</span> (x,y) <span class="ot">-&gt;</span> (y,x)</span></code></pre></div>
 <p>Here we see that <code>p</code> is evaluated to WHNF, however neither of the fields will be further forced despite the fact that they are both mentioned. Additionally, we see that swap returns a [constructed product result]<span class="citation" data-cites="cpr">(<span class="citeproc-not-found" data-reference-id="cpr"><strong>???</strong></span>)</span>.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb8-1" title="1"><span class="co">-- Demand signature: &lt;S,1*U(U)&gt;&lt;L,A&gt;m</span></a>
-<a class="sourceLine" id="cb8-2" title="2"><span class="ot">f ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></a>
-<a class="sourceLine" id="cb8-3" title="3">f x y <span class="ot">=</span> <span class="kw">case</span> x <span class="kw">of</span> </a>
-<a class="sourceLine" id="cb8-4" title="4">          <span class="dt">I</span><span class="op">#</span> x<span class="op">#</span> <span class="ot">-&gt;</span> <span class="dt">I</span><span class="op">#</span> (x<span class="op">#</span> <span class="op">+#</span> <span class="dv">1</span><span class="op">#</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">-- Demand signature: &lt;S,1*U(U)&gt;&lt;L,A&gt;m</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="ot">f ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a>f x y <span class="ot">=</span> <span class="kw">case</span> x <span class="kw">of</span> </span>
+<span id="cb8-4"><a href="#cb8-4"></a>          <span class="dt">I</span><span class="op">#</span> x<span class="op">#</span> <span class="ot">-&gt;</span> <span class="dt">I</span><span class="op">#</span> (x<span class="op">#</span> <span class="op">+#</span> <span class="dv">1</span><span class="op">#</span>)</span></code></pre></div>
 <p>This is another simple case: the first argument, <code>x</code>, has a demand of <code>&lt;S,1*U(U)&gt;</code>, owing to the fact that it is scrutinized by the case.</p>
 <p>Now let’s look at a combinator involving a higher-order function,</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb9-1" title="1"><span class="co">-- Demand signature: &lt;L,C(C1(U))&gt;&lt;L,U&gt;&lt;S,1*U&gt;</span></a>
-<a class="sourceLine" id="cb9-2" title="2"><span class="ot">foldl' ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> [b] <span class="ot">-&gt;</span> a</a>
-<a class="sourceLine" id="cb9-3" title="3">foldl' f y xs <span class="ot">=</span></a>
-<a class="sourceLine" id="cb9-4" title="4">    <span class="kw">case</span> xs <span class="kw">of</span></a>
-<a class="sourceLine" id="cb9-5" title="5">      []    <span class="ot">-&gt;</span> y</a>
-<a class="sourceLine" id="cb9-6" title="6">      x<span class="op">:</span>xs' <span class="ot">-&gt;</span> foldl' f (f y x) xs'</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">-- Demand signature: &lt;L,C(C1(U))&gt;&lt;L,U&gt;&lt;S,1*U&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="ot">foldl' ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> [b] <span class="ot">-&gt;</span> a</span>
+<span id="cb9-3"><a href="#cb9-3"></a>foldl' f y xs <span class="ot">=</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a>    <span class="kw">case</span> xs <span class="kw">of</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a>      []    <span class="ot">-&gt;</span> y</span>
+<span id="cb9-6"><a href="#cb9-6"></a>      x<span class="op">:</span>xs' <span class="ot">-&gt;</span> foldl' f (f y x) xs'</span></code></pre></div>
 <p>The first thing to notice here is the lazy strictness on <code>f</code>; this is due to the conservative nature of strictness analysis. Afterall, evaluating <code>foldl' f</code> to an empty list will never force <code>f</code>. However, we nevertheless see that <code>f</code>’s usage signature reflects that it is called with two arguments: .</p>
 <p>Exceptions tend to make</p>
 <h4 id="absence-analysis">Absence analysis</h4>
 <p>Consider the function,</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb10-1" title="1"><span class="ot">f ::</span> (<span class="dt">Int</span>, <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span></a>
-<a class="sourceLine" id="cb10-2" title="2">f (a,_) <span class="ot">=</span> a <span class="op">+</span> <span class="dv">42</span></a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1"></a><span class="ot">f ::</span> (<span class="dt">Int</span>, <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>f (a,_) <span class="ot">=</span> a <span class="op">+</span> <span class="dv">42</span></span></code></pre></div>
 <p>The strictness analysis discussed above allows us to determine that the first element of the tuple argument is demanded strictly. This observation allows to perform the [worker-wrapper transformation][worker-wrapper] on <code>f</code>, resulting in,</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb11-1" title="1">f_workerer</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1"></a>f_workerer</span></code></pre></div>
 <p>However, what of the second element?</p>
 <p>It is quite obvious that the second element is not called for at all</p>
 <h2 id="trick-locating-outputable-instances">Trick: Locating <code>Outputable</code> instances</h2>
@@ -349,7 +349,7 @@ instance Outputable ClsInst -- Defined in ‘InstEnv’</code></pre>
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>GHC’s Core language is known in the literature as <a href="SystemFC">System FC</a>, owing to the fact that it is closely related to <a href="https://en.wikipedia.org/wiki/System_F">System F</a>. In fact, the “C” in “FC” stands for “coercion”, indicative of the fact that System FC is simply System F with coercions.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></p></li>
+<li id="fn1" role="doc-endnote"><p>GHC’s Core language is known in the literature as <a href="SystemFC">System FC</a>, owing to the fact that it is closely related to <a href="https://en.wikipedia.org/wiki/System_F">System F</a>. In fact, the “C” in “FC” stands for “coercion”, indicative of the fact that System FC is simply System F with coercions.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 </article>

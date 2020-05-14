@@ -95,19 +95,19 @@ P(\alpha \,\vert\,\mathrm{tails}) = \frac{P(\mathrm{tails} \,\vert\,\alpha) P(\a
 <h1 id="an-example">An example</h1>
 <p>Let’s apply this to some real data. Say we flip our coin (with true <span class="math inline">\(\alpha = 0.7\)</span>) one hundred times, giving rise to a sampling of flips shown in Figure 1.</p>
 <figure>
-<img src="../media/bayes/flips.svg" alt="A sampling of flips" /><figcaption>A sampling of flips</figcaption>
+<img src="../media/bayes/flips.svg" alt /><figcaption>A sampling of flips</figcaption>
 </figure>
 <p>Here we start with zero flips at the origin. The first point is up, meaning we have flipped a heads. We then flip a few more heads, followed by several tails, <em>et cetera</em>. If we use a maximum likelihood inference to estimate <span class="math inline">\(\alpha\)</span> (as a frequentist might do), we find that the estimate remains quite far from the true value for the first several flips, eventually coming to rest near the true <span class="math inline">\(\alpha = 0.7\)</span> line.</p>
 <figure>
-<img src="../media/bayes/ml-inference.svg" alt="The Agresti-Coull estimate of \alpha from the observations shown in Figure 1. The error bars are given by the 5% confidence interval." /><figcaption>The Agresti-Coull estimate of <span class="math inline">\(\alpha\)</span> from the observations shown in Figure 1. The error bars are given by the 5% confidence interval.</figcaption>
+<img src="../media/bayes/ml-inference.svg" alt /><figcaption>The Agresti-Coull estimate of <span class="math inline">\(\alpha\)</span> from the observations shown in Figure 1. The error bars are given by the 5% confidence interval.</figcaption>
 </figure>
 <p>Now let’s consider a Bayesian inference. Let’s first start with a uniform prior: we disregard your friend’s observations and assume no prior knowledge of <span class="math inline">\(\alpha\)</span> (there are a few details concerning the nature of non-informativeness buried in this statement that we’ll sweep under the rug; see <a href="http://www.amstat.org/publications/jse/v12n2/zhu.pdf">Zhu2004</a> for more on this).</p>
 <figure>
-<img src="../media/bayes/bayes.svg" alt="A Bayesian inference of \alpha from the observations shown in Figure 1." /><figcaption>A Bayesian inference of <span class="math inline">\(\alpha\)</span> from the observations shown in Figure 1.</figcaption>
+<img src="../media/bayes/bayes.svg" alt /><figcaption>A Bayesian inference of <span class="math inline">\(\alpha\)</span> from the observations shown in Figure 1.</figcaption>
 </figure>
 <p>We start with a prior informed by your friend’s experience (encoded as a <a href="https://en.wikipedia.org/wiki/Beta_distribution">Beta distribution</a>) and update it after every flip.</p>
 <figure>
-<img src="../media/bayes/bayes-prior.svg" alt="A Bayesian inference of \alpha from the observations shown in Figure 1 including a prior." /><figcaption>A Bayesian inference of <span class="math inline">\(\alpha\)</span> from the observations shown in Figure 1 including a prior.</figcaption>
+<img src="../media/bayes/bayes-prior.svg" alt /><figcaption>A Bayesian inference of <span class="math inline">\(\alpha\)</span> from the observations shown in Figure 1 including a prior.</figcaption>
 </figure>
 <p>As you see, in the limit of large number of observations, the maximum likelihood inference, and the Bayesian inference, with and without informative prior, come to the same answer. The difference matters most in the face of small quantities of data as whatever prior you give the Bayesian inference will contribute strongly to the posterior. As you accumulate more observations the role of the prior diminishes and the Bayesian inference converges to the ML inference.</p>
 <p>Which method you choose depends largely upon your needs. That being said, the flexibility and consistency enabled by the Bayesian approach makes many problems much easier to reason about. Being able to speak about all of the variables in your problem, both known and latent, in the same language is incredibly powerful. Especially coupled with formalisms such as <a href="https://en.wikipedia.org/wiki/Graphical_model">graphical models</a> and generalized inference methods such as <a href="https://en.wikipedia.org/wiki/Variational_Bayesian_methods">variational inference</a> and <a href="https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo">Markov Chain Monte Carlo</a>, the Bayesian framework offers the ability to construct rich models while retaining the ability to perform meaningful inference. For this reason, much of modern machine learning is built on the Bayesian interpretation.</p>
