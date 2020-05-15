@@ -38,8 +38,7 @@
         </div>
     </header>
 
-    <h1 id="installing-picoharp-under-modern-ubuntu-with-wine">Installing PicoHarp under modern Ubuntu with Wine</h1>
-<p>Version used: PicoHarp 300 v2.3</p>
+    <p>Version used: PicoHarp 300 v2.3</p>
 <p>The udev rules that ship with the distribution were a bit out of date, so we use our own,</p>
 <pre><code>$ cat &gt;99-picoquant.rules &lt;&lt;EOF
 ACTION==&quot;add&quot;, SUBSYSTEM==&quot;usb&quot;, ATTRS{idVendor}==&quot;0e0d&quot;, ATTRS{idProduct}==&quot;0003&quot;, MODE=&quot;0666&quot;

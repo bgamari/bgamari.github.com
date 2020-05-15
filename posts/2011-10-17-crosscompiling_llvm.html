@@ -38,8 +38,7 @@
         </div>
     </header>
 
-    <h1 id="cross-compiling-llvm-for-arm-on-ubuntu">Cross-compiling LLVM for ARM on Ubuntu</h1>
-<p>In my efforts to get the GHC compiler set running registerised on ARM, I found that I spent a large amount of time waiting for LLVM builds. To avoid this, I tried cross-compiling LLVM for my ARM target on my <code>x86_64</code> laptop.</p>
+    <p>In my efforts to get the GHC compiler set running registerised on ARM, I found that I spent a large amount of time waiting for LLVM builds. To avoid this, I tried cross-compiling LLVM for my ARM target on my <code>x86_64</code> laptop.</p>
 <p>Since we are cross-compiling, we will obviously need a cross-compiler on the build machine (assuming Ubuntu),</p>
 <pre><code>$ sudo apt-get install gcc-arm-linux-gnueabi</code></pre>
 <p>Grab an LLVM tree,</p>

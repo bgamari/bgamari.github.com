@@ -38,8 +38,7 @@
         </div>
     </header>
 
-    <h1 id="notes-concerning-lpc43xx-and-openocd">Notes concerning LPC43xx and OpenOCD</h1>
-<p>The LPC43xx seems to be pretty finicky when it comes to its JTAG. interface. Here are a few things that I found helped in getting the LPC and OpenOCD to talk,</p>
+    <p>The LPC43xx seems to be pretty finicky when it comes to its JTAG. interface. Here are a few things that I found helped in getting the LPC and OpenOCD to talk,</p>
 <ul>
 <li><p>I use a BusBlaster. The new <code>interfaces/ftdi/dp_busblaster.cfg</code> configuration uses OpenOCD’s new FTDI driver which seems to be much more reliable than the old <code>interfaces/busblaster.cfg</code> configuration.</p></li>
 <li><p>The M0 target seems to <a href="http://comments.gmane.org/gmane.comp.debugging.openocd.devel/22732">screw up halt</a>. Workaround by disabling in <code>target/lpc4350.cfg</code>. (TODO: check whether this is still necessary)</p></li>

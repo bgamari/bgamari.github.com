@@ -38,8 +38,7 @@
         </div>
     </header>
 
-    <h1 id="securely-copying-with-escalated-privileges-with-rsync">Securely copying with escalated privileges with rsync</h1>
-<p>Recently I had to migrate some files from one machine to another. As usual, <code>rsync</code> was the first tool I reached for, but a few considerations complicated matters: 1. both the source and destination locations required escalated privileges to access 2. remote <code>root</code> logins were not allowed on either machine, ruling out <code>sudo     rsync $path root@$dest</code> 3. passwordless <code>sudo</code> was not allowed on either machine, ruling out <code>sudo     rsync --rsync-path='sudo rsync'</code>.</p>
+    <p>Recently I had to migrate some files from one machine to another. As usual, <code>rsync</code> was the first tool I reached for, but a few considerations complicated matters: 1. both the source and destination locations required escalated privileges to access 2. remote <code>root</code> logins were not allowed on either machine, ruling out <code>sudo     rsync $path root@$dest</code> 3. passwordless <code>sudo</code> was not allowed on either machine, ruling out <code>sudo     rsync --rsync-path='sudo rsync'</code>.</p>
 <p>Consequently, the solution here is to use <code>rsync</code>’s daemon mode. However, it’s obviously undesireable to start a privileged <code>rsync</code> daemon on the open internet. For this reason, we run the <code>rsync</code> daemon over an <code>ssh</code> tunnel. Here is how,</p>
 <ol type="1">
 <li>on the destination: <code>ssh -L 9000:127.0.0.1:9000 \$src_host</code></li>

@@ -38,8 +38,7 @@
         </div>
     </header>
 
-    <h1 id="self-built-kernels-on-linaro">Self-built kernels on Linaro</h1>
-<p>Tried compiling kernel with <code>.config</code> from (http://elinux.org/Panda_How_to_kernel_3_3_rcx).</p>
+    <p>Tried compiling kernel with <code>.config</code> from (http://elinux.org/Panda_How_to_kernel_3_3_rcx).</p>
 <pre><code> $ make CROSS_COMPILE=arm-linux-gnueabi- ARCH=arm uImage
  $ make CROSS_COMPILE=arm-linux-gnueabi- ARCH=arm tarbz2-pkg</code></pre>
 <p>Copy <code>arch/arm/boot/uImage</code> to boot partition and unpack modules tarball in root partition. First boot doesn’t go so well,</p>

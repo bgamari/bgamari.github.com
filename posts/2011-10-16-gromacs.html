@@ -38,8 +38,7 @@
         </div>
     </header>
 
-    <h1 id="installing-openmm-and-gromacs-with-amber-force-field">Installing OpenMM and GROMACS with AMBER force-field</h1>
-<h2 id="installing-openmm">Installing OpenMM</h2>
+    <h2 id="installing-openmm">Installing OpenMM</h2>
 <p>GROMACS relies on the OpenMM library for its CUDA support. We’ll use binaries provided by the OpenMM folks. Grab the latest <a href="https://simtk.org/project/xml/downloads.xml?group_id=161">binary package</a> for the desired architecture and unpack. Add OpenMM tree to <code>LD_LIBRARY_PATH</code>,</p>
 <pre><code>$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/gromacs/OpenMM3.1.1-Linux64/lib</code></pre>
 <p>The binary package comes with a test in the <code>bin/</code> directory. Run it to ensure that things are working properly,</p>

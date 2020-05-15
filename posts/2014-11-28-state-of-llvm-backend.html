@@ -38,8 +38,7 @@
         </div>
     </header>
 
-    <h1 id="ghc-and-llvm-a-status-update">GHC and LLVM: A status update</h1>
-<p>GHC and LLVM have had a long and somewhat tumultuous relationship. At this point David Terei’s lovely LLVM code generation backend has been with us now for almost five years and nine LLVM releases. GHC has benefited significantly from its use of LLVM; LLVM has enabled us to support new platforms, given us access to a state-of-the-art low-level optimizer, and enabled support for SIMD instructions all with very little man-power.</p>
+    <p>GHC and LLVM have had a long and somewhat tumultuous relationship. At this point David Terei’s lovely LLVM code generation backend has been with us now for almost five years and nine LLVM releases. GHC has benefited significantly from its use of LLVM; LLVM has enabled us to support new platforms, given us access to a state-of-the-art low-level optimizer, and enabled support for SIMD instructions all with very little man-power.</p>
 <h2 id="but-its-not-all-rosy">But it’s not all rosy…</h2>
 <p>As always there are also challenges; LLVM is a rather tricky project to target, offering very little in the way of compatibility guarantees between versions. While this allows the project to adapt quickly, it does mean that simultaneously supporting more than a couple of versions quickly becomes painful.</p>
 <p>There is also a bit of an impedance mismatch between GHC and LLVM’s intermediate language: while GHC’s C– representation is largely un-typed, LLVM requires types on nearly everything… to the point of blatant redundancy. While this makes LLVM’s parser straightforward, it does mean the GHC LLVM backend must engage in some rather involved gymnastics to ensure that the code it produces passes LLVM’s type checker.</p>

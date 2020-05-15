@@ -38,8 +38,7 @@
         </div>
     </header>
 
-    <h1 id="installing-llvm-and-ghc-on-arm">Installing LLVM and GHC on ARM</h1>
-<p>Recently GHC’s LLVM backend gained <a href="http://hackage.haskell.org/trac/ghc/wiki/Building/ARMLinuxGnuEABI">registerized build support for ARM</a>. This could result in as much as a doubling of performance on ARM, meaning Haskell might finally be a first-class citizen on this wonderful architecture. If you are as excited about this as me, you’ll want to try it out. This is what I did.</p>
+    <p>Recently GHC’s LLVM backend gained <a href="http://hackage.haskell.org/trac/ghc/wiki/Building/ARMLinuxGnuEABI">registerized build support for ARM</a>. This could result in as much as a doubling of performance on ARM, meaning Haskell might finally be a first-class citizen on this wonderful architecture. If you are as excited about this as me, you’ll want to try it out. This is what I did.</p>
 <p>This was done on a BeagleBoard XM running <a href="http://www.linaro.org/">Linaro’s Ubuntu Natty</a> distribution. Be warned that both LLVM and GHC’s builds can require large amounts of memory at times. This can be very taxing on the system and can be quite slow. Swap was necessary at some points. Be prepared to wait the better part of a day as the build proceeds.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <p>We’ll first need a few packages,</p>

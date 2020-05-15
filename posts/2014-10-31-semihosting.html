@@ -38,8 +38,7 @@
         </div>
     </header>
 
-    <h1 id="semihosting-with-arm-gcc-and-openocd">Semihosting with ARM, GCC, and OpenOCD</h1>
-<p>One of the many nice features of the ARM Cortex microcontrollers is the ability to use the JTAG debug interface as a sink for <code>printf</code> messages. This capability is known as <em>semihosting</em>. It’s actually quite straightforward to configure with open source tooling (the <a href="https://www.sourceware.org/newlib/"><code>newlib</code></a> C standard library and <a href="http://openocd.org/">OpenOCD</a> JTAG implementation).</p>
+    <p>One of the many nice features of the ARM Cortex microcontrollers is the ability to use the JTAG debug interface as a sink for <code>printf</code> messages. This capability is known as <em>semihosting</em>. It’s actually quite straightforward to configure with open source tooling (the <a href="https://www.sourceware.org/newlib/"><code>newlib</code></a> C standard library and <a href="http://openocd.org/">OpenOCD</a> JTAG implementation).</p>
 <p>You’ll need to add the following to <code>LDFLAGS</code>,</p>
 <pre><code>LDFLAGS += --specs=rdimon.specs -lc -lrdimon</code></pre>
 <p>Note that <code>librdimon</code> takes the place of <code>libnosys</code>.</p>
