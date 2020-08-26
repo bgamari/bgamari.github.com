@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>bgamari.github.com - What I want in a laptop</title>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="content">
+        <div id="sidebar">
+          <nav>
+            <h1>Navigation</h1>
+            <ul>
+              <li><a href="../index.html">Home</a></li>
+              <li><a href="../posts.html">Blog</a></li>
+              <li><a href="../research-agenda.html">Research agenda</a></li>
+              <li><a href="../publications.html">Publications</a></li>
+              <li><a href="../past-research.html">Past research</a></li>
+              <li><a href="../media/cv.pdf">Curriculum Vitæ</a></li>
+            </ul>
+            <h1>Related Links</h1>
+            <ul>
+              <li><a href="http://goldnerlab.physics.umass.edu/wiki/">Research group</a></li>
+              <li><a href="http://www.github.com/bgamari">Github</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <section id="main">
+        <article>
+    <h1>What I want in a laptop</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2020-08-22" class="pubdate">2020-08-22</time> | tagged with <ul class="tags"><li>hardware</li></ul>
+        </div>
+    </header>
+
+    <p>Recently I have been rather disappointed by the state of the laptop market. While I have been wanting to replace my aging Dell Latitude E7470 (an otherwise great laptop), either vendors have badly misunderstood how technical users use their products or I am somehow have extraordinarily strange requirements.</p>
+<p>In an effort to help determine which of these is possibilities is the case, I thought it would be helpful to put in writing my criteria. In the unlikely event that someone working for one of these companies stumbles across this, below is my rubric for evaluating laptops, roughly in order of importance. Hopefully this should shed light on what constitutes a usable machine to someone such as myself</p>
+<ul>
+<li><p><em>32 gigabytes of RAM</em>. Looking at my current session, Firefox alone is chewing through 8 gigabytes; a Jupyter notebook session another 3 gigabytes, various other processes constitute another 4 gigabytes. 16 gigabytes of memory in 2020 is utterly inadequate. I don’t mind performing the memory upgrade myself but sadly with the recent trend of soldered-in RAM this is not always an option.</p></li>
+<li><p><em>a bright, reasonably high resolution display.</em> I often work outside; anything less than 400 nits is painful at best. Likewise, I work with text: I don’t need high fidelity color or ultra-fast response-time. Just give me a bright panel with enough pixels to comfortably display a few columns of code in <code>vim</code>. 1920 x 1080 is the minimum that I would use.</p>
+<p>My last few Latitudes have spoiled me with touchscreens, although this is not strictly necessary.</p></li>
+<li><p><em>14-inch form-factor and reasonable weight</em>. I bring my laptop everywhere; it should be tote-able and of a reasonable weight (3 pounds is fine; I’d much rather have sufficient robustness and cooling than something lighter-than-air)</p></li>
+<li><p><em>for the love of all that is good, no nVidia GPU.</em> I’ve been subjected to the torture that is nVidia’s Linux support before; this is not a mistake I am willing to repeat. Integrated or discrete, I don’t care; it just needs to work.</p></li>
+<li><p><em>functional firmware.</em> I shouldn’t need to say this but this means no ACPI quirks; S3 suspend and S4 hibernation should just work. The fact that I do not use Windows is not an excuse for the machine does not running as advertised.</p></li>
+<li><p><em>a usable keyboard</em>. I really don’t have high expectations; I’m not a mechnical keyboard afficianato. However, it shouldn’t feel like I’m typing on porridge. Equally bad is the sub-micron key actuation distance of recent Apple hardware. Needless to say, a keyboard must be tolerant of crumbs and the occassional splash.</p>
+<p>A keyboard backlight is invaluable for working in dark areas.</p></li>
+<li><p><em>solid build quality</em>. The machine will be used. Indoors, outdoors, in tents, on boats, on hikes, sideways, upside-down… It will not have an easy life and drops happen. A plastic chassis is unlikely to cut the mustard. Chassis creaking is a very bad sign. The display should not oscillate due to typing vibrations.</p></li>
+<li><p><em>battery capacity</em>. It should be possible to edit code away from an outlet for at least eight hours. Thankfully, with today’s hardware this isn’t a particularly difficult requirement to meet.</p></li>
+<li><p><em>A sensible array of ports</em>. At very least:</p>
+<ul>
+<li>two display outputs (preferably one HDMI, one DisplayPort).</li>
+<li>three USB</li>
+<li>ideally gigabit Ethernet</li>
+<li>combined analog headphone/microphone 3.5mm jack</li>
+</ul>
+<p>I don’t particularly care how the device is charged; perhaps USB-PD would be nice but have not felt particularly burdened by having a dedicated charger. Moreover, a dedicated charge port has the advantage of side-stepping the compatibility and labelling nightmare that is USB.</p></li>
+<li><p><em>repairable</em>. I do not believe in throw-away items, especially in something as environmentally damaging as a computer. Consequently, I expect this investment to last for at least five years. Things will break; it should be possible to fix them. Parts need to be readily available. Disassembly should be reasonably easy and not require special tools.</p></li>
+<li><p><em>mature industrial design</em>. A laptop is a tool, not a Las Vegas light show. Gaudy “gamer” aesthetics are an immediate disqualifier.</p></li>
+<li><p><em>a fast-ish CPU</em>. I usually work via SSH but it is still sometimes necessary to run a build locally. With AMD’s recent Renoir CPUs, there is no excuse not to have a reasonably speedy CPU.</p></li>
+<li><p><em>a touchpoint</em>: A good touchpoint is far easier to control than a touchpad (particularly relative to click-pads) and is accessible from the home-row. Sadly (and somewhat inexplicably) these are becoming somewhat rare.</p></li>
+</ul>
+</article>
+
+        </section>
+      </div>
+
+      <footer id="footer">
+        <span>Generated by <a href="http://jaspervdj.be/hakyll/index.html">Hakyll</a>.</span>
+      </footer>
+    </div>
+  </body>
+</html>
+
