@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>bgamari.github.com - IDE support when working on GHC</title>
+    <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="content">
+        <div id="sidebar">
+          <nav>
+            <h1>Navigation</h1>
+            <ul>
+              <li><a href="../index.html">Home</a></li>
+              <li><a href="../posts.html">Blog</a></li>
+              <li><a href="../research-agenda.html">Research agenda</a></li>
+              <li><a href="../publications.html">Publications</a></li>
+              <li><a href="../past-research.html">Past research</a></li>
+              <li><a href="../media/cv.pdf">Curriculum Vitæ</a></li>
+            </ul>
+            <h1>Related Links</h1>
+            <ul>
+              <li><a href="http://goldnerlab.physics.umass.edu/wiki/">Research group</a></li>
+              <li><a href="http://www.github.com/bgamari">Github</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <section id="main">
+        <article>
+    <h1>IDE support when working on GHC</h1>
+    <header>
+        <div class="meta">
+            <time datetime="2021-07-23" class="pubdate">2021-07-23</time> | tagged with <ul class="tags"></ul>
+        </div>
+    </header>
+
+    <p>Here are some notes for how I configure Neovim, <code>haskell-language-server</code>, and <code>clangd</code> for an IDE-like experience when working on GHC:</p>
+<ul>
+<li><p>start using this an up-to-date <a href="https://gitlab.haskell.org/ghc/ghc.nix/-/commit/4e69ca6894fe21bf1c6f4ed98ff406dbf9d6541c">ghc.nix</a></p></li>
+<li><p>start a <code>ghc.nix</code> shell: <code>nix-shell ../ghc.nix --arg withIde true</code></p></li>
+<li><p>configure <code>nvim-lspconfig</code>’s HLS support to correctly identify the root directory of a GHC source tree:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb1-1"><a href="#cb1-1"></a>lspconfig<span class="op">.</span>hls<span class="op">.</span>setup<span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>    root_dir <span class="op">=</span> <span class="kw">function</span><span class="op">(</span>fname<span class="op">)</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a>        <span class="kw">local</span> util <span class="op">=</span> lspconfig<span class="op">.</span>util</span>
+<span id="cb1-4"><a href="#cb1-4"></a>        <span class="kw">local</span> x <span class="op">=</span> util<span class="op">.</span>root_pattern<span class="op">(</span><span class="st">&quot;hadrian&quot;</span><span class="op">)(</span>fname<span class="op">)</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>        <span class="cf">if</span> x <span class="cf">then</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>            <span class="cf">return</span> x</span>
+<span id="cb1-7"><a href="#cb1-7"></a>        <span class="cf">end</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a></span>
+<span id="cb1-9"><a href="#cb1-9"></a>        <span class="cf">return</span> util<span class="op">.</span>root_pattern<span class="op">(</span><span class="st">&quot;*.cabal&quot;</span><span class="op">,</span> <span class="st">&quot;stack.yaml&quot;</span><span class="op">,</span> <span class="st">&quot;cabal.project&quot;</span><span class="op">,</span> <span class="st">&quot;package.yaml&quot;</span><span class="op">,</span> <span class="st">&quot;hie.yaml&quot;</span><span class="op">)(</span>fname<span class="op">)</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>      <span class="cf">end</span><span class="op">;</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="op">}</span></span></code></pre></div></li>
+<li><p>configure <code>nvim-lspconfig</code> use <code>clangd</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb2-1"><a href="#cb2-1"></a>lspconfig<span class="op">.</span>clangd<span class="op">.</span>setup<span class="op">{}</span></span></code></pre></div></li>
+<li><p>create a <code>compile_flags.txt</code> for <code>clangd</code> (ideally this would be upstreamed as a <code>.clangd</code> file but this mechanism <a href="https://github.com/clangd/clangd/issues/649">doesn’t appear to work</a>):</p>
+<pre><code>-xc
+-Iincludes
+-Irts
+-I.hie-bios/stage0/lib</code></pre></li>
+<li><p>Run <code>haskell-language-server-wrapper compiler/GHC.hs</code> to ensure that things work (and generate various things in <code>.hie-bios</code>)</p></li>
+<li><p>Enjoy</p></li>
+</ul>
+</article>
+
+        </section>
+      </div>
+
+      <footer id="footer">
+        <span>Generated by <a href="http://jaspervdj.be/hakyll/index.html">Hakyll</a>.</span>
+      </footer>
+    </div>
+  </body>
+</html>
+

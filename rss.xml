@@ -432,6 +432,14 @@
     <guid>http://bgamari.github.com//posts/2020-08-22-what-i-want-in-a-laptop.html</guid>
     <dc:creator>Ben Gamari</dc:creator>
 </item>
+<item>
+    <title>IDE support when working on GHC</title>
+    <link>http://bgamari.github.com//posts/2021-07-23-ide-support-working-on-ghc.html</link>
+    <description><![CDATA[Some notes on how I configure nvim for IDE support when working on GHC]]></description>
+    <pubDate>Fri, 23 Jul 2021 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2021-07-23-ide-support-working-on-ghc.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
 
     </channel>
 </rss>
