@@ -440,6 +440,14 @@
     <guid>http://bgamari.github.com//posts/2021-07-23-ide-support-working-on-ghc.html</guid>
     <dc:creator>Ben Gamari</dc:creator>
 </item>
+<item>
+    <title>taskd, foreground and Android</title>
+    <link>http://bgamari.github.com//posts/2021-09-02-taskd-and-android.html</link>
+    <description><![CDATA[Notes from configuring taskd and foreground]]></description>
+    <pubDate>Sat, 02 Oct 2021 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2021-09-02-taskd-and-android.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
 
     </channel>
 </rss>
