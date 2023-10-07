@@ -432,6 +432,14 @@
     <guid>http://bgamari.github.com//posts/2021-07-23-ide-support-working-on-ghc.html</guid>
     <dc:creator>Ben Gamari</dc:creator>
 </item>
+<item>
+    <title>Retrospective on the Thinkpad T14s</title>
+    <link>http://bgamari.github.com//posts/2023-10-03-lenovo-retrospective.html</link>
+    <description><![CDATA[My experiences with the Thinkpad T14s]]></description>
+    <pubDate>Tue, 03 Oct 2023 00:00:00 UT</pubDate>
+    <guid>http://bgamari.github.com//posts/2023-10-03-lenovo-retrospective.html</guid>
+    <dc:creator>Ben Gamari</dc:creator>
+</item>
 
     </channel>
 </rss>
